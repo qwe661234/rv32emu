@@ -5,6 +5,7 @@ OUT ?= build
 BIN := $(OUT)/rv32emu
 
 CFLAGS = -std=gnu99 -O2 -Wall -Wextra
+CFLAGS += -fomit-frame-pointer -fno-stack-check -fno-stack-protector
 CFLAGS += -include src/common.h
 
 # Set the default stack pointer

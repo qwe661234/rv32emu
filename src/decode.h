@@ -240,6 +240,8 @@ typedef struct {
 
     /* instruction length */
     uint8_t insn_len;
+    /* To determine whether the IR is last IR in a basic block */
+    bool tailcall;
 } rv_insn_t;
 
 /* translated basic block */

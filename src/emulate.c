@@ -256,6 +256,7 @@ static bool insn_is_misaligned(uint32_t pc)
 
 static bool emulate(riscv_t *rv, const rv_insn_t *ir)
 {
+    rv->X[rv_reg_zero] = 0;
     switch (ir->opcode) {
     /* RV32I Base Instruction Set */
     case rv_insn_lui: /* LUI: Load Upper Immediate */
@@ -292,6 +293,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
             return false;
         }
         /* can branch */
+        rv->csr_cycle++;
         return true;
     }
     case rv_insn_jalr: { /* JALR: Jump and Link Register */
@@ -315,6 +317,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
             return false;
         }
         /* can branch */
+        rv->csr_cycle++;
         return true;
     }
     case rv_insn_beq: { /* BEQ: Branch if Equal */
@@ -328,6 +331,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
                 return false;
             }
             /* can branch */
+            rv->csr_cycle++;
             return true;
         }
         break;
@@ -343,6 +347,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
                 return false;
             }
             /* can branch */
+            rv->csr_cycle++;
             return true;
         }
         break;
@@ -358,6 +363,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
                 return false;
             }
             /* can branch */
+            rv->csr_cycle++;
             return true;
         }
         break;
@@ -373,6 +379,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
                 return false;
             }
             /* can branch */
+            rv->csr_cycle++;
             return true;
         }
         break;
@@ -388,6 +395,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
                 return false;
             }
             /* can branch */
+            rv->csr_cycle++;
             return true;
         }
         break;
@@ -403,6 +411,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
                 return false;
             }
             /* can branch */
+            rv->csr_cycle++;
             return true;
         }
         break;
@@ -553,10 +562,12 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
     case rv_insn_ecall: /* ECALL: Environment Call */
         rv->compressed = false;
         rv->io.on_ecall(rv);
+        rv->csr_cycle++;
         return true;
     case rv_insn_ebreak: /* EBREAK: Environment Break */
         rv->compressed = false;
         rv->io.on_ebreak(rv);
+        rv->csr_cycle++;
         return true;
     case rv_insn_wfi:  /* WFI: Wait for Interrupt */
     case rv_insn_uret: /* URET: return from traps in U-mode */
@@ -567,6 +578,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
     case rv_insn_mret: /* MRET: return from traps in U-mode */
         rv->PC = rv->csr_mepc;
         /* this is a branch */
+        rv->csr_cycle++;
         return true;
 
 #if RV32_HAS(Zifencei)
@@ -986,6 +998,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
             return false;
         }
         /* can branch */
+        rv->csr_cycle++;
         return true;
     case rv_insn_cli: /* C.LI */
         /* C.LI loads the sign-extended 6-bit immediate, imm, into register rd.
@@ -1064,6 +1077,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
             return false;
         }
         /* can branch */
+        rv->csr_cycle++;
         return true;
     case rv_insn_cbeqz: /* C.BEQZ */
         /* BEQZ performs conditional control transfers. The offset is
@@ -1074,10 +1088,12 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
          */
         rv->PC += (!rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len;
         /* can branch */
+        rv->csr_cycle++;
         return true;
     case rv_insn_cbnez: /* C.BEQZ */
         rv->PC += (rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len;
         /* can branch */
+        rv->csr_cycle++;
         return true;
     case rv_insn_cslli: /* C.SLLI */
         /* C.SLLI is a CI-format instruction that performs a logical left shift
@@ -1100,6 +1116,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
     case rv_insn_cjr: /* C.JR */
         rv->PC = rv->X[ir->rs1];
         /* can branch */
+        rv->csr_cycle++;
         return true;
     case rv_insn_cmv: /* C.MV */
         rv->X[ir->rd] = rv->X[ir->rs2];
@@ -1108,6 +1125,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
         rv->compressed = true;
         rv->io.on_ebreak(rv);
         /* can branch */
+        rv->csr_cycle++;
         return true;
     case rv_insn_cjalr: { /* C.JALR */
         /* Unconditional jump and store PC+2 to ra */
@@ -1120,6 +1138,7 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
             return false;
         }
         /* can branch */
+        rv->csr_cycle++;
         return true;
     }
     case rv_insn_cadd: /* C.ADD */
@@ -1147,7 +1166,10 @@ static bool emulate(riscv_t *rv, const rv_insn_t *ir)
 
     /* step over instruction */
     rv->PC += ir->insn_len;
-    return true;
+    rv->csr_cycle++;
+    if (ir->tailcall)
+        return true;
+    MUST_TAIL return emulate(rv, ir + 1);
 }
 
 static bool insn_is_branch(uint8_t opcode)
@@ -1240,27 +1262,6 @@ static block_t *block_find(const block_map_t *map, const uint32_t addr)
     return NULL;
 }
 
-/* execute a basic block */
-static bool block_emulate(riscv_t *rv, const block_t *block)
-{
-    const uint32_t n_insn = block->n_insn;
-    const rv_insn_t *ir = block->ir;
-
-    /* execute the block */
-    for (uint32_t i = 0; i < n_insn; i++) {
-        /* enforce zero register */
-        rv->X[rv_reg_zero] = 0;
-
-        /* execute the instruction */
-        if (!emulate(rv, ir + i))
-            return false;
-
-        /* increment the cycles csr */
-        rv->csr_cycle++;
-    }
-    return true;
-}
-
 static void block_translate(riscv_t *rv, block_t *block)
 {
     block->pc_start = block->pc_end = rv->PC;
@@ -1288,6 +1289,7 @@ static void block_translate(riscv_t *rv, block_t *block)
         if (insn_is_branch(ir->opcode))
             break;
     }
+    block->ir[block->n_insn - 1].tailcall = true;
 }
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
@@ -1350,7 +1352,7 @@ void rv_step(riscv_t *rv, int32_t cycles)
         assert(block);
 
         /* execute the block */
-        if (!block_emulate(rv, block))
+        if (!emulate(rv, block->ir))
             break;
 
         prev = block;

@@ -39,3 +39,10 @@
 #define IIF_0(t, ...) __VA_ARGS__
 /* run the 1st parameter */
 #define IIF_1(t, ...) t
+
+#if defined(__has_attribute) && __has_attribute(musttail)
+/* Clang requires a special tail recursion attribute to use tail recursion. */
+#define MUST_TAIL __attribute__((musttail))
+#else
+#define MUST_TAIL
+#endif
