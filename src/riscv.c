@@ -11,27 +11,35 @@
 
 #include "riscv_private.h"
 
-/* initialize the block map */
-static void block_map_init(block_map_t *map, const uint8_t bits)
+queue_t *create_queue()
 {
-    map->block_capacity = 1 << bits;
-    map->size = 0;
-    map->map = calloc(map->block_capacity, sizeof(struct block *));
+    queue_t *queue = (queue_t *) malloc(sizeof(queue_t));
+    queue->count = 0;
+    queue->front = queue->rear = NULL;
+    return queue;
 }
 
-/* clear all block in the block map */
-void block_map_clear(block_map_t *map)
+hashtable_t *create_hashtable()
 {
-    assert(map);
-    for (uint32_t i = 0; i < map->block_capacity; i++) {
-        block_t *block = map->map[i];
-        if (!block)
-            continue;
-        free(block->ir);
-        free(block);
-        map->map[i] = NULL;
-    }
-    map->size = 0;
+    hashtable_t *hash = (hashtable_t *) malloc(sizeof(hashtable_t));
+    hash->array = (node_t **) malloc(CAPACITY * sizeof(node_t *));
+    return hash;
+}
+
+cache_t *create_cache()
+{
+    cache_t *cache = (cache_t *) malloc(sizeof(cache_t));
+    cache->lruQueue = create_queue();
+    cache->hashtable = create_hashtable();
+    return cache;
+}
+
+void free_cache(cache_t *cache)
+{
+    free(cache->hashtable->array);
+    free(cache->hashtable);
+    free(cache->lruQueue);
+    free(cache);
 }
 
 riscv_user_t rv_userdata(riscv_t *rv)
@@ -88,9 +96,8 @@ riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
     /* copy over the userdata */
     rv->userdata = userdata;
 
-    /* initialize the block map */
-    block_map_init(&rv->block_map, 10);
-
+    /* initialize the block cache */
+    rv->block_cache = create_cache();
     /* reset */
     rv_reset(rv, 0U);
 
@@ -110,7 +117,7 @@ bool rv_has_halted(riscv_t *rv)
 void rv_delete(riscv_t *rv)
 {
     assert(rv);
-    block_map_clear(&rv->block_map);
+    free_cache(rv->block_cache);
     free(rv);
 }
 

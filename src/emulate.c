@@ -1244,18 +1244,6 @@ static bool insn_is_branch(uint8_t opcode)
     return false;
 }
 
-/* hash function is used when mapping address into the block map */
-static uint32_t hash(size_t k)
-{
-    k ^= k << 21;
-    k ^= k >> 17;
-#if (SIZE_MAX > 0xFFFFFFFF)
-    k ^= k >> 35;
-    k ^= k >> 51;
-#endif
-    return k;
-}
-
 /* allocate a basic block */
 static block_t *block_alloc(const uint8_t bits)
 {
@@ -1267,40 +1255,75 @@ static block_t *block_alloc(const uint8_t bits)
     return block;
 }
 
-/* insert a block into block map */
-static void block_insert(block_map_t *map, const block_t *block)
+node_t *new_node(uint32_t key, block_t *val)
 {
-    assert(map && block);
-    const uint32_t mask = map->block_capacity - 1;
-    uint32_t index = hash(block->pc_start);
-
-    /* insert into the block map */
-    for (;; index++) {
-        if (!map->map[index & mask]) {
-            map->map[index & mask] = (block_t *) block;
-            break;
-        }
-    }
-    map->size++;
+    node_t *tmp = (node_t *) malloc(sizeof(node_t));
+    tmp->key = key;
+    tmp->value = val;
+    tmp->prev = tmp->next = NULL;
+    return tmp;
 }
 
-/* try to locate an already translated block in the block map */
-static block_t *block_find(const block_map_t *map, const uint32_t addr)
+void de_queue(queue_t *queue)
 {
-    assert(map);
-    uint32_t index = hash(addr);
-    const uint32_t mask = map->block_capacity - 1;
+    if (queue->count == 0)
+        return;
 
-    /* find block in block map */
-    for (;; index++) {
-        block_t *block = map->map[index & mask];
-        if (!block)
-            return NULL;
-
-        if (block->pc_start == addr)
-            return block;
+    node_t *temp = queue->rear;
+    if (queue->front == queue->rear)
+        queue->front = queue->rear = NULL;
+    else {
+        queue->rear = queue->rear->prev;
+        queue->rear->next = NULL;
     }
-    return NULL;
+    free(temp->value->ir);
+    free(temp->value);
+    free(temp);
+    queue->count--;
+}
+
+void en_queue(queue_t *queue, hashtable_t *hashtable, uint32_t key, block_t *val)
+{
+    node_t *node = new_node(key, val);
+    if (queue->count == 0) {
+        queue->rear = queue->front = node;
+    } else {
+        queue->front->prev = node;
+        node->next = queue->front;
+        queue->front = node;
+    }
+    hashtable->array[key % CAPACITY] = node;
+    queue->count++;
+}
+
+block_t *cache_get(cache_t *cache, uint32_t key)
+{
+    queue_t *queue = cache->lruQueue;
+    hashtable_t *hashtable = cache->hashtable;
+    node_t *target = hashtable->array[key % CAPACITY];
+    if (!target || target->key != key)
+        return NULL;
+    if (target != queue->front) {
+        target->prev->next = target->next;
+        if (target->next)
+            target->next->prev = target->prev;
+        else {
+            queue->rear = target->prev;
+            queue->rear->next = NULL;
+        }
+        queue->front->prev = target;
+        target->next = queue->front;
+        queue->front = target;
+    }
+    return target->value;
+}
+
+void cache_put(cache_t *cache, uint32_t key, block_t *val)
+{
+    if (cache->lruQueue->count == CAPACITY) {
+        de_queue(cache->lruQueue);
+    }
+    en_queue(cache->lruQueue, cache->hashtable, key, val);
 }
 
 static void block_translate(riscv_t *rv, block_t *block)
@@ -1335,24 +1358,17 @@ static void block_translate(riscv_t *rv, block_t *block)
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
-    block_map_t *map = &rv->block_map;
-    /* lookup the next block in the block map */
-    block_t *next = block_find(map, rv->PC);
-
+    /* find block in block cache */
+    block_t *next = cache_get(rv->block_cache, rv->PC);
     if (!next) {
-        if (map->size * 1.25 > map->block_capacity) {
-            block_map_clear(map);
-            prev = NULL;
-        }
-
         /* allocate a new block */
         next = block_alloc(10);
 
         /* translate the basic block */
         block_translate(rv, next);
 
-        /* insert the block into block map */
-        block_insert(&rv->block_map, next);
+        /* insert the block into block cache */
+        cache_put(rv->block_cache, next->pc_start, next);
 
         /* update the block prediction
          * When we translate a new block, the block predictor may benefit,
@@ -1388,7 +1404,6 @@ void rv_step(riscv_t *rv, int32_t cycles)
              */
             block = block_find_or_translate(rv, prev);
         }
-
         /* we should have a block by now */
         assert(block);
 

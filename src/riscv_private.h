@@ -13,6 +13,7 @@
 #include "decode.h"
 #include "riscv.h"
 
+#define CAPACITY 4096
 /* CSRs */
 enum {
     /* floating point */
@@ -61,14 +62,25 @@ typedef struct block {
     rv_insn_t *ir;             /**< IR as memory blocks */
 } block_t;
 
-typedef struct {
-    uint32_t block_capacity; /**< max number of entries in the block map */
-    uint32_t size;           /**< number of entries currently in the map */
-    block_t **map;           /**< block map */
-} block_map_t;
+typedef struct node {
+    struct node *prev, *next;
+    uint32_t key;
+    block_t *value;
+} node_t;
 
-/* clear all block in the block map */
-void block_map_clear(block_map_t *map);
+typedef struct queue {
+    uint32_t count;
+    node_t *front, *rear;
+} queue_t;
+
+typedef struct hashtable {
+    node_t **array;
+} hashtable_t;
+
+typedef struct cache {
+    hashtable_t *hashtable;
+    queue_t *lruQueue;
+} cache_t;
 
 struct riscv_internal {
     bool halt;
@@ -113,8 +125,8 @@ struct riscv_internal {
     uint32_t csr_mip;
     uint32_t csr_mbadaddr;
 
-    bool compressed;       /**< current instruction is compressed or not */
-    block_map_t block_map; /**< basic block map */
+    bool compressed; /**< current instruction is compressed or not */
+    cache_t *block_cache;
 };
 
 /* sign extend a 16 bit value */
