@@ -53,6 +53,11 @@
 #define RV32_FEATURE_GDBSTUB 1
 #endif
 
+/* Basic block profiler */
+#ifndef RV32_FEATURE_BASIC_BLOCK_PROFILING
+#define RV32_FEATURE_BASIC_BLOCK_PROFILING 1
+#endif
+
 /* Feature test macro */
 #define RV32_HAS(x) RV32_FEATURE_##x
 

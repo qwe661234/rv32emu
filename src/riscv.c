@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "riscv_private.h"
+#include "statistics.h"
 
 queue_t *create_queue()
 {
@@ -90,6 +91,7 @@ riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
 
     /* initialize the block cache */
     rv->block_cache = create_cache();
+    rv->stat_map = map_init(uint32_t, info_node_t*, map_cmp_uint);
     /* reset */
     rv_reset(rv, 0U);
 
@@ -110,6 +112,7 @@ void rv_delete(riscv_t *rv)
 {
     assert(rv);
     free_cache(rv->block_cache);
+    map_delete(rv->stat_map);
     free(rv);
 }
 

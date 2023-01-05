@@ -32,6 +32,7 @@ extern struct target_ops gdbstub_ops;
 #include "riscv.h"
 #include "riscv_private.h"
 #include "utils.h"
+#include "statistics.h"
 
 /* RISC-V exception code list */
 #define RV_EXCEPTION_LIST                                       \
@@ -1362,6 +1363,7 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
     /* find block in block cache */
     block_t *next = cache_get(rv->block_cache, rv->PC);
     if (!next) {
+        cache_miss++;
         /* allocate a new block */
         next = block_alloc(10);
 
@@ -1379,7 +1381,7 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
         if (prev)
             prev->predict = next;
     }
-
+    info_stat(rv->stat_map, next);
     return next;
 }
 

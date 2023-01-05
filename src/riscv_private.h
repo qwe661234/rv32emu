@@ -122,6 +122,7 @@ struct riscv_internal {
 
     bool compressed; /**< current instruction is compressed or not */
     cache_t *block_cache;
+    map_t stat_map;
 };
 
 /* sign extend a 16 bit value */

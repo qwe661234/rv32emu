@@ -9,6 +9,7 @@
 
 #include "elf.h"
 #include "state.h"
+#include "statistics.h"
 
 /* enable program trace mode */
 static bool opt_trace = false;
@@ -79,6 +80,7 @@ static void run(riscv_t *rv)
         /* step instructions */
         rv_step(rv, cycles_per_step);
     }
+    info_print(rv->stat_map);
 }
 
 static void print_usage(const char *filename)
