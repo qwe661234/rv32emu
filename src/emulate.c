@@ -1255,10 +1255,9 @@ static block_t *block_alloc(const uint8_t bits)
     return block;
 }
 
-node_t *new_node(uint32_t key, block_t *val)
+node_t *new_node(block_t *val)
 {
     node_t *tmp = (node_t *) malloc(sizeof(node_t));
-    tmp->key = key;
     tmp->value = val;
     tmp->prev = tmp->next = NULL;
     return tmp;
@@ -1282,9 +1281,9 @@ void de_queue(queue_t *queue)
     queue->count--;
 }
 
-void en_queue(queue_t *queue, hashtable_t *hashtable, uint32_t key, block_t *val)
+void en_queue(queue_t *queue, map_t hashtable, uint32_t key, block_t *val)
 {
-    node_t *node = new_node(key, val);
+    node_t *node = new_node(val);
     if (queue->count == 0) {
         queue->rear = queue->front = node;
     } else {
@@ -1292,17 +1291,19 @@ void en_queue(queue_t *queue, hashtable_t *hashtable, uint32_t key, block_t *val
         node->next = queue->front;
         queue->front = node;
     }
-    hashtable->array[key % CAPACITY] = node;
+    map_insert(hashtable, &(key), &(node));
     queue->count++;
 }
 
 block_t *cache_get(cache_t *cache, uint32_t key)
 {
     queue_t *queue = cache->lruQueue;
-    hashtable_t *hashtable = cache->hashtable;
-    node_t *target = hashtable->array[key % CAPACITY];
-    if (!target || target->key != key)
+    map_t hashtable = cache->hashtable;
+    map_iter_t it;
+    map_find(hashtable, &it, &key);
+    if (map_at_end(hashtable, &it))
         return NULL;
+    node_t *target = map_iter_value(&it, node_t *);
     if (target != queue->front) {
         target->prev->next = target->next;
         if (target->next)

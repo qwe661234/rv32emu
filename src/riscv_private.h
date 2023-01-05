@@ -64,7 +64,6 @@ typedef struct block {
 
 typedef struct node {
     struct node *prev, *next;
-    uint32_t key;
     block_t *value;
 } node_t;
 
@@ -73,12 +72,8 @@ typedef struct queue {
     node_t *front, *rear;
 } queue_t;
 
-typedef struct hashtable {
-    node_t **array;
-} hashtable_t;
-
 typedef struct cache {
-    hashtable_t *hashtable;
+    map_t hashtable;
     queue_t *lruQueue;
 } cache_t;
 

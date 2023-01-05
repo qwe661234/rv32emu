@@ -19,25 +19,17 @@ queue_t *create_queue()
     return queue;
 }
 
-hashtable_t *create_hashtable()
-{
-    hashtable_t *hash = (hashtable_t *) malloc(sizeof(hashtable_t));
-    hash->array = (node_t **) malloc(CAPACITY * sizeof(node_t *));
-    return hash;
-}
-
 cache_t *create_cache()
 {
     cache_t *cache = (cache_t *) malloc(sizeof(cache_t));
     cache->lruQueue = create_queue();
-    cache->hashtable = create_hashtable();
+    cache->hashtable = map_init(uint32_t, node_t *, map_cmp_uint);
     return cache;
 }
 
 void free_cache(cache_t *cache)
 {
-    free(cache->hashtable->array);
-    free(cache->hashtable);
+    map_delete(cache->hashtable);
     free(cache->lruQueue);
     free(cache);
 }
