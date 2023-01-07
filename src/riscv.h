@@ -159,6 +159,11 @@ void rv_halt(riscv_t *rv);
 /* return the halt state */
 bool rv_has_halted(riscv_t *rv);
 
+#if RV32_HAS(BASIC_BLOCK_PROFILING)
+void histogram_stat(riscv_t *rv);
+void histogram_print();
+#endif
+
 #ifdef __cplusplus
 };
 #endif

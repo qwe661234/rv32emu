@@ -1341,6 +1341,9 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 
     if (!next) {
         if (map->size * 1.25 > map->block_capacity) {
+#if RV32_HAS(BASIC_BLOCK_PROFILING)
+            histogram_stat(rv);
+#endif
             block_map_clear(map);
             prev = NULL;
         }
@@ -1362,7 +1365,9 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
         if (prev)
             prev->predict = next;
     }
-
+#if RV32_HAS(BASIC_BLOCK_PROFILING)
+    next->call++;
+#endif
     return next;
 }
 

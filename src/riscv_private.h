@@ -59,6 +59,9 @@ typedef struct block {
     uint32_t insn_capacity;    /**< maximum of instructions encompased */
     struct block *predict;     /**< block prediction */
     rv_insn_t *ir;             /**< IR as memory blocks */
+#if RV32_HAS(BASIC_BLOCK_PROFILING)
+    size_t call;
+#endif
 } block_t;
 
 typedef struct {

@@ -9,6 +9,9 @@
 
 #include "elf.h"
 #include "state.h"
+#if RV32_HAS(BASIC_BLOCK_PROFILING)
+#include "riscv.h"
+#endif
 
 /* enable program trace mode */
 static bool opt_trace = false;
@@ -234,6 +237,11 @@ int main(int argc, char **args)
     else {
         run(rv);
     }
+
+#if RV32_HAS(BASIC_BLOCK_PROFILING)
+    histogram_stat(rv);
+    histogram_print();
+#endif
 
     /* print statistics */
     if (opt_stats)

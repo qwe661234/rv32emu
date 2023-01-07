@@ -40,6 +40,10 @@ ifeq ($(call has, EXT_F), 1)
 LDFLAGS += -lm
 endif
 
+# Basic block profiler
+ENABLE_BASIC_BLOCK_PROFILING ?= 1
+$(call set-feature, BASIC_BLOCK_PROFILING)
+
 # Experimental SDL oriented system calls
 ENABLE_SDL ?= 1
 ifeq ($(call has, SDL), 1)

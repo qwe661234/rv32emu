@@ -144,3 +144,47 @@ void rv_stats(riscv_t *rv)
 {
     printf("CSR cycle count: %" PRIu64 "\n", rv->csr_cycle);
 }
+
+#if RV32_HAS(BASIC_BLOCK_PROFILING)
+#define BLOCK_CAPACITY 1024
+
+typedef struct {
+    size_t block_count;
+    size_t block_call;
+} histogram_t;
+histogram_t histogram[BLOCK_CAPACITY + 1] = {{0}};
+
+void histogram_stat(riscv_t *rv)
+{
+    block_map_t *block_map = &rv->block_map;
+    block_t *bk;
+    for (uint32_t i = 0; i < block_map->block_capacity; i++) {
+        if ((bk = block_map->map[i])) {
+            histogram[bk->n_insn].block_count++;
+            histogram[bk->n_insn].block_call += bk->call;
+        }
+    }
+}
+
+void histogram_print()
+{
+    histogram_t histogram_total = {0};
+
+    for (size_t i = 0; i < BLOCK_CAPACITY; i++) {
+        if (histogram[i].block_count) {
+            histogram_total.block_count += histogram[i].block_count;
+            histogram_total.block_call += histogram[i].block_call;
+        }
+    }
+    printf("Instruction |        Count        |       Invoked Times \n");
+    for (size_t i = 0; i < BLOCK_CAPACITY; i++) {
+            printf(
+                "%11zu | %9zu [%6.2lf %%]| %15zu [%6.2lf %%]\n",
+                i, histogram[i].block_count,
+                (double) histogram[i].block_count /
+                    histogram_total.block_count * 100,
+                histogram[i].block_call, (double) histogram[i].block_call /
+                    histogram_total.block_call * 100);
+    }
+}
+#endif
