@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 #include "riscv_private.h"
 
@@ -28,6 +30,7 @@ void block_map_clear(block_map_t *map)
         if (!block)
             continue;
         free(block->ir);
+        munmap(block->code_page, block->code_page_size);
         free(block);
         map->map[i] = NULL;
     }
