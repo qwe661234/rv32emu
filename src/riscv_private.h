@@ -117,6 +117,8 @@ struct riscv_internal {
 
     bool compressed;       /**< current instruction is compressed or not */
     block_map_t block_map; /**< basic block map */
+
+    char *code_page[1024];
 };
 
 /* sign extend a 16 bit value */

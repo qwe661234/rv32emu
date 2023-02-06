@@ -261,20 +261,64 @@ enum {
 #undef _
 };
 
-#define PUSH_RTURN_ADDRESS(addr) asm volatile("push %0\n\t" ::"r"(addr));
-#define JUMP(addr) asm volatile("jmp *%0" : : "r"(addr));
-#define PASS_PARAMETER_1(p1) asm volatile("mov %0, %%rdi" ::"m"(p1));
-#define PASS_PARAMETER_2(p1, p2)       \
-    asm volatile(                      \
-        "mov %0, %%rdi\n\t"            \
-        "mov %0, %%rsi\n\t" ::"m"(p1), \
-        "m"(p2));
-#define PASS_PARAMETER_3(p1, p2, p3)   \
-    asm volatile(                      \
-        "mov %0, %%rdi\n\t"            \
-        "mov %0, %%rsi\n\t"            \
-        "mov %0, %%rdx\n\t" ::"m"(p1), \
-        "m"(p2), "m"(p3));
+void invoke_csrrw(riscv_t *rv, rv_insn_t *ir)
+{
+    uint32_t tmp = csr_csrrw(rv, ir->imm, rv->X[ir->rs1]);
+    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    rv->PC += ir->insn_len;
+}
+
+void invoke_csrrs(riscv_t *rv, rv_insn_t *ir)
+{
+    uint32_t tmp =
+        csr_csrrs(rv, ir->imm, (ir->rs1 == rv_reg_zero) ? 0U : rv->X[ir->rs1]);
+    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    rv->PC += ir->insn_len;
+}
+
+void invoke_csrrc(riscv_t *rv, rv_insn_t *ir)
+{
+    uint32_t tmp =
+        csr_csrrc(rv, ir->imm, (ir->rs1 == rv_reg_zero) ? ~0U : rv->X[ir->rs1]);
+    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    rv->PC += ir->insn_len;
+}
+
+void invoke_csrrwi(riscv_t *rv, rv_insn_t *ir)
+{
+    uint32_t tmp = csr_csrrw(rv, ir->imm, ir->rs1);
+    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    rv->PC += ir->insn_len;
+}
+
+void invoke_csrrsi(riscv_t *rv, rv_insn_t *ir)
+{
+    uint32_t tmp = csr_csrrs(rv, ir->imm, ir->rs1);
+    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    rv->PC += ir->insn_len;
+}
+
+void invoke_csrrci(riscv_t *rv, rv_insn_t *ir)
+{
+    uint32_t tmp = csr_csrrc(rv, ir->imm, ir->rs1);
+    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    rv->PC += ir->insn_len;
+}
+
+void invoke_store_misaligned_hanlder(riscv_t *rv, uint32_t addr)
+{
+    rv_except_store_misaligned(rv, addr);
+}
+
+void invoke_load_misaligned_hanlder(riscv_t *rv, uint32_t addr)
+{
+    rv_except_load_misaligned(rv, addr);
+}
+
+void invoke_insn_misaligned_hanlder(riscv_t *rv, uint32_t addr)
+{
+    rv_except_insn_misaligned(rv, addr);
+}
 
 #ifndef PAD
 #define PAD __asm__("");
@@ -283,9 +327,21 @@ enum {
 #define label(x, z) op_##x##_##z:
 
 #if defined(__aarch64__)
-    #define HALT_SIZE       32
+#define HALT_SIZE 32
 #else
-    #define HALT_SIZE       64
+#define HALT_SIZE 64
+#define PUSH_RTURN_ADDRESS(addr) asm volatile("push %0\n\t" ::"r"(addr));
+#define JUMP(addr) asm volatile("jmp *%0" : : "r"(addr));
+#define PASS_PARAMETER_rr(p1, p2)      \
+    asm volatile(                      \
+        "mov %0, %%rdi\n\t"            \
+        "mov %1, %%rsi\n\t" ::"r"(p1), \
+        "r"(p2));
+#define PASS_PARAMETER_rm(p1, p2)      \
+    asm volatile(                      \
+        "mov %0, %%rdi\n\t"            \
+        "mov %1, %%rsi\n\t" ::"r"(p1), \
+        "m"(p2));
 #endif
 
 #define DEF_OP_LBLS(op, PRE, code)                           \
@@ -295,27 +351,19 @@ enum {
     rv->csr_cycle++;                                         \
     CAL_PC(handle_END[ir->opcode], handle_ENTRY[ir->opcode]) \
     code;                                                    \
-    if (!__rv_insn_##op##_canbranch) {                       \
+    if (!__rv_insn_##op##_canbranch)                         \
         rv->PC += ir->insn_len;                              \
-    }                                                        \
     label(op, END);
 
 #define DEF_HALT_LBL()                             \
     label(halt, START) PAD label(halt, ENTRY) /**/ \
         GUARD(halt) return true;                   \
-    label(halt, END) ;
-#define DEF_OPC_LBLL(op, PRE, code, code2)                   \
-    label(op, START) PAD label(op, ENTRY)                    \
-    PRE GUARD(op) rv->X[rv_reg_zero] = 0;                    \
-    ir = block->ir + ir_count++;                             \
-    rv->csr_cycle++;                                         \
-    CAL_PC(handle_END[ir->opcode], handle_ENTRY[ir->opcode]) \
-    code;                                                    \
-    if (!__rv_insn_##op##_canbranch) {                       \
-        rv->PC += ir->insn_len;                              \
-    }                                                        \
-    code2;                                                   \
-    label(op, END)
+    label(halt, END);
+
+#define DEF_HALT_LBL2()                              \
+    label(halt2, START) PAD label(halt2, ENTRY) /**/ \
+        GUARD(halt) return false;                    \
+    label(halt2, END);
 
 #define RVOP(op, code) DEF_OP_LBLS(op, /**/, code)
 
@@ -394,8 +442,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         /* check instruction misaligned */
         if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
             rv->compressed = false;
-            rv_except_insn_misaligned(rv, pc);
-            return false;
+            PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_insn_misaligned_hanlder)
         }
     })
 
@@ -417,8 +465,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         /* check instruction misaligned */
         if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
             rv->compressed = false;
-            rv_except_insn_misaligned(rv, pc);
-            return false;
+            PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_insn_misaligned_hanlder)
         }
     })
 
@@ -431,8 +479,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
             /* check instruction misaligned */
             if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
                 rv->compressed = false;
-                rv_except_insn_misaligned(rv, pc);
-                return false;
+                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_insn_misaligned_hanlder)
             }
         } else
             rv->PC += ir->insn_len;
@@ -446,8 +494,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
             /* check instruction misaligned */
             if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
                 rv->compressed = false;
-                rv_except_insn_misaligned(rv, pc);
-                return false;
+                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_insn_misaligned_hanlder)
             }
         } else
             rv->PC += ir->insn_len;
@@ -461,8 +509,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
             /* check instruction misaligned */
             if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
                 rv->compressed = false;
-                rv_except_insn_misaligned(rv, pc);
-                return false;
+                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_insn_misaligned_hanlder)
             }
         } else
             rv->PC += ir->insn_len;
@@ -476,8 +524,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
             /* check instruction misaligned */
             if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
                 rv->compressed = false;
-                rv_except_insn_misaligned(rv, pc);
-                return false;
+                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_insn_misaligned_hanlder)
             }
         } else
             rv->PC += ir->insn_len;
@@ -491,8 +539,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
             /* check instruction misaligned */
             if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
                 rv->compressed = false;
-                rv_except_insn_misaligned(rv, pc);
-                return false;
+                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_insn_misaligned_hanlder)
             }
         } else
             rv->PC += ir->insn_len;
@@ -506,8 +554,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
             /* check instruction misaligned */
             if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
                 rv->compressed = false;
-                rv_except_insn_misaligned(rv, pc);
-                return false;
+                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_insn_misaligned_hanlder)
             }
         } else
             rv->PC += ir->insn_len;
@@ -524,8 +572,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
         if (unlikely(addr & 1)) {
             rv->compressed = false;
-            rv_except_load_misaligned(rv, addr);
-            return false;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_load_misaligned_hanlder)
         }
         rv->X[ir->rd] = sign_extend_h(rv->io.mem_read_s(rv, addr));
     })
@@ -535,8 +583,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
         if (unlikely(addr & 3)) {
             rv->compressed = false;
-            rv_except_load_misaligned(rv, addr);
-            return false;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_load_misaligned_hanlder)
         }
         rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
     })
@@ -549,8 +597,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
         if (unlikely(addr & 1)) {
             rv->compressed = false;
-            rv_except_load_misaligned(rv, addr);
-            return false;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_load_misaligned_hanlder)
         }
         rv->X[ir->rd] = rv->io.mem_read_s(rv, addr);
     })
@@ -563,8 +611,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
         if (unlikely(addr & 1)) {
             rv->compressed = false;
-            rv_except_store_misaligned(rv, addr);
-            return false;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_store_misaligned_hanlder)
         }
         rv->io.mem_write_s(rv, addr, rv->X[ir->rs2]);
     })
@@ -574,8 +622,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
         if (unlikely(addr & 3)) {
             rv->compressed = false;
-            rv_except_store_misaligned(rv, addr);
-            return false;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_store_misaligned_hanlder)
         }
         rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
     })
@@ -692,56 +740,40 @@ static bool emulate(riscv_t *rv, const block_t *block)
     RVOP(hret, return false;)
 
     /* MRET: return from traps in U-mode */
-    RVOP(mret, {
-        rv->PC = rv->csr_mepc;
-        /* this is a branch */
-        return true;
-    })
+    RVOP(mret, { rv->PC = rv->csr_mepc; })
 
     /* RV32 Zifencei Standard Extension */
 #if RV32_HAS(Zifencei)
-    RVOP(fencei, {/* FIXME: fill real implementations */ rv->PC += ir->insn_len;});
+    RVOP(fencei, { /* FIXME: fill real implementations */
+                   rv->PC += ir->insn_len;
+    });
 #endif
 
     /* RV32 Zicsr Standard Extension */
 #if RV32_HAS(Zicsr)
     /* CSRRW: Atomic Read/Write CSR */
-    RVOP(csrrw, {
-        uint32_t tmp = csr_csrrw(rv, ir->imm, rv->X[ir->rs1]);
-        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    })
+    RVOP(csrrw,
+         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrw)})
 
     /* CSRRS: Atomic Read and Set Bits in CSR */
-    RVOP(csrrs, {
-        uint32_t tmp = csr_csrrs(
-            rv, ir->imm, (ir->rs1 == rv_reg_zero) ? 0U : rv->X[ir->rs1]);
-        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    })
+    RVOP(csrrs,
+         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrs)})
 
     /* CSRRC: Atomic Read and Clear Bits in CSR */
-    RVOP(csrrc, {
-        uint32_t tmp = csr_csrrc(
-            rv, ir->imm, (ir->rs1 == rv_reg_zero) ? ~0U : rv->X[ir->rs1]);
-        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    })
+    RVOP(csrrc,
+         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrc)})
 
     /* CSRRWI */
-    RVOP(csrrwi, {
-        uint32_t tmp = csr_csrrw(rv, ir->imm, ir->rs1);
-        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    })
+    RVOP(csrrwi,
+         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrwi)})
 
     /* CSRRSI */
-    RVOP(csrrsi, {
-        uint32_t tmp = csr_csrrs(rv, ir->imm, ir->rs1);
-        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    })
+    RVOP(csrrsi,
+         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrsi)})
 
     /* CSRRCI */
-    RVOP(csrrci, {
-        uint32_t tmp = csr_csrrc(rv, ir->imm, ir->rs1);
-        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    })
+    RVOP(csrrci,
+         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrci)})
 #endif /* RV32_HAS(Zicsr) */
 
     /* RV32M Standard Extension */
@@ -1125,8 +1157,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + (uint32_t) ir->imm;
         if (addr & 3) {
             rv->compressed = true;
-            rv_except_load_misaligned(rv, addr);
-            return false;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_load_misaligned_hanlder)
         }
         rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
     })
@@ -1140,8 +1172,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + (uint32_t) ir->imm;
         if (addr & 3) {
             rv->compressed = true;
-            rv_except_store_misaligned(rv, addr);
-            return false;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_store_misaligned_hanlder)
         }
         rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
     })
@@ -1164,8 +1196,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         rv->PC += ir->imm;
         if (rv->PC & 0x1) {
             rv->compressed = true;
-            rv_except_insn_misaligned(rv, rv->PC);
-            return false;
+            PASS_PARAMETER_rm(rv, rv->PC) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_insn_misaligned_hanlder)
         }
     })
 
@@ -1231,6 +1263,20 @@ static bool emulate(riscv_t *rv, const block_t *block)
     /* C.AND */
     RVOP(cand, rv->X[ir->rd] = rv->X[ir->rs1] & rv->X[ir->rs2];)
 
+    /* C.BEQZ performs conditional control transfers. The offset is
+     * sign-extended and added to the pc to form the branch target
+     * address. It can therefore target a ±256 B range. C.BEQZ takes the
+     * branch if the value in register rs1' is zero.
+     * It expands to beq rs1', x0, offset[8:1].
+     */
+    RVOP(cbeqz, {
+        if (rv->PC)
+            rv->PC += (!rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len;
+    })
+
+    RVOP(cbnez,
+         { rv->PC += (rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
+
     /* C.J performs an unconditional control transfer. The offset is
      * sign-extended and added to the pc to form the jump target address.
      * C.J can therefore target a ±2 KiB range.
@@ -1240,22 +1286,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
         rv->PC += ir->imm;
         if (rv->PC & 0x1) {
             rv->compressed = true;
-            rv_except_insn_misaligned(rv, rv->PC);
-            return false;
+            PASS_PARAMETER_rm(rv, rv->PC) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                JUMP(invoke_insn_misaligned_hanlder)
         }
     })
-
-    /* C.BEQZ performs conditional control transfers. The offset is
-     * sign-extended and added to the pc to form the branch target
-     * address. It can therefore target a ±256 B range. C.BEQZ takes the
-     * branch if the value in register rs1' is zero.
-     * It expands to beq rs1', x0, offset[8:1].
-     */
-    RVOP(cbeqz,
-         { rv->PC += (!rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
-
-    RVOP(cbnez,
-         { rv->PC += (rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
 
     /* C.SLLI is a CI-format instruction that performs a logical left
      * shift of the value in register rd then writes the result to rd.
@@ -1263,17 +1297,6 @@ static bool emulate(riscv_t *rv, const block_t *block)
      * C.SLLI expands into slli rd, rd, shamt[5:0].
      */
     RVOP(cslli, rv->X[ir->rd] <<= (uint8_t) ir->imm;)
-
-    /* C.LWSP */
-    RVOP(clwsp, {
-        const uint32_t addr = rv->X[rv_reg_sp] + ir->imm;
-        if (addr & 3) {
-            rv->compressed = true;
-            rv_except_load_misaligned(rv, addr);
-            return false;
-        }
-        rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
-    })
 
     /* C.JR */
     RVOP(cjr, { rv->PC = rv->X[ir->rs1]; })
@@ -1286,7 +1309,27 @@ static bool emulate(riscv_t *rv, const block_t *block)
         rv->compressed = true;
         rv->io.on_ebreak(rv);
     })
+    /* C.LWSP */
+    RVOP(clwsp, {
+        const uint32_t addr = rv->X[rv_reg_sp] + ir->imm;
+        if (addr & 3) {
+            rv->compressed = true;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_load_misaligned_hanlder)
+        }
+        rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
+    })
 
+    /* C.SWSP */
+    RVOP(cswsp, {
+        const uint32_t addr = rv->X[2] + ir->imm;
+        if (addr & 3) {
+            rv->compressed = true;
+            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_store_misaligned_hanlder)
+        }
+        rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
+    })
     /* C.JALR */
     RVOP(cjalr, {
         /* Unconditional jump and store PC+2 to ra */
@@ -1295,8 +1338,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         rv->PC = jump_to;
         if (rv->PC & 0x1) {
             rv->compressed = true;
-            rv_except_insn_misaligned(rv, rv->PC);
-            return false;
+            PASS_PARAMETER_rm(rv, rv->PC) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
+                    JUMP(invoke_insn_misaligned_hanlder)
         }
     })
 
@@ -1309,19 +1352,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
      */
     RVOP(cadd, rv->X[ir->rd] = rv->X[ir->rs1] + rv->X[ir->rs2];)
 
-    /* C.SWSP */
-    RVOP(cswsp, {
-        const uint32_t addr = rv->X[2] + ir->imm;
-        if (addr & 3) {
-            rv->compressed = true;
-            rv_except_store_misaligned(rv, addr);
-            return false;
-        }
-        rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
-    })
 #endif
 
     DEF_HALT_LBL()
+    DEF_HALT_LBL2()
 }
 #pragma GCC pop_options
 
@@ -1421,33 +1455,35 @@ static void block_translate(riscv_t *rv, block_t *block)
         if (insn_is_branch(ir->opcode))
             break;
     }
-    /* instruction code size maximum is 300 */
-    uint32_t page_count = (300 * block->n_insn + getpagesize() - 1) / getpagesize() + 1; 
-    block->code_page = (char *) malloc_exec(page_count);
-    block->code_page_size = getpagesize() * page_count;
-    emulate(rv, block);
 }
 
+int count = 0;
+block_t *barray[1024];
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
     block_map_t *map = &rv->block_map;
     /* lookup the next block in the block map */
     block_t *next = block_find(map, rv->PC);
+    // block_t *next = NULL;
     if (!next) {
         if (map->size * 1.25 > map->block_capacity) {
+            count = 0;
+            memset(barray, 0, 1024 * sizeof(block_t *));
             block_map_clear(map);
             prev = NULL;
         }
 
         /* allocate a new block */
         next = block_alloc(10);
-        
+
         /* translate the basic block */
         block_translate(rv, next);
 
         /* insert the block into block map */
         block_insert(&rv->block_map, next);
 
+        /* initialize code page */
+        next->code_page = NULL;
         /* update the block prediction
          * When we translate a new block, the block predictor may benefit,
          * but when it is updated after we find a particular block, it may
@@ -1455,7 +1491,17 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
          */
         if (prev)
             prev->predict = next;
-    } 
+    }
+
+    if (!next->code_page) {
+        if (barray[count])
+            barray[count]->code_page = NULL;
+        memset(rv->code_page[count], 0, 4096);
+        barray[count] = next;
+        next->code_page = rv->code_page[count];
+        count = (count + 1) % 1024;
+        emulate(rv, next);
+    }
 
     return next;
 }
@@ -1476,6 +1522,15 @@ void rv_step(riscv_t *rv, int32_t cycles)
         /* try to predict the next block */
         if (prev && prev->predict && prev->predict->pc_start == rv->PC) {
             block = prev->predict;
+            if (!block->code_page) {
+                if (barray[count])
+                    barray[count]->code_page = NULL;
+                memset(rv->code_page[count], 0, 4096);
+                barray[count] = block;
+                block->code_page = rv->code_page[count];
+                count = (count + 1) % 1024;
+                emulate(rv, block);
+            }
         } else {
             /* lookup the next block in block map or translate a new block,
              * and move onto the next block.

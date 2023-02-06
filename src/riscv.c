@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 #include "riscv_private.h"
-
+#include "utils.h"
 /* initialize the block map */
 static void block_map_init(block_map_t *map, const uint8_t bits)
 {
@@ -30,7 +30,7 @@ void block_map_clear(block_map_t *map)
         if (!block)
             continue;
         free(block->ir);
-        munmap(block->code_page, block->code_page_size);
+        block->code_page = NULL;
         free(block);
         map->map[i] = NULL;
     }
@@ -97,6 +97,10 @@ riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
     /* reset */
     rv_reset(rv, 0U);
 
+    for(int i = 0; i < 1024; i++) {
+        rv->code_page[i] = malloc_exec(30);
+    }
+    
     return rv;
 }
 

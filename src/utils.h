@@ -15,10 +15,5 @@ void rv_clock_gettime(struct timespec *tp);
 #include <sys/mman.h>
 #include <unistd.h>
 
-static void *malloc_exec(uint32_t page_count)
-{
-    void *block = mmap(0, getpagesize() * page_count, PROT_WRITE | PROT_EXEC,
-                       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    return block;
-}
+void *malloc_exec(uint32_t page_count);
 #endif

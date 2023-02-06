@@ -79,3 +79,15 @@ void rv_clock_gettime(struct timespec *tp)
     tp->tv_sec = tv_sec;
     tp->tv_nsec = tv_msec;
 }
+
+#if defined(__linux__) || defined(__APPLE__)
+#include <sys/mman.h>
+#include <unistd.h>
+
+void *malloc_exec(uint32_t page_count)
+{
+    void *block = mmap(0, getpagesize() * page_count, PROT_WRITE | PROT_EXEC,
+                       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    return block;
+}
+#endif
