@@ -34,196 +34,6 @@ extern struct target_ops gdbstub_ops;
 #include "riscv_private.h"
 #include "utils.h"
 
-/* RISC-V exception code list */
-#define RV_EXCEPTION_LIST                                       \
-    _(insn_misaligned, 0)  /* Instruction address misaligned */ \
-    _(illegal_insn, 2)     /* Illegal instruction */            \
-    _(breakpoint, 3)       /* Breakpoint */                     \
-    _(load_misaligned, 4)  /* Load address misaligned */        \
-    _(store_misaligned, 6) /* Store/AMO address misaligned */   \
-    _(ecall_M, 11)         /* Environment call from M-mode */
-
-enum {
-#define _(type, code) rv_exception_code##type = code,
-    RV_EXCEPTION_LIST
-#undef _
-};
-
-static void rv_exception_default_handler(riscv_t *rv)
-{
-    rv->csr_mepc += rv->compressed ? INSN_16 : INSN_32;
-    rv->PC = rv->csr_mepc; /* mret */
-}
-
-#define EXCEPTION_HANDLER_IMPL(type, code)                                \
-    static void rv_except_##type(riscv_t *rv, uint32_t mtval)             \
-    {                                                                     \
-        /* mtvec (Machine Trap-Vector Base Address Register)              \
-         * mtvec[MXLEN-1:2]: vector base address                          \
-         * mtvec[1:0] : vector mode                                       \
-         */                                                               \
-        const uint32_t base = rv->csr_mtvec & ~0x3;                       \
-        const uint32_t mode = rv->csr_mtvec & 0x3;                        \
-        /* mepc  (Machine Exception Program Counter)                      \
-         * mtval (Machine Trap Value Register)                            \
-         * mcause (Machine Cause Register): store exception code          \
-         */                                                               \
-        rv->csr_mepc = rv->PC;                                            \
-        rv->csr_mtval = mtval;                                            \
-        rv->csr_mcause = code;                                            \
-        if (!rv->csr_mtvec) { /* in case CSR is not configured */         \
-            rv_exception_default_handler(rv);                             \
-            return;                                                       \
-        }                                                                 \
-        switch (mode) {                                                   \
-        case 0: /* DIRECT: All exceptions set PC to base */               \
-            rv->PC = base;                                                \
-            break;                                                        \
-        /* VECTORED: Asynchronous interrupts set PC to base + 4 * code */ \
-        case 1:                                                           \
-            rv->PC = base + 4 * code;                                     \
-            break;                                                        \
-        }                                                                 \
-        /* longjmp to return false */                                     \
-    }
-
-/* RISC-V exception handlers */
-#define _(type, code) EXCEPTION_HANDLER_IMPL(type, code)
-RV_EXCEPTION_LIST
-#undef _
-
-/* Get current time in microsecnds and update csr_time register */
-static inline void update_time(riscv_t *rv)
-{
-    struct timeval tv;
-    rv_gettimeofday(&tv);
-
-    uint64_t t = (uint64_t) tv.tv_sec * 1e6 + (uint32_t) tv.tv_usec;
-    rv->csr_time[0] = t & 0xFFFFFFFF;
-    rv->csr_time[1] = t >> 32;
-}
-
-#if RV32_HAS(Zicsr)
-/* get a pointer to a CSR */
-static uint32_t *csr_get_ptr(riscv_t *rv, uint32_t csr)
-{
-    switch (csr) {
-    case CSR_MSTATUS: /* Machine Status */
-        return (uint32_t *) (&rv->csr_mstatus);
-    case CSR_MTVEC: /* Machine Trap Handler */
-        return (uint32_t *) (&rv->csr_mtvec);
-    case CSR_MISA: /* Machine ISA and Extensions */
-        return (uint32_t *) (&rv->csr_misa);
-
-    /* Machine Trap Handling */
-    case CSR_MSCRATCH: /* Machine Scratch Register */
-        return (uint32_t *) (&rv->csr_mscratch);
-    case CSR_MEPC: /* Machine Exception Program Counter */
-        return (uint32_t *) (&rv->csr_mepc);
-    case CSR_MCAUSE: /* Machine Exception Cause */
-        return (uint32_t *) (&rv->csr_mcause);
-    case CSR_MTVAL: /* Machine Trap Value */
-        return (uint32_t *) (&rv->csr_mtval);
-    case CSR_MIP: /* Machine Interrupt Pending */
-        return (uint32_t *) (&rv->csr_mip);
-
-    /* Machine Counter/Timers */
-    case CSR_CYCLE: /* Cycle counter for RDCYCLE instruction */
-        return (uint32_t *) (&rv->csr_cycle) + 0;
-    case CSR_CYCLEH: /* Upper 32 bits of cycle */
-        return (uint32_t *) (&rv->csr_cycle) + 1;
-
-    /* TIME/TIMEH - very roughly about 1 ms per tick */
-    case CSR_TIME: { /* Timer for RDTIME instruction */
-        update_time(rv);
-        return &rv->csr_time[0];
-    }
-    case CSR_TIMEH: { /* Upper 32 bits of time */
-        update_time(rv);
-        return &rv->csr_time[1];
-    }
-    case CSR_INSTRET: /* Number of Instructions Retired Counter */
-        /* Number of Instructions Retired Counter, just use cycle */
-        return (uint32_t *) (&rv->csr_cycle);
-#if RV32_HAS(EXT_F)
-    case CSR_FFLAGS:
-        return (uint32_t *) (&rv->csr_fcsr);
-    case CSR_FCSR:
-        return (uint32_t *) (&rv->csr_fcsr);
-#endif
-    default:
-        return NULL;
-    }
-}
-
-static inline bool csr_is_writable(uint32_t csr)
-{
-    return csr < 0xc00;
-}
-
-/* CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the
- * CSRs and integer registers. CSRRW reads the old value of the CSR,
- * zero - extends the value to XLEN bits, then writes it to integer register rd.
- * The initial value in rs1 is written to the CSR.
- * If rd == x0, then the instruction shall not read the CSR and shall not cause
- * any of the side effects that might occur on a CSR read.
- */
-static uint32_t csr_csrrw(riscv_t *rv, uint32_t csr, uint32_t val)
-{
-    uint32_t *c = csr_get_ptr(rv, csr);
-    if (!c)
-        return 0;
-
-    uint32_t out = *c;
-#if RV32_HAS(EXT_F)
-    if (csr == CSR_FFLAGS)
-        out &= FFLAG_MASK;
-#endif
-    if (csr_is_writable(csr))
-        *c = val;
-
-    return out;
-}
-
-/* perform csrrs (atomic read and set) */
-static uint32_t csr_csrrs(riscv_t *rv, uint32_t csr, uint32_t val)
-{
-    uint32_t *c = csr_get_ptr(rv, csr);
-    if (!c)
-        return 0;
-
-    uint32_t out = *c;
-#if RV32_HAS(EXT_F)
-    if (csr == CSR_FFLAGS)
-        out &= FFLAG_MASK;
-#endif
-    if (csr_is_writable(csr))
-        *c |= val;
-
-    return out;
-}
-
-/* perform csrrc (atomic read and clear)
- * Read old value of CSR, zero-extend to XLEN bits, write to rd
- * Read value from rs1, use as bit mask to clear bits in CSR
- */
-static uint32_t csr_csrrc(riscv_t *rv, uint32_t csr, uint32_t val)
-{
-    uint32_t *c = csr_get_ptr(rv, csr);
-    if (!c)
-        return 0;
-
-    uint32_t out = *c;
-#if RV32_HAS(EXT_F)
-    if (csr == CSR_FFLAGS)
-        out &= FFLAG_MASK;
-#endif
-    if (csr_is_writable(csr))
-        *c &= ~val;
-    return out;
-}
-#endif
-
 #if RV32_HAS(GDBSTUB)
 void rv_debug(riscv_t *rv)
 {
@@ -247,78 +57,12 @@ void rv_debug(riscv_t *rv)
 }
 #endif /* RV32_HAS(GDBSTUB) */
 
-
-#if RV32_HAS(EXT_C)
-#define INSN_IS_MISALIGNED(pc) (pc) & 0x1
-#else
-#define INSN_IS_MISALIGNED(pc) (pc) & 0x3
-#endif
-
 /* can-branch information for each RISC-V instruction */
 enum {
 #define _(inst, can_branch) __rv_insn_##inst##_canbranch = can_branch,
     RISCV_INSN_LIST
 #undef _
 };
-
-void invoke_csrrw(riscv_t *rv, rv_insn_t *ir)
-{
-    uint32_t tmp = csr_csrrw(rv, ir->imm, rv->X[ir->rs1]);
-    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    rv->PC += ir->insn_len;
-}
-
-void invoke_csrrs(riscv_t *rv, rv_insn_t *ir)
-{
-    uint32_t tmp =
-        csr_csrrs(rv, ir->imm, (ir->rs1 == rv_reg_zero) ? 0U : rv->X[ir->rs1]);
-    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    rv->PC += ir->insn_len;
-}
-
-void invoke_csrrc(riscv_t *rv, rv_insn_t *ir)
-{
-    uint32_t tmp =
-        csr_csrrc(rv, ir->imm, (ir->rs1 == rv_reg_zero) ? ~0U : rv->X[ir->rs1]);
-    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    rv->PC += ir->insn_len;
-}
-
-void invoke_csrrwi(riscv_t *rv, rv_insn_t *ir)
-{
-    uint32_t tmp = csr_csrrw(rv, ir->imm, ir->rs1);
-    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    rv->PC += ir->insn_len;
-}
-
-void invoke_csrrsi(riscv_t *rv, rv_insn_t *ir)
-{
-    uint32_t tmp = csr_csrrs(rv, ir->imm, ir->rs1);
-    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    rv->PC += ir->insn_len;
-}
-
-void invoke_csrrci(riscv_t *rv, rv_insn_t *ir)
-{
-    uint32_t tmp = csr_csrrc(rv, ir->imm, ir->rs1);
-    rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
-    rv->PC += ir->insn_len;
-}
-
-void invoke_store_misaligned_hanlder(riscv_t *rv, uint32_t addr)
-{
-    rv_except_store_misaligned(rv, addr);
-}
-
-void invoke_load_misaligned_hanlder(riscv_t *rv, uint32_t addr)
-{
-    rv_except_load_misaligned(rv, addr);
-}
-
-void invoke_insn_misaligned_hanlder(riscv_t *rv, uint32_t addr)
-{
-    rv_except_insn_misaligned(rv, addr);
-}
 
 #ifndef PAD
 #define PAD __asm__("");
@@ -330,18 +74,6 @@ void invoke_insn_misaligned_hanlder(riscv_t *rv, uint32_t addr)
 #define HALT_SIZE 32
 #else
 #define HALT_SIZE 64
-#define PUSH_RTURN_ADDRESS(addr) asm volatile("push %0\n\t" ::"r"(addr));
-#define JUMP(addr) asm volatile("jmp *%0" : : "r"(addr));
-#define PASS_PARAMETER_rr(p1, p2)      \
-    asm volatile(                      \
-        "mov %0, %%rdi\n\t"            \
-        "mov %1, %%rsi\n\t" ::"r"(p1), \
-        "r"(p2));
-#define PASS_PARAMETER_rm(p1, p2)      \
-    asm volatile(                      \
-        "mov %0, %%rdi\n\t"            \
-        "mov %1, %%rsi\n\t" ::"r"(p1), \
-        "m"(p2));
 #endif
 
 #define DEF_OP_LBLS(op, PRE, code)                           \
@@ -374,8 +106,17 @@ void invoke_insn_misaligned_hanlder(riscv_t *rv, uint32_t addr)
 #define CAL_PC(LABEL1, LABEL2) PC += ((char *) LABEL1 - (char *) LABEL2);
 
 static size_t *handle_SIZE = NULL;
+extern jmp_buf jmpbuffer;
+
+#define sys_icache_invalidate(addr, size) \
+    __builtin___clear_cache((char *) (addr), (char *) (addr) + (size))
+#ifndef __clang__
 #pragma GCC push_options
 #pragma GCC optimize("Os")
+#define UNLIKELY unlikely
+#else
+#define UNLIKELY
+#endif
 /* execute a basic block */
 static bool emulate(riscv_t *rv, const block_t *block)
 {
@@ -400,16 +141,20 @@ static bool emulate(riscv_t *rv, const block_t *block)
     rv_insn_t volatile *ir;
     uint32_t volatile ir_count = 0;
     char *volatile PC = block->code_page;
-    if (*(block->code_page)) {
+
+    if (*(block->code_page))
         goto *(block->code_page);
-    }
 
     for (uint32_t i = 0; i < block->n_insn; i++) {
         ir = block->ir + i;
         memcpy(PC, handle_ENTRY[ir->opcode], handle_SIZE[ir->opcode]);
+        sys_icache_invalidate(PC, handle_SIZE[ir->opcode]);
         CAL_PC(handle_END[ir->opcode], handle_ENTRY[ir->opcode])
     }
     memcpy(PC, &&op_halt_ENTRY, HALT_SIZE);
+    sys_icache_invalidate(PC, HALT_SIZE);
+    if (setjmp(jmpbuffer))
+        return false;
     return true;
     RVOP(nop, /* no operation */)
 
@@ -440,10 +185,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (ir->rd)
             rv->X[ir->rd] = pc + ir->insn_len;
         /* check instruction misaligned */
-        if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
+        if (UNLIKELY(insn_is_misaligned(rv->PC))) {
             rv->compressed = false;
-            PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_insn_misaligned_hanlder)
+            rv->exception_handler[0](rv, pc);
+            rv->ret_false();
         }
     })
 
@@ -463,10 +208,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (ir->rd)
             rv->X[ir->rd] = pc + ir->insn_len;
         /* check instruction misaligned */
-        if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
+        if (UNLIKELY(insn_is_misaligned(rv->PC))) {
             rv->compressed = false;
-            PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_insn_misaligned_hanlder)
+            rv->exception_handler[0](rv, pc);
+            rv->ret_false();
         }
     })
 
@@ -477,10 +222,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
             rv->PC = pc + ir->imm;
 
             /* check instruction misaligned */
-            if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
+            if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
-                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_insn_misaligned_hanlder)
+                rv->exception_handler[0](rv, pc);
+                rv->ret_false();
             }
         } else
             rv->PC += ir->insn_len;
@@ -492,10 +237,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (rv->X[ir->rs1] != rv->X[ir->rs2]) {
             rv->PC += ir->imm;
             /* check instruction misaligned */
-            if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
+            if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
-                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_insn_misaligned_hanlder)
+                rv->exception_handler[0](rv, pc);
+                rv->ret_false();
             }
         } else
             rv->PC += ir->insn_len;
@@ -507,10 +252,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if ((int32_t) rv->X[ir->rs1] < (int32_t) rv->X[ir->rs2]) {
             rv->PC += ir->imm;
             /* check instruction misaligned */
-            if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
+            if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
-                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_insn_misaligned_hanlder)
+                rv->exception_handler[0](rv, pc);
+                rv->ret_false();
             }
         } else
             rv->PC += ir->insn_len;
@@ -522,10 +267,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if ((int32_t) rv->X[ir->rs1] >= (int32_t) rv->X[ir->rs2]) {
             rv->PC += ir->imm;
             /* check instruction misaligned */
-            if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
+            if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
-                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_insn_misaligned_hanlder)
+                rv->exception_handler[0](rv, pc);
+                rv->ret_false();
             }
         } else
             rv->PC += ir->insn_len;
@@ -537,10 +282,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (rv->X[ir->rs1] < rv->X[ir->rs2]) {
             rv->PC += ir->imm;
             /* check instruction misaligned */
-            if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
+            if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
-                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_insn_misaligned_hanlder)
+                rv->exception_handler[0](rv, pc);
+                rv->ret_false();
             }
         } else
             rv->PC += ir->insn_len;
@@ -552,10 +297,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (rv->X[ir->rs1] >= rv->X[ir->rs2]) {
             rv->PC += ir->imm;
             /* check instruction misaligned */
-            if (unlikely(INSN_IS_MISALIGNED(rv->PC))) {
+            if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
-                PASS_PARAMETER_rm(rv, pc) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_insn_misaligned_hanlder)
+                rv->exception_handler[0](rv, pc);
+                rv->ret_false();
             }
         } else
             rv->PC += ir->insn_len;
@@ -570,10 +315,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
     /* LH: Load Halfword */
     RVOP(lh, {
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
-        if (unlikely(addr & 1)) {
+        if (UNLIKELY(addr & 1)) {
             rv->compressed = false;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_load_misaligned_hanlder)
+            rv->exception_handler[3](rv, addr);
+            rv->ret_false();
         }
         rv->X[ir->rd] = sign_extend_h(rv->io.mem_read_s(rv, addr));
     })
@@ -581,10 +326,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
     /* LW: Load Word */
     RVOP(lw, {
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
-        if (unlikely(addr & 3)) {
+        if (UNLIKELY(addr & 3)) {
             rv->compressed = false;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_load_misaligned_hanlder)
+            rv->exception_handler[3](rv, addr);
+            rv->ret_false();
         }
         rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
     })
@@ -595,10 +340,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
     /* LHU: Load Halfword Unsigned */
     RVOP(lhu, {
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
-        if (unlikely(addr & 1)) {
+        if (UNLIKELY(addr & 1)) {
             rv->compressed = false;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_load_misaligned_hanlder)
+            rv->exception_handler[3](rv, addr);
+            rv->ret_false();
         }
         rv->X[ir->rd] = rv->io.mem_read_s(rv, addr);
     })
@@ -609,10 +354,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
     /* SH: Store Halfword */
     RVOP(sh, {
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
-        if (unlikely(addr & 1)) {
+        if (UNLIKELY(addr & 1)) {
             rv->compressed = false;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_store_misaligned_hanlder)
+            rv->exception_handler[4](rv, addr);
+            rv->ret_false();
         }
         rv->io.mem_write_s(rv, addr, rv->X[ir->rs2]);
     })
@@ -620,10 +365,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
     /* SW: Store Word */
     RVOP(sw, {
         const uint32_t addr = rv->X[ir->rs1] + ir->imm;
-        if (unlikely(addr & 3)) {
+        if (UNLIKELY(addr & 3)) {
             rv->compressed = false;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_store_misaligned_hanlder)
+            rv->exception_handler[4](rv, addr);
+            rv->ret_false();
         }
         rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
     })
@@ -752,28 +497,41 @@ static bool emulate(riscv_t *rv, const block_t *block)
     /* RV32 Zicsr Standard Extension */
 #if RV32_HAS(Zicsr)
     /* CSRRW: Atomic Read/Write CSR */
-    RVOP(csrrw,
-         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrw)})
+    RVOP(csrrw, {
+        uint32_t tmp = rv->csr_handler[0](rv, ir->imm, rv->X[ir->rs1]);
+        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    })
 
     /* CSRRS: Atomic Read and Set Bits in CSR */
-    RVOP(csrrs,
-         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrs)})
+    RVOP(csrrs, {
+        uint32_t tmp = rv->csr_handler[1](rv, ir->imm, ir->rs1);
+        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    })
 
     /* CSRRC: Atomic Read and Clear Bits in CSR */
-    RVOP(csrrc,
-         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrc)})
+    RVOP(csrrc, {
+        uint32_t tmp = rv->csr_handler[2](
+            rv, ir->imm, (ir->rs1 == rv_reg_zero) ? ~0U : rv->X[ir->rs1]);
+        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    })
 
     /* CSRRWI */
-    RVOP(csrrwi,
-         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrwi)})
+    RVOP(csrrwi, {
+        uint32_t tmp = rv->csr_handler[0](rv, ir->imm, ir->rs1);
+        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    })
 
     /* CSRRSI */
-    RVOP(csrrsi,
-         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrsi)})
+    RVOP(csrrsi, {
+        uint32_t tmp = rv->csr_handler[1](rv, ir->imm, ir->rs1);
+        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    })
 
     /* CSRRCI */
-    RVOP(csrrci,
-         {PASS_PARAMETER_rr(rv, ir) PUSH_RTURN_ADDRESS(PC) JUMP(invoke_csrrci)})
+    RVOP(csrrci, {
+        uint32_t tmp = rv->csr_handler[2](rv, ir->imm, ir->rs1);
+        rv->X[ir->rd] = ir->rd ? tmp : rv->X[ir->rd];
+    })
 #endif /* RV32_HAS(Zicsr) */
 
     /* RV32M Standard Extension */
@@ -1157,8 +915,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + (uint32_t) ir->imm;
         if (addr & 3) {
             rv->compressed = true;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_load_misaligned_hanlder)
+            rv->exception_handler[3](rv, addr);
+            rv->ret_false();
         }
         rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
     })
@@ -1172,8 +930,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[ir->rs1] + (uint32_t) ir->imm;
         if (addr & 3) {
             rv->compressed = true;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_store_misaligned_hanlder)
+            rv->exception_handler[4](rv, addr);
+            rv->ret_false();
         }
         rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
     })
@@ -1196,8 +954,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         rv->PC += ir->imm;
         if (rv->PC & 0x1) {
             rv->compressed = true;
-            PASS_PARAMETER_rm(rv, rv->PC) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_insn_misaligned_hanlder)
+            rv->exception_handler[0](rv, rv->PC);
+            rv->ret_false();
         }
     })
 
@@ -1286,8 +1044,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         rv->PC += ir->imm;
         if (rv->PC & 0x1) {
             rv->compressed = true;
-            PASS_PARAMETER_rm(rv, rv->PC) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                JUMP(invoke_insn_misaligned_hanlder)
+            rv->exception_handler[0](rv, rv->PC);
+            rv->ret_false();
         }
     })
 
@@ -1314,8 +1072,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[rv_reg_sp] + ir->imm;
         if (addr & 3) {
             rv->compressed = true;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_load_misaligned_hanlder)
+            rv->exception_handler[3](rv, addr);
+            rv->ret_false();
         }
         rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
     })
@@ -1325,8 +1083,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t addr = rv->X[2] + ir->imm;
         if (addr & 3) {
             rv->compressed = true;
-            PASS_PARAMETER_rm(rv, addr) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_store_misaligned_hanlder)
+            rv->exception_handler[4](rv, addr);
+            rv->ret_false();
         }
         rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
     })
@@ -1338,8 +1096,8 @@ static bool emulate(riscv_t *rv, const block_t *block)
         rv->PC = jump_to;
         if (rv->PC & 0x1) {
             rv->compressed = true;
-            PASS_PARAMETER_rm(rv, rv->PC) PUSH_RTURN_ADDRESS(&&op_halt2_ENTRY)
-                    JUMP(invoke_insn_misaligned_hanlder)
+            rv->exception_handler[0](rv, rv->PC);
+            rv->ret_false();
         }
     })
 
@@ -1355,9 +1113,10 @@ static bool emulate(riscv_t *rv, const block_t *block)
 #endif
 
     DEF_HALT_LBL()
-    DEF_HALT_LBL2()
 }
+#ifndef __clang__
 #pragma GCC pop_options
+#endif
 
 static bool insn_is_branch(uint8_t opcode)
 {
@@ -1444,7 +1203,7 @@ static void block_translate(riscv_t *rv, block_t *block)
         /* decode the instruction */
         if (!rv_decode(ir, insn)) {
             rv->compressed = (ir->insn_len == INSN_16);
-            rv_except_illegal_insn(rv, insn);
+            rv->exception_handler[1](rv, insn);
             break;
         }
         /* compute the end of pc */
@@ -1541,7 +1300,7 @@ void rv_step(riscv_t *rv, int32_t cycles)
         /* we should have a block by now */
         assert(block);
         /* execute the block */
-        if (unlikely(!emulate(rv, block)))
+        if (UNLIKELY(!emulate(rv, block)))
             break;
         prev = block;
     }
@@ -1550,12 +1309,12 @@ void rv_step(riscv_t *rv, int32_t cycles)
 void ebreak_handler(riscv_t *rv)
 {
     assert(rv);
-    rv_except_breakpoint(rv, rv->PC);
+    rv->exception_handler[2](rv, rv->PC);
 }
 
 void ecall_handler(riscv_t *rv)
 {
     assert(rv);
-    rv_except_ecall_M(rv, 0);
+    rv->exception_handler[5](rv, 0);
     syscall_handler(rv);
 }

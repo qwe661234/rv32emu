@@ -77,7 +77,9 @@ struct riscv_internal {
 
     /* I/O interface */
     riscv_io_t io;
-
+    void (*exception_handler[6])(riscv_t *, uint32_t);
+    uint32_t (*csr_handler[3])(riscv_t *, uint32_t, uint32_t);
+    void (*ret_false)();
     /* integer registers */
     riscv_word_t X[RV_N_REGS];
     riscv_word_t PC;
@@ -131,4 +133,15 @@ static inline uint32_t sign_extend_h(const uint32_t x)
 static inline uint32_t sign_extend_b(const uint32_t x)
 {
     return (int32_t) ((int8_t) x);
+}
+
+static inline bool insn_is_misaligned(uint32_t pc)
+{
+    return (pc &
+#if RV32_HAS(EXT_C)
+            0x1
+#else
+            0x3
+#endif
+    );
 }
