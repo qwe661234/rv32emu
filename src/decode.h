@@ -228,6 +228,18 @@ enum {
     INSN_32 = 4,
 };
 
+typedef struct predict_info {
+    /*
+       branch_or_jump:
+       0: The instruction is unrelated to branch or jump
+       1: The predict block would be branch taken
+       2: The predict block would be branch not taken
+       Other: The predict block would be jump target
+    */
+    riscv_word_t branch_or_jump;
+    riscv_word_t predict_PC;
+    bool merge;
+} predict_info_t;
 typedef struct rv_insn {
     union {
         int32_t imm;
@@ -244,6 +256,7 @@ typedef struct rv_insn {
     /* instruction length */
     uint8_t insn_len;
 
+    predict_info_t pd_info;
     /* According to tail-call optimization (TCO), if a C function ends with
      * a function call to another function or itself and simply returns that
      * function's result, the compiler can substitute a simple jump to the

@@ -79,7 +79,7 @@ struct riscv_internal {
     riscv_io_t io;
     void (*exception_handler[6])(riscv_t *, uint32_t);
     uint32_t (*csr_handler[3])(riscv_t *, uint32_t, uint32_t);
-    void (*ret_false)();
+    void (*ret_bool[2])();
     /* integer registers */
     riscv_word_t X[RV_N_REGS];
     riscv_word_t PC;

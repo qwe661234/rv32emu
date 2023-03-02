@@ -76,15 +76,15 @@ enum {
 #define HALT_SIZE 64
 #endif
 
-#define DEF_OP_LBLS(op, PRE, code)                           \
-    label(op, START) PAD label(op, ENTRY)                    \
-    PRE GUARD(op) rv->X[rv_reg_zero] = 0;                    \
-    ir = block->ir + ir_count++;                             \
-    rv->csr_cycle++;                                         \
-    CAL_PC(handle_END[ir->opcode], handle_ENTRY[ir->opcode]) \
-    code;                                                    \
-    if (!__rv_insn_##op##_canbranch)                         \
-        rv->PC += ir->insn_len;                              \
+#define DEF_OP_LBLS(op, PRE, code)                            \
+    label(op, START) PAD label(op, ENTRY) branch_or_jump = 0; \
+    PRE GUARD(op) rv->X[rv_reg_zero] = 0;                     \
+    ir = block->ir + ir_count++;                              \
+    rv->csr_cycle++;                                          \
+    CAL_PC(handle_END[ir->opcode], handle_ENTRY[ir->opcode])  \
+    code;                                                     \
+    if (!__rv_insn_##op##_canbranch)                          \
+        rv->PC += ir->insn_len;                               \
     label(op, END);
 
 #define DEF_HALT_LBL()                             \
@@ -140,6 +140,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
 
     rv_insn_t volatile *ir;
     uint32_t volatile ir_count = 0;
+    uint32_t volatile branch_or_jump = 0;
     char *volatile PC = block->code_page;
 
     if (*(block->code_page))
@@ -181,14 +182,23 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t pc = rv->PC;
         /* Jump */
         rv->PC += ir->imm;
+        branch_or_jump = rv->PC;
         /* link with return address */
-        if (ir->rd)
+        if (ir->rd) {
             rv->X[ir->rd] = pc + ir->insn_len;
+        }
         /* check instruction misaligned */
         if (UNLIKELY(insn_is_misaligned(rv->PC))) {
             rv->compressed = false;
             rv->exception_handler[0](rv, pc);
-            rv->ret_false();
+            rv->ret_bool[0]();
+        }
+        if (!ir->pd_info.merge) {
+            ir->pd_info.branch_or_jump = branch_or_jump;
+            ir->pd_info.predict_PC = rv->PC;
+        } else if (ir->pd_info.merge &&
+                   ir->pd_info.branch_or_jump != branch_or_jump) {
+            rv->ret_bool[1]();
         }
     })
 
@@ -204,6 +214,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         const uint32_t pc = rv->PC;
         /* jump */
         rv->PC = (rv->X[ir->rs1] + ir->imm) & ~1U;
+        branch_or_jump = rv->PC;
         /* link */
         if (ir->rd)
             rv->X[ir->rd] = pc + ir->insn_len;
@@ -211,7 +222,14 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (UNLIKELY(insn_is_misaligned(rv->PC))) {
             rv->compressed = false;
             rv->exception_handler[0](rv, pc);
-            rv->ret_false();
+            rv->ret_bool[0]();
+        }
+        if (!ir->pd_info.merge) {
+            ir->pd_info.branch_or_jump = branch_or_jump;
+            ir->pd_info.predict_PC = rv->PC;
+        } else if (ir->pd_info.merge &&
+                   ir->pd_info.branch_or_jump != branch_or_jump) {
+            rv->ret_bool[1]();
         }
     })
 
@@ -219,91 +237,151 @@ static bool emulate(riscv_t *rv, const block_t *block)
     RVOP(beq, {
         const uint32_t pc = rv->PC;
         if (rv->X[ir->rs1] == rv->X[ir->rs2]) {
+            branch_or_jump = 1;
             rv->PC = pc + ir->imm;
 
             /* check instruction misaligned */
             if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
                 rv->exception_handler[0](rv, pc);
-                rv->ret_false();
+                rv->ret_bool[0]();
             }
-        } else
+        } else {
+            branch_or_jump = 2;
             rv->PC += ir->insn_len;
+        }
+        if (!ir->pd_info.merge) {
+            ir->pd_info.branch_or_jump = branch_or_jump;
+            ir->pd_info.predict_PC = rv->PC;
+        } else if (ir->pd_info.merge &&
+                   ir->pd_info.branch_or_jump != branch_or_jump) {
+            rv->ret_bool[1]();
+        }
     })
 
     /* BNE: Branch if Not Equal */
     RVOP(bne, {
         const uint32_t pc = rv->PC;
         if (rv->X[ir->rs1] != rv->X[ir->rs2]) {
+            branch_or_jump = 1;
             rv->PC += ir->imm;
             /* check instruction misaligned */
             if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
                 rv->exception_handler[0](rv, pc);
-                rv->ret_false();
+                rv->ret_bool[0]();
             }
-        } else
+        } else {
+            branch_or_jump = 2;
             rv->PC += ir->insn_len;
+        }
+        if (!ir->pd_info.merge) {
+            ir->pd_info.branch_or_jump = branch_or_jump;
+            ir->pd_info.predict_PC = rv->PC;
+        } else if (ir->pd_info.merge &&
+                   ir->pd_info.branch_or_jump != branch_or_jump) {
+            rv->ret_bool[1]();
+        }
     })
 
     /* BLT: Branch if Less Than */
     RVOP(blt, {
         const uint32_t pc = rv->PC;
         if ((int32_t) rv->X[ir->rs1] < (int32_t) rv->X[ir->rs2]) {
+            branch_or_jump = 1;
             rv->PC += ir->imm;
             /* check instruction misaligned */
             if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
                 rv->exception_handler[0](rv, pc);
-                rv->ret_false();
+                rv->ret_bool[0]();
             }
-        } else
+        } else {
+            branch_or_jump = 2;
             rv->PC += ir->insn_len;
+        }
+        if (!ir->pd_info.merge) {
+            ir->pd_info.branch_or_jump = branch_or_jump;
+            ir->pd_info.predict_PC = rv->PC;
+        } else if (ir->pd_info.merge &&
+                   ir->pd_info.branch_or_jump != branch_or_jump) {
+            rv->ret_bool[1]();
+        }
     })
 
     /* BGE: Branch if Greater Than */
     RVOP(bge, {
         const uint32_t pc = rv->PC;
         if ((int32_t) rv->X[ir->rs1] >= (int32_t) rv->X[ir->rs2]) {
+            branch_or_jump = 1;
             rv->PC += ir->imm;
             /* check instruction misaligned */
             if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
                 rv->exception_handler[0](rv, pc);
-                rv->ret_false();
+                rv->ret_bool[0]();
             }
-        } else
+        } else {
+            branch_or_jump = 2;
             rv->PC += ir->insn_len;
+        }
+        if (!ir->pd_info.merge) {
+            ir->pd_info.branch_or_jump = branch_or_jump;
+            ir->pd_info.predict_PC = rv->PC;
+        } else if (ir->pd_info.merge &&
+                   ir->pd_info.branch_or_jump != branch_or_jump) {
+            rv->ret_bool[1]();
+        }
     })
 
     /* BLTU: Branch if Less Than Unsigned */
     RVOP(bltu, {
         const uint32_t pc = rv->PC;
         if (rv->X[ir->rs1] < rv->X[ir->rs2]) {
+            branch_or_jump = 1;
             rv->PC += ir->imm;
             /* check instruction misaligned */
             if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
                 rv->exception_handler[0](rv, pc);
-                rv->ret_false();
+                rv->ret_bool[0]();
             }
-        } else
+        } else {
+            branch_or_jump = 2;
             rv->PC += ir->insn_len;
+        }
+        if (!ir->pd_info.merge) {
+            ir->pd_info.branch_or_jump = branch_or_jump;
+            ir->pd_info.predict_PC = rv->PC;
+        } else if (ir->pd_info.merge &&
+                   ir->pd_info.branch_or_jump != branch_or_jump) {
+            rv->ret_bool[1]();
+        }
     })
 
     /* BGEU: Branch if Greater Than Unsigned */
     RVOP(bgeu, {
         const uint32_t pc = rv->PC;
         if (rv->X[ir->rs1] >= rv->X[ir->rs2]) {
+            branch_or_jump = 1;
             rv->PC += ir->imm;
             /* check instruction misaligned */
             if (UNLIKELY(insn_is_misaligned(rv->PC))) {
                 rv->compressed = false;
                 rv->exception_handler[0](rv, pc);
-                rv->ret_false();
+                rv->ret_bool[0]();
             }
-        } else
+        } else {
             rv->PC += ir->insn_len;
+            branch_or_jump = 2;
+        }
+        if (!ir->pd_info.merge) {
+            ir->pd_info.branch_or_jump = branch_or_jump;
+            ir->pd_info.predict_PC = rv->PC;
+        } else if (ir->pd_info.merge &&
+                   ir->pd_info.branch_or_jump != branch_or_jump) {
+            rv->ret_bool[1]();
+        }
     })
 
     /* LB: Load Byte */
@@ -318,7 +396,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (UNLIKELY(addr & 1)) {
             rv->compressed = false;
             rv->exception_handler[3](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->X[ir->rd] = sign_extend_h(rv->io.mem_read_s(rv, addr));
     })
@@ -329,7 +407,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (UNLIKELY(addr & 3)) {
             rv->compressed = false;
             rv->exception_handler[3](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
     })
@@ -343,7 +421,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (UNLIKELY(addr & 1)) {
             rv->compressed = false;
             rv->exception_handler[3](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->X[ir->rd] = rv->io.mem_read_s(rv, addr);
     })
@@ -357,7 +435,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (UNLIKELY(addr & 1)) {
             rv->compressed = false;
             rv->exception_handler[4](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->io.mem_write_s(rv, addr, rv->X[ir->rs2]);
     })
@@ -368,7 +446,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (UNLIKELY(addr & 3)) {
             rv->compressed = false;
             rv->exception_handler[4](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
     })
@@ -916,7 +994,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (addr & 3) {
             rv->compressed = true;
             rv->exception_handler[3](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
     })
@@ -931,7 +1009,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (addr & 3) {
             rv->compressed = true;
             rv->exception_handler[4](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
     })
@@ -955,7 +1033,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (rv->PC & 0x1) {
             rv->compressed = true;
             rv->exception_handler[0](rv, rv->PC);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
     })
 
@@ -1045,7 +1123,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (rv->PC & 0x1) {
             rv->compressed = true;
             rv->exception_handler[0](rv, rv->PC);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
     })
 
@@ -1073,7 +1151,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (addr & 3) {
             rv->compressed = true;
             rv->exception_handler[3](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->X[ir->rd] = rv->io.mem_read_w(rv, addr);
     })
@@ -1084,7 +1162,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (addr & 3) {
             rv->compressed = true;
             rv->exception_handler[4](rv, addr);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
         rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
     })
@@ -1097,7 +1175,7 @@ static bool emulate(riscv_t *rv, const block_t *block)
         if (rv->PC & 0x1) {
             rv->compressed = true;
             rv->exception_handler[0](rv, rv->PC);
-            rv->ret_false();
+            rv->ret_bool[0]();
         }
     })
 
@@ -1223,7 +1301,6 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
     block_map_t *map = &rv->block_map;
     /* lookup the next block in the block map */
     block_t *next = block_find(map, rv->PC);
-    // block_t *next = NULL;
     if (!next) {
         if (map->size * 1.25 > map->block_capacity) {
             count = 0;
@@ -1265,6 +1342,26 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
     return next;
 }
 
+void merge_predict_block(block_t *prev, block_t *predict_block)
+{
+    if (prev->n_insn + predict_block->n_insn > prev->insn_capacity)
+        return;
+    rv_insn_t *last_ir = prev->ir + prev->n_insn - 1;
+    if (last_ir->pd_info.merge ||
+        last_ir->pd_info.predict_PC != predict_block->pc_start)
+        return;
+    last_ir->pd_info.predict_PC = predict_block->pc_start;
+    last_ir->pd_info.merge = 1;
+    last_ir += 1;
+    for (uint32_t i = 0; i < predict_block->n_insn; i++) {
+        memcpy(last_ir + i, predict_block->ir + i, sizeof(rv_insn_t));
+    }
+    prev->n_insn += predict_block->n_insn;
+    prev->predict = predict_block->predict;
+    prev->pc_end = predict_block->pc_end;
+    prev->code_page = NULL;
+}
+
 void rv_step(riscv_t *rv, int32_t cycles)
 {
     assert(rv);
@@ -1290,11 +1387,13 @@ void rv_step(riscv_t *rv, int32_t cycles)
                 count = (count + 1) % 1024;
                 emulate(rv, block);
             }
+            merge_predict_block(prev, block);
         } else {
             /* lookup the next block in block map or translate a new block,
              * and move onto the next block.
              */
             block = block_find_or_translate(rv, prev);
+            prev = block;
         }
 
         /* we should have a block by now */
@@ -1302,7 +1401,6 @@ void rv_step(riscv_t *rv, int32_t cycles)
         /* execute the block */
         if (UNLIKELY(!emulate(rv, block)))
             break;
-        prev = block;
     }
 }
 

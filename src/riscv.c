@@ -276,6 +276,11 @@ void jump_to_false()
     longjmp(jmpbuffer, 1);
 }
 
+void jump_to_true()
+{
+    longjmp(jmpbuffer, 0);
+}
+
 riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
 {
     assert(io);
@@ -307,7 +312,8 @@ riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
     rv->csr_handler[0] = &csr_csrrw;
     rv->csr_handler[1] = &csr_csrrs;
     rv->csr_handler[2] = &csr_csrrc;
-    rv->ret_false = &jump_to_false;
+    rv->ret_bool[0] = &jump_to_false;
+    rv->ret_bool[1] = &jump_to_true;
 
     return rv;
 }
