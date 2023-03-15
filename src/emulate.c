@@ -1378,16 +1378,6 @@ bool extend_block(block_t *prev, block_t *next_block)
     return true;
 }
 
-block_t *copy_block(block_t *next_block)
-{
-    block_t *new_block = block_alloc(10);
-    memcpy(new_block, next_block, sizeof(block_t));
-    for (uint32_t i = 0; i < next_block->n_insn; i++) {
-        memcpy(new_block->ir + i, next_block->ir + i, sizeof(rv_insn_t));
-    }
-    return new_block;
-}
-
 block_t *tmp_block = NULL;
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
@@ -1400,30 +1390,25 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
             block_map_clear(map);
             prev = NULL;
         }
-        if (prev && prev->ir[prev->n_insn - 1].branch_not_taken) {
-            if (!tmp_block) {
-                tmp_block = block_alloc(10);
-            }
-            /* reset tmp_block */
-            tmp_block->n_insn = 0;
 
-            /* translate the tmp_block */
-            block_translate(rv, tmp_block);
+        if (unlikely(!tmp_block))
+            tmp_block = block_alloc(10);
 
-            /* extend the basic block */
-            if (prev->pc_end == tmp_block->pc_start)
-                extend_block(prev, tmp_block);
+        /* reset tmp_block */
+        tmp_block->n_insn = 0;
+        block_translate(rv, tmp_block);
 
-            return tmp_block;
-        } else {
-            /* allocate a new block */
-            next = block_alloc(10);
+        // /* extend the basic block */
+        // if (prev && prev->ir[prev->n_insn - 1].branch_not_taken &&
+        // prev->pc_end == tmp_block->pc_start) {
+        //     extend_block(prev, tmp_block);
+        //     return tmp_block;
+        // }
 
-            /* translate the basic block */
-            block_translate(rv, next);
-
+        /* check the number of instruction in the basic block */
+        if (tmp_block->n_insn >= 2) {
             /* insert the block into block map */
-            block_insert(&rv->block_map, next);
+            block_insert(&rv->block_map, tmp_block);
 
             /* update the block prediction
              * When we translate a new block, the block predictor may benefit,
@@ -1431,8 +1416,13 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
              * penalize us significantly.
              */
             if (prev)
-                prev->predict = next;
-        }
+                prev->predict = tmp_block;
+
+            next = tmp_block;
+            /* allocate a new tmp_block for replacing previous one */
+            tmp_block = block_alloc(10);
+        } else
+            return tmp_block;
     }
 
     return next;
@@ -1471,6 +1461,8 @@ void rv_step(riscv_t *rv, int32_t cycles)
 
         if (block != tmp_block)
             prev = block;
+        else
+            prev = NULL;
     }
 }
 
