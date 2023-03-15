@@ -264,22 +264,22 @@ enum {
 #undef _
 };
 
-#define RVOP(inst, code)                                                  \
-    static bool do_##inst(riscv_t *rv UNUSED, const rv_insn_t *ir UNUSED) \
-    {                                                                     \
-        rv->X[rv_reg_zero] = 0;                                           \
-        code;                                                             \
-        rv->csr_cycle++;                                                  \
-        if (__rv_insn_##inst##_canbranch) {                               \
-            /* can branch */                                              \
-            return true;                                                  \
-        }                                                                 \
-    nextop:                                                               \
-        rv->PC += ir->insn_len;                                           \
-        if (ir->tailcall)                                                 \
-            return true;                                                  \
-        const rv_insn_t *next = ir + 1;                                   \
-        MUST_TAIL return next->impl(rv, next);                            \
+#define RVOP(inst, code)                                            \
+    static bool do_##inst(riscv_t *rv UNUSED, rv_insn_t *ir UNUSED) \
+    {                                                               \
+        rv->X[rv_reg_zero] = 0;                                     \
+        rv->csr_cycle++;                                            \
+        code;                                                       \
+        if (__rv_insn_##inst##_canbranch) {                         \
+            /* can branch */                                        \
+            return true;                                            \
+        }                                                           \
+    nextop:                                                         \
+        rv->PC += ir->insn_len;                                     \
+        if (ir->tailcall)                                           \
+            return true;                                            \
+        const rv_insn_t *next = ir + 1;                             \
+        MUST_TAIL return next->impl(rv, next);                      \
     }
 
 /* RV32I Base Instruction Set */
@@ -346,8 +346,10 @@ RVOP(jalr, {
 /* BEQ: Branch if Equal */
 RVOP(beq, {
     const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] != rv->X[ir->rs2])
+    if (rv->X[ir->rs1] != rv->X[ir->rs2]) {
+        ir->branch_not_taken = true;
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -360,8 +362,10 @@ RVOP(beq, {
 /* BNE: Branch if Not Equal */
 RVOP(bne, {
     const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] == rv->X[ir->rs2])
+    if (rv->X[ir->rs1] == rv->X[ir->rs2]) {
+        ir->branch_not_taken = true;
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -374,8 +378,10 @@ RVOP(bne, {
 /* BLT: Branch if Less Than */
 RVOP(blt, {
     const uint32_t pc = rv->PC;
-    if ((int32_t) rv->X[ir->rs1] >= (int32_t) rv->X[ir->rs2])
+    if ((int32_t) rv->X[ir->rs1] >= (int32_t) rv->X[ir->rs2]) {
+        ir->branch_not_taken = true;
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -388,8 +394,10 @@ RVOP(blt, {
 /* BGE: Branch if Greater Than */
 RVOP(bge, {
     const uint32_t pc = rv->PC;
-    if ((int32_t) rv->X[ir->rs1] < (int32_t) rv->X[ir->rs2])
+    if ((int32_t) rv->X[ir->rs1] < (int32_t) rv->X[ir->rs2]) {
+        ir->branch_not_taken = true;
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -402,8 +410,10 @@ RVOP(bge, {
 /* BLTU: Branch if Less Than Unsigned */
 RVOP(bltu, {
     const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] >= rv->X[ir->rs2])
+    if (rv->X[ir->rs1] >= rv->X[ir->rs2]) {
+        ir->branch_not_taken = true;
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -416,8 +426,10 @@ RVOP(bltu, {
 /* BGEU: Branch if Greater Than Unsigned */
 RVOP(bgeu, {
     const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] < rv->X[ir->rs2])
+    if (rv->X[ir->rs1] < rv->X[ir->rs2]) {
+        ir->branch_not_taken = true;
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -1164,11 +1176,22 @@ RVOP(cj, {
  * the value in register rs1' is zero. It expands to beq rs1', x0,
  * offset[8:1].
  */
-RVOP(cbeqz,
-     { rv->PC += (!rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
+RVOP(cbeqz, {
+    if (rv->X[ir->rs1]) {
+        ir->branch_not_taken = true;
+        goto nextop;
+    }
+    rv->PC += (uint32_t) ir->imm;
+})
 
 /* C.BEQZ */
-RVOP(cbnez, { rv->PC += (rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
+RVOP(cbnez, {
+    if (!rv->X[ir->rs1]) {
+        ir->branch_not_taken = true;
+        goto nextop;
+    }
+    rv->PC += (uint32_t) ir->imm;
+})
 
 /* C.SLLI is a CI-format instruction that performs a logical left shift
  * of the value in register rd then writes the result to rd. The shift
@@ -1340,6 +1363,32 @@ static void block_translate(riscv_t *rv, block_t *block)
     block->ir[block->n_insn - 1].tailcall = true;
 }
 
+bool extend_block(block_t *prev, block_t *next_block)
+{
+    if (prev->n_insn + next_block->n_insn > prev->insn_capacity)
+        return false;
+
+    rv_insn_t *last_ir = prev->ir + prev->n_insn;
+    for (uint32_t i = 0; i < next_block->n_insn; i++) {
+        memcpy(last_ir + i, next_block->ir + i, sizeof(rv_insn_t));
+    }
+    prev->ir[prev->n_insn - 1].tailcall = false;
+    prev->n_insn += next_block->n_insn;
+    prev->pc_end = next_block->pc_end;
+    return true;
+}
+
+block_t *copy_block(block_t *next_block)
+{
+    block_t *new_block = block_alloc(10);
+    memcpy(new_block, next_block, sizeof(block_t));
+    for (uint32_t i = 0; i < next_block->n_insn; i++) {
+        memcpy(new_block->ir + i, next_block->ir + i, sizeof(rv_insn_t));
+    }
+    return new_block;
+}
+
+block_t *tmp_block = NULL;
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
     block_map_t *map = &rv->block_map;
@@ -1351,23 +1400,39 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
             block_map_clear(map);
             prev = NULL;
         }
+        if (prev && prev->ir[prev->n_insn - 1].branch_not_taken) {
+            if (!tmp_block) {
+                tmp_block = block_alloc(10);
+            }
+            /* reset tmp_block */
+            tmp_block->n_insn = 0;
 
-        /* allocate a new block */
-        next = block_alloc(10);
+            /* translate the tmp_block */
+            block_translate(rv, tmp_block);
 
-        /* translate the basic block */
-        block_translate(rv, next);
+            /* extend the basic block */
+            if (prev->pc_end == tmp_block->pc_start)
+                extend_block(prev, tmp_block);
 
-        /* insert the block into block map */
-        block_insert(&rv->block_map, next);
+            return tmp_block;
+        } else {
+            /* allocate a new block */
+            next = block_alloc(10);
 
-        /* update the block prediction
-         * When we translate a new block, the block predictor may benefit,
-         * but when it is updated after we find a particular block, it may
-         * penalize us significantly.
-         */
-        if (prev)
-            prev->predict = next;
+            /* translate the basic block */
+            block_translate(rv, next);
+
+            /* insert the block into block map */
+            block_insert(&rv->block_map, next);
+
+            /* update the block prediction
+             * When we translate a new block, the block predictor may benefit,
+             * but when it is updated after we find a particular block, it may
+             * penalize us significantly.
+             */
+            if (prev)
+                prev->predict = next;
+        }
     }
 
     return next;
@@ -1384,7 +1449,7 @@ void rv_step(riscv_t *rv, int32_t cycles)
 
     /* loop until we hit out cycle target */
     while (rv->csr_cycle < cycles_target && !rv->halt) {
-        block_t *block;
+        block_t *block = NULL;
 
         /* try to predict the next block */
         if (prev && prev->predict && prev->predict->pc_start == rv->PC) {
@@ -1404,7 +1469,8 @@ void rv_step(riscv_t *rv, int32_t cycles)
         if (unlikely(!ir->impl(rv, ir)))
             break;
 
-        prev = block;
+        if (block != tmp_block)
+            prev = block;
     }
 }
 
