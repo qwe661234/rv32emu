@@ -1251,6 +1251,26 @@ static bool insn_is_branch(uint8_t opcode)
     return false;
 }
 
+static bool insn_is_unconditional_jump(uint8_t opcode)
+{
+    switch (opcode) {
+    case rv_insn_ecall:
+    case rv_insn_ebreak:
+    case rv_insn_jal:
+    case rv_insn_jalr:
+    case rv_insn_mret:
+#if RV32_HAS(EXT_C)
+    case rv_insn_cj:
+    case rv_insn_cjalr:
+    case rv_insn_cjal:
+    case rv_insn_cjr:
+    case rv_insn_cebreak:
+#endif
+        return true;
+    }
+    return false;
+}
+
 /* hash function is used when mapping address into the block map */
 static uint32_t hash(size_t k)
 {
@@ -1334,7 +1354,7 @@ static void block_translate(riscv_t *rv, block_t *block)
         block->n_insn++;
 
         /* stop on branch */
-        if (insn_is_branch(ir->opcode))
+        if (insn_is_unconditional_jump(ir->opcode))
             break;
     }
     block->ir[block->n_insn - 1].tailcall = true;
