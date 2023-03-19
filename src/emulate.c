@@ -264,22 +264,19 @@ enum {
 #undef _
 };
 
-#define RVOP(inst, code)                                                  \
-    static bool do_##inst(riscv_t *rv UNUSED, const rv_insn_t *ir UNUSED) \
-    {                                                                     \
-        rv->X[rv_reg_zero] = 0;                                           \
-        code;                                                             \
-        rv->csr_cycle++;                                                  \
-        if (__rv_insn_##inst##_canbranch) {                               \
-            /* can branch */                                              \
-            return true;                                                  \
-        }                                                                 \
-    nextop:                                                               \
-        rv->PC += ir->insn_len;                                           \
-        if (ir->tailcall)                                                 \
-            return true;                                                  \
-        const rv_insn_t *next = ir + 1;                                   \
-        MUST_TAIL return next->impl(rv, next);                            \
+#define RVOP(inst, code)                                            \
+    static bool do_##inst(riscv_t *rv UNUSED, rv_insn_t *ir UNUSED) \
+    {                                                               \
+        rv->X[rv_reg_zero] = 0;                                     \
+        rv->csr_cycle++;                                            \
+        code;                                                       \
+    nextop:                                                         \
+        rv->PC += ir->insn_len;                                     \
+    predict_op:                                                     \
+        if (ir->tailcall)                                           \
+            return true;                                            \
+        const rv_insn_t *next = ir + 1;                             \
+        MUST_TAIL return next->impl(rv, next);                      \
     }
 
 /* RV32I Base Instruction Set */
@@ -319,6 +316,7 @@ RVOP(jal, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    return true;
 })
 
 /*The indirect jump instruction JALR uses the I-type encoding. The
@@ -341,13 +339,20 @@ RVOP(jalr, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    return true;
 })
 
 /* BEQ: Branch if Equal */
 RVOP(beq, {
     const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] != rv->X[ir->rs2])
+    if (rv->X[ir->rs1] != rv->X[ir->rs2]) {
+        ir->branch_not_taken++;
+        if (ir->predict != 2) {
+            rv->PC += ir->insn_len;
+            return true;
+        }
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -355,13 +360,23 @@ RVOP(beq, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    ir->branch_taken++;
+    if (ir->predict == 1)
+        goto predict_op;
+    return true;
 })
 
 /* BNE: Branch if Not Equal */
 RVOP(bne, {
     const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] == rv->X[ir->rs2])
+    if (rv->X[ir->rs1] == rv->X[ir->rs2]) {
+        ir->branch_not_taken++;
+        if (ir->predict != 2) {
+            rv->PC += ir->insn_len;
+            return true;
+        }
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -369,13 +384,23 @@ RVOP(bne, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    ir->branch_taken++;
+    if (ir->predict == 1)
+        goto predict_op;
+    return true;
 })
 
 /* BLT: Branch if Less Than */
 RVOP(blt, {
     const uint32_t pc = rv->PC;
-    if ((int32_t) rv->X[ir->rs1] >= (int32_t) rv->X[ir->rs2])
+    if ((int32_t) rv->X[ir->rs1] >= (int32_t) rv->X[ir->rs2]) {
+        ir->branch_not_taken++;
+        if (ir->predict != 2) {
+            rv->PC += ir->insn_len;
+            return true;
+        }
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -383,13 +408,23 @@ RVOP(blt, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    ir->branch_taken++;
+    if (ir->predict == 1)
+        goto predict_op;
+    return true;
 })
 
 /* BGE: Branch if Greater Than */
 RVOP(bge, {
     const uint32_t pc = rv->PC;
-    if ((int32_t) rv->X[ir->rs1] < (int32_t) rv->X[ir->rs2])
+    if ((int32_t) rv->X[ir->rs1] < (int32_t) rv->X[ir->rs2]) {
+        ir->branch_not_taken++;
+        if (ir->predict != 2) {
+            rv->PC += ir->insn_len;
+            return true;
+        }
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -397,13 +432,23 @@ RVOP(bge, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    ir->branch_taken++;
+    if (ir->predict == 1)
+        goto predict_op;
+    return true;
 })
 
 /* BLTU: Branch if Less Than Unsigned */
 RVOP(bltu, {
     const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] >= rv->X[ir->rs2])
+    if (rv->X[ir->rs1] >= rv->X[ir->rs2]) {
+        ir->branch_not_taken++;
+        if (ir->predict != 2) {
+            rv->PC += ir->insn_len;
+            return true;
+        }
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -411,13 +456,23 @@ RVOP(bltu, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    ir->branch_taken++;
+    if (ir->predict == 1)
+        goto predict_op;
+    return true;
 })
 
 /* BGEU: Branch if Greater Than Unsigned */
 RVOP(bgeu, {
     const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] < rv->X[ir->rs2])
+    if (rv->X[ir->rs1] < rv->X[ir->rs2]) {
+        ir->branch_not_taken++;
+        if (ir->predict != 2) {
+            rv->PC += ir->insn_len;
+            return true;
+        }
         goto nextop;
+    }
     rv->PC += ir->imm;
     /* check instruction misaligned */
     if (unlikely(insn_is_misaligned(rv->PC))) {
@@ -425,6 +480,10 @@ RVOP(bgeu, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    ir->branch_taken++;
+    if (ir->predict == 1)
+        goto predict_op;
+    return true;
 })
 
 /* LB: Load Byte */
@@ -583,12 +642,14 @@ RVOP(and, { rv->X[ir->rd] = rv->X[ir->rs1] & rv->X[ir->rs2]; })
 RVOP(ecall, {
     rv->compressed = false;
     rv->io.on_ecall(rv);
+    return true;
 })
 
 /* EBREAK: Environment Break */
 RVOP(ebreak, {
     rv->compressed = false;
     rv->io.on_ebreak(rv);
+    return true;
 })
 
 /* WFI: Wait for Interrupt */
@@ -616,11 +677,15 @@ RVOP(hret, {
 })
 
 /* MRET: return from traps in U-mode */
-RVOP(mret, { rv->PC = rv->csr_mepc; })
+RVOP(mret, {
+    rv->PC = rv->csr_mepc;
+    return true;
+})
 
 #if RV32_HAS(Zifencei) /* RV32 Zifencei Standard Extension */
 RVOP(fencei, {
     rv->PC += ir->insn_len;
+    return true;
     /* FIXME: fill real implementations */
 })
 #endif
@@ -1085,6 +1150,7 @@ RVOP(cjal, {
         rv_except_insn_misaligned(rv, rv->PC);
         return false;
     }
+    return true;
 })
 
 /* C.LI loads the sign-extended 6-bit immediate, imm, into register rd.
@@ -1156,6 +1222,7 @@ RVOP(cj, {
         rv_except_insn_misaligned(rv, rv->PC);
         return false;
     }
+    return true;
 })
 
 /* C.BEQZ performs conditional control transfers. The offset is
@@ -1164,11 +1231,36 @@ RVOP(cj, {
  * the value in register rs1' is zero. It expands to beq rs1', x0,
  * offset[8:1].
  */
-RVOP(cbeqz,
-     { rv->PC += (!rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
+RVOP(cbeqz, {
+    if (rv->X[ir->rs1]) {
+        ir->branch_not_taken++;
+        rv->PC += ir->insn_len;
+        if (ir->predict != 2)
+            return true;
+        goto predict_op;
+    }
+    ir->branch_taken++;
+    rv->PC += (uint32_t) ir->imm;
+    if (ir->predict != 1)
+        return true;
+    goto predict_op;
+})
 
 /* C.BEQZ */
-RVOP(cbnez, { rv->PC += (rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
+RVOP(cbnez, {
+    if (!rv->X[ir->rs1]) {
+        ir->branch_not_taken++;
+        rv->PC += ir->insn_len;
+        if (ir->predict != 2)
+            return true;
+        goto predict_op;
+    }
+    ir->branch_taken++;
+    rv->PC += (uint32_t) ir->imm;
+    if (ir->predict != 1)
+        return true;
+    goto predict_op;
+})
 
 /* C.SLLI is a CI-format instruction that performs a logical left shift
  * of the value in register rd then writes the result to rd. The shift
@@ -1189,7 +1281,10 @@ RVOP(clwsp, {
 })
 
 /* C.JR */
-RVOP(cjr, { rv->PC = rv->X[ir->rs1]; })
+RVOP(cjr, {
+    rv->PC = rv->X[ir->rs1];
+    return true;
+})
 
 /* C.MV */
 RVOP(cmv, { rv->X[ir->rd] = rv->X[ir->rs2]; })
@@ -1211,6 +1306,7 @@ RVOP(cjalr, {
         rv_except_insn_misaligned(rv, rv->PC);
         return false;
     }
+    return true;
 })
 
 /* C.ADD adds the values in registers rd and rs2 and writes the
@@ -1333,11 +1429,50 @@ static void block_translate(riscv_t *rv, block_t *block)
         block->pc_end += ir->insn_len;
         block->n_insn++;
 
-        /* stop on branch */
         if (insn_is_branch(ir->opcode))
             break;
+
+        /* stop on branch */
     }
     block->ir[block->n_insn - 1].tailcall = true;
+}
+
+static bool append_block(block_t *prev, const block_t *next_block)
+{
+    if (prev->n_insn + next_block->n_insn > prev->insn_capacity)
+        return false;
+
+    rv_insn_t *last_ir = prev->ir + prev->n_insn;
+    for (uint32_t i = 0; i < next_block->n_insn; i++) {
+        memcpy(last_ir + i, next_block->ir + i, sizeof(rv_insn_t));
+    }
+    prev->ir[prev->n_insn - 1].tailcall = false;
+    prev->n_insn += next_block->n_insn;
+    prev->pc_end = next_block->pc_end;
+    return true;
+}
+
+#define BRANCH_PREDICT_THRESHOLD 10
+static void extend_block(riscv_t *rv, block_t *block)
+{
+    rv_insn_t *last_ir = block->ir + block->n_insn - 1;
+    if (last_ir->predict || last_ir->branch_taken + last_ir->branch_not_taken <=
+                                BRANCH_PREDICT_THRESHOLD)
+        return;
+    uint32_t predict_pc, predict;
+    if (last_ir->branch_taken > last_ir->branch_not_taken) {
+        predict = 1;
+        predict_pc = block->pc_end - last_ir->insn_len + last_ir->imm;
+    } else {
+        predict = 2;
+        predict_pc = block->pc_end;
+    }
+
+    block_map_t *map = &rv->block_map;
+    /* lookup the next block in the block map */
+    block_t *next = block_find(map, predict_pc);
+    if (next && append_block(block, next))
+        last_ir->predict = predict;
 }
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
@@ -1368,7 +1503,9 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
          */
         if (prev)
             prev->predict = next;
-    }
+    } else
+        extend_block(rv, next);
+
 
     return next;
 }

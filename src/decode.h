@@ -244,6 +244,18 @@ typedef struct rv_insn {
     /* instruction length */
     uint8_t insn_len;
 
+    /*
+     * record branch for branch prediction
+     */
+    uint8_t branch_taken;
+    uint8_t branch_not_taken;
+    /*
+     * 0: not_predict
+     * 1: predict_branch_taken
+     * 2: predict_branch_not_taken
+     */
+    uint8_t predict;
+
     /* According to tail-call optimization (TCO), if a C function ends with
      * a function call to another function or itself and simply returns that
      * function's result, the compiler can substitute a simple jump to the
