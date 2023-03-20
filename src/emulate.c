@@ -1366,6 +1366,8 @@ static block_t *block_alloc(const uint8_t bits)
     block->insn_capacity = 1 << bits;
     block->n_insn = 0;
     block->predict = NULL;
+    block->branch_len = 0;
+    memset(block->branch_insn, 0, sizeof(uint16_t) << 10);
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
     return block;
 }
@@ -1429,19 +1431,19 @@ static void block_translate(riscv_t *rv, block_t *block)
         block->pc_end += ir->insn_len;
         block->n_insn++;
 
-        if (insn_is_branch(ir->opcode))
+        if (insn_is_branch(ir->opcode)) {
+            block->branch_insn[block->branch_len] = block->n_insn;
+            block->branch_len++;
             break;
+        }
 
         /* stop on branch */
     }
     block->ir[block->n_insn - 1].tailcall = true;
 }
 
-static bool append_block(block_t *prev, const block_t *next_block)
+static void append_block(block_t *prev, const block_t *next_block)
 {
-    if (prev->n_insn + next_block->n_insn > prev->insn_capacity)
-        return false;
-
     rv_insn_t *last_ir = prev->ir + prev->n_insn;
     for (uint32_t i = 0; i < next_block->n_insn; i++) {
         memcpy(last_ir + i, next_block->ir + i, sizeof(rv_insn_t));
@@ -1449,30 +1451,44 @@ static bool append_block(block_t *prev, const block_t *next_block)
     prev->ir[prev->n_insn - 1].tailcall = false;
     prev->n_insn += next_block->n_insn;
     prev->pc_end = next_block->pc_end;
-    return true;
+    prev->branch_insn[prev->branch_len] = prev->n_insn;
+    prev->branch_len++;
 }
 
 #define BRANCH_PREDICT_THRESHOLD 10
 static void extend_block(riscv_t *rv, block_t *block)
 {
-    rv_insn_t *last_ir = block->ir + block->n_insn - 1;
-    if (last_ir->predict || last_ir->branch_taken + last_ir->branch_not_taken <=
-                                BRANCH_PREDICT_THRESHOLD)
+    for (uint32_t i = 0; i < block->branch_len; i++) {
+        rv_insn_t *ir = block->ir + block->branch_insn[i] - 1;
+        if (ir->branch_taken + ir->branch_not_taken <= BRANCH_PREDICT_THRESHOLD)
+            return;
+        uint32_t predict_pc, predict;
+        if (ir->branch_taken > ir->branch_not_taken) {
+            predict = 1;
+            predict_pc = block->pc_end - ir->insn_len + ir->imm;
+        } else {
+            predict = 2;
+            predict_pc = block->pc_end;
+        }
+        if (ir->predict == predict)
+            continue;
+        if (ir->predict) {
+            block->n_insn = 0;
+            block->branch_len = 0;
+            ir->predict = 0;
+            block_translate(rv, block);
+            break;
+        }
+        ir->branch_taken = ir->branch_not_taken = 0;
+        block_map_t *map = &rv->block_map;
+        /* lookup the next block in the block map */
+        block_t *next = block_find(map, predict_pc);
+        if (next && block->n_insn + next->n_insn <= block->insn_capacity) {
+            append_block(block, next);
+            ir->predict = predict;
+        }
         return;
-    uint32_t predict_pc, predict;
-    if (last_ir->branch_taken > last_ir->branch_not_taken) {
-        predict = 1;
-        predict_pc = block->pc_end - last_ir->insn_len + last_ir->imm;
-    } else {
-        predict = 2;
-        predict_pc = block->pc_end;
     }
-
-    block_map_t *map = &rv->block_map;
-    /* lookup the next block in the block map */
-    block_t *next = block_find(map, predict_pc);
-    if (next && append_block(block, next))
-        last_ir->predict = predict;
 }
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)

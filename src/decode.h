@@ -247,8 +247,8 @@ typedef struct rv_insn {
     /*
      * record branch for branch prediction
      */
-    uint8_t branch_taken;
-    uint8_t branch_not_taken;
+    uint32_t branch_taken;
+    uint32_t branch_not_taken;
     /*
      * 0: not_predict
      * 1: predict_branch_taken
