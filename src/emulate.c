@@ -1346,7 +1346,7 @@ static bool insn_is_branch(uint8_t opcode)
     }
     return false;
 }
-
+#if !RV32_HAS(ARCACHE)
 /* hash function is used when mapping address into the block map */
 static uint32_t hash(size_t k)
 {
@@ -1358,7 +1358,7 @@ static uint32_t hash(size_t k)
 #endif
     return k;
 }
-
+#endif
 /* allocate a basic block */
 static block_t *block_alloc(const uint8_t bits)
 {
@@ -1369,7 +1369,7 @@ static block_t *block_alloc(const uint8_t bits)
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
     return block;
 }
-
+#if !RV32_HAS(ARCACHE)
 /* insert a block into block map */
 static void block_insert(block_map_t *map, const block_t *block)
 {
@@ -1405,7 +1405,7 @@ static block_t *block_find(const block_map_t *map, const uint32_t addr)
     }
     return NULL;
 }
-
+#endif
 static void block_translate(riscv_t *rv, block_t *block)
 {
     block->pc_start = block->pc_end = rv->PC;
@@ -1468,24 +1468,35 @@ static void extend_block(riscv_t *rv, block_t *block)
         predict_pc = block->pc_end;
     }
 
+#if RV32_HAS(ARCACHE)
+    /* lookup the next block in the block cache */
+    block_t *next = (block_t *) cache_get(rv->cache, predict_pc);
+#else
     block_map_t *map = &rv->block_map;
     /* lookup the next block in the block map */
     block_t *next = block_find(map, predict_pc);
-    if (next && append_block(block, next))
+#endif
+    if (next && predict_pc != block->pc_start && append_block(block, next))
         last_ir->predict = predict;
 }
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
+#if RV32_HAS(ARCACHE)
+    /* lookup the next block in the block cache */
+    block_t *next = (block_t *) cache_get(rv->cache, rv->PC);
+#else
     block_map_t *map = &rv->block_map;
     /* lookup the next block in the block map */
     block_t *next = block_find(map, rv->PC);
-
+#endif
     if (!next) {
+#if !RV32_HAS(ARCACHE)
         if (map->size * 1.25 > map->block_capacity) {
             block_map_clear(map);
             prev = NULL;
         }
+#endif
 
         /* allocate a new block */
         next = block_alloc(10);
@@ -1493,8 +1504,17 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
         /* translate the basic block */
         block_translate(rv, next);
 
+#if RV32_HAS(ARCACHE)
+        /* insert the block into block cache */
+        block_t *delete_target = cache_put(rv->cache, rv->PC, &(*next));
+        if (delete_target) {
+            free(delete_target->ir);
+            free(delete_target);
+        }
+#else
         /* insert the block into block map */
         block_insert(&rv->block_map, next);
+#endif
 
         /* update the block prediction
          * When we translate a new block, the block predictor may benefit,

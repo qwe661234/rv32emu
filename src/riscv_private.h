@@ -10,6 +10,9 @@
 #include "breakpoint.h"
 #include "mini-gdbstub/include/gdbstub.h"
 #endif
+#if RV32_HAS(ARCACHE)
+#include "cache.h"
+#endif
 #include "decode.h"
 #include "riscv.h"
 
@@ -61,6 +64,7 @@ typedef struct block {
     rv_insn_t *ir;             /**< IR as memory blocks */
 } block_t;
 
+#if !RV32_HAS(ARCACHE)
 typedef struct {
     uint32_t block_capacity; /**< max number of entries in the block map */
     uint32_t size;           /**< number of entries currently in the map */
@@ -69,7 +73,7 @@ typedef struct {
 
 /* clear all block in the block map */
 void block_map_clear(block_map_t *map);
-
+#endif
 struct riscv_internal {
     bool halt;
 
@@ -117,8 +121,12 @@ struct riscv_internal {
     uint32_t csr_mip;
     uint32_t csr_mbadaddr;
 
-    bool compressed;       /**< current instruction is compressed or not */
+    bool compressed; /**< current instruction is compressed or not */
+#if RV32_HAS(ARCACHE)
+    struct cache *cache;
+#else
     block_map_t block_map; /**< basic block map */
+#endif
 };
 
 /* sign extend a 16 bit value */

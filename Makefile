@@ -55,7 +55,7 @@ $(OUT)/syscall_sdl.o: CFLAGS += $(shell sdl2-config --cflags)
 LDFLAGS += $(shell sdl2-config --libs)
 endif
 
-ENABLE_GDBSTUB ?= 1
+ENABLE_GDBSTUB ?= 0
 $(call set-feature, GDBSTUB)
 ifeq ($(call has, GDBSTUB), 1)
 GDBSTUB_OUT = $(abspath $(OUT)/mini-gdbstub)

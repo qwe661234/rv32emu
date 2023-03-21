@@ -58,6 +58,7 @@ typedef struct {
     void *value;
     uint32_t key;
     cache_list_t type;
+    uint32_t hit_time;
     struct list_head list;
     struct hlist_node ht_list;
 } arc_entry_t;
@@ -321,7 +322,7 @@ void *cache_get(cache_t *cache, uint32_t key)
         REPLACE_LIST(>=, >);
         move_to_mru(cache, entry, LFU_list);
     }
-
+    entry->hit_time++;
     CACHE_ASSERT(cache);
     /* return NULL if cache miss */
     return entry->value;
@@ -391,7 +392,7 @@ void *cache_put(cache_t *cache, uint32_t key, void *value)
         cache->list_size[LRU_ghost_list]++;
     }
     hlist_add_head(&new_entry->ht_list, &cache->map->ht_list_head[HASH(key)]);
-
+    new_entry->hit_time++;
     CACHE_ASSERT(cache);
     return delete_value;
 }
@@ -406,7 +407,10 @@ void cache_free(cache_t *cache, void (*callback)(void *))
         list_for_each_entry_safe (entry, safe, cache->lists[i], list,
                                   arc_entry_t)
 #endif
-            callback(entry->value);
+        {
+            if (entry->hit_time >= 100000)
+                callback(entry->value);
+        }
     }
     free(cache->map->ht_list_head);
     free(cache->map);

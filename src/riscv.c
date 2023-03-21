@@ -9,6 +9,7 @@
 
 #include "riscv_private.h"
 
+#if !RV32_HAS(ARCACHE)
 /* initialize the block map */
 static void block_map_init(block_map_t *map, const uint8_t bits)
 {
@@ -31,6 +32,7 @@ void block_map_clear(block_map_t *map)
     }
     map->size = 0;
 }
+#endif
 
 riscv_user_t rv_userdata(riscv_t *rv)
 {
@@ -86,8 +88,13 @@ riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
     /* copy over the userdata */
     rv->userdata = userdata;
 
+#if RV32_HAS(ARCACHE)
+    /* initialize the block cache */
+    rv->cache = cache_create(10);
+#else
     /* initialize the block map */
     block_map_init(&rv->block_map, 10);
+#endif
 
     /* reset */
     rv_reset(rv, 0U);
@@ -105,12 +112,29 @@ bool rv_has_halted(riscv_t *rv)
     return rv->halt;
 }
 
+int list[1024] = {0};
+void release_block(void *block)
+{
+    list[((block_t *) block)->n_insn]++;
+    free(((block_t *) block)->ir);
+    free(block);
+}
+
 void rv_delete(riscv_t *rv)
 {
     assert(rv);
+#if RV32_HAS(ARCACHE)
+    cache_free(rv->cache, release_block);
+#else
     block_map_clear(&rv->block_map);
     free(rv->block_map.map);
+#endif
     free(rv);
+    for (int i = 0; i < 1024; i++) {
+        if (list[i]) {
+            printf("|%u | %u|\n", i, list[i]);
+        }
+    }
 }
 
 void rv_reset(riscv_t *rv, riscv_word_t pc)
