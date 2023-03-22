@@ -267,6 +267,7 @@ enum {
 #define RVOP(inst, code)                                            \
     static bool do_##inst(riscv_t *rv UNUSED, rv_insn_t *ir UNUSED) \
     {                                                               \
+        uint16_t offset = 1;                                        \
         rv->X[rv_reg_zero] = 0;                                     \
         rv->csr_cycle++;                                            \
         code;                                                       \
@@ -275,7 +276,7 @@ enum {
     predict_op:                                                     \
         if (ir->tailcall)                                           \
             return true;                                            \
-        const rv_insn_t *next = ir + 1;                             \
+        const rv_insn_t *next = ir + offset;                        \
         MUST_TAIL return next->impl(rv, next);                      \
     }
 
@@ -346,12 +347,10 @@ RVOP(jalr, {
 RVOP(beq, {
     const uint32_t pc = rv->PC;
     if (rv->X[ir->rs1] != rv->X[ir->rs2]) {
-        ir->branch_not_taken++;
-        if (ir->predict != 2) {
-            rv->PC += ir->insn_len;
-            return true;
-        }
-        goto nextop;
+        rv->PC += ir->insn_len;
+        if (ir->branch_not_taken)
+            goto predict_op;
+        return true;
     }
     rv->PC += ir->imm;
     /* check instruction misaligned */
@@ -360,9 +359,10 @@ RVOP(beq, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
-    ir->branch_taken++;
-    if (ir->predict == 1)
+    if (ir->branch_taken) {
+        offset = ir->branch_taken;
         goto predict_op;
+    }
     return true;
 })
 
@@ -370,12 +370,10 @@ RVOP(beq, {
 RVOP(bne, {
     const uint32_t pc = rv->PC;
     if (rv->X[ir->rs1] == rv->X[ir->rs2]) {
-        ir->branch_not_taken++;
-        if (ir->predict != 2) {
-            rv->PC += ir->insn_len;
-            return true;
-        }
-        goto nextop;
+        rv->PC += ir->insn_len;
+        if (ir->branch_not_taken)
+            goto predict_op;
+        return true;
     }
     rv->PC += ir->imm;
     /* check instruction misaligned */
@@ -384,9 +382,10 @@ RVOP(bne, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
-    ir->branch_taken++;
-    if (ir->predict == 1)
+    if (ir->branch_taken) {
+        offset = ir->branch_taken;
         goto predict_op;
+    }
     return true;
 })
 
@@ -394,12 +393,10 @@ RVOP(bne, {
 RVOP(blt, {
     const uint32_t pc = rv->PC;
     if ((int32_t) rv->X[ir->rs1] >= (int32_t) rv->X[ir->rs2]) {
-        ir->branch_not_taken++;
-        if (ir->predict != 2) {
-            rv->PC += ir->insn_len;
-            return true;
-        }
-        goto nextop;
+        rv->PC += ir->insn_len;
+        if (ir->branch_not_taken)
+            goto predict_op;
+        return true;
     }
     rv->PC += ir->imm;
     /* check instruction misaligned */
@@ -408,9 +405,10 @@ RVOP(blt, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
-    ir->branch_taken++;
-    if (ir->predict == 1)
+    if (ir->branch_taken) {
+        offset = ir->branch_taken;
         goto predict_op;
+    }
     return true;
 })
 
@@ -418,12 +416,10 @@ RVOP(blt, {
 RVOP(bge, {
     const uint32_t pc = rv->PC;
     if ((int32_t) rv->X[ir->rs1] < (int32_t) rv->X[ir->rs2]) {
-        ir->branch_not_taken++;
-        if (ir->predict != 2) {
-            rv->PC += ir->insn_len;
-            return true;
-        }
-        goto nextop;
+        rv->PC += ir->insn_len;
+        if (ir->branch_not_taken)
+            goto predict_op;
+        return true;
     }
     rv->PC += ir->imm;
     /* check instruction misaligned */
@@ -432,9 +428,10 @@ RVOP(bge, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
-    ir->branch_taken++;
-    if (ir->predict == 1)
+    if (ir->branch_taken) {
+        offset = ir->branch_taken;
         goto predict_op;
+    }
     return true;
 })
 
@@ -442,12 +439,10 @@ RVOP(bge, {
 RVOP(bltu, {
     const uint32_t pc = rv->PC;
     if (rv->X[ir->rs1] >= rv->X[ir->rs2]) {
-        ir->branch_not_taken++;
-        if (ir->predict != 2) {
-            rv->PC += ir->insn_len;
-            return true;
-        }
-        goto nextop;
+        rv->PC += ir->insn_len;
+        if (ir->branch_not_taken)
+            goto predict_op;
+        return true;
     }
     rv->PC += ir->imm;
     /* check instruction misaligned */
@@ -456,9 +451,10 @@ RVOP(bltu, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
-    ir->branch_taken++;
-    if (ir->predict == 1)
+    if (ir->branch_taken) {
+        offset = ir->branch_taken;
         goto predict_op;
+    }
     return true;
 })
 
@@ -466,12 +462,10 @@ RVOP(bltu, {
 RVOP(bgeu, {
     const uint32_t pc = rv->PC;
     if (rv->X[ir->rs1] < rv->X[ir->rs2]) {
-        ir->branch_not_taken++;
-        if (ir->predict != 2) {
-            rv->PC += ir->insn_len;
-            return true;
-        }
-        goto nextop;
+        rv->PC += ir->insn_len;
+        if (ir->branch_not_taken)
+            goto predict_op;
+        return true;
     }
     rv->PC += ir->imm;
     /* check instruction misaligned */
@@ -480,9 +474,10 @@ RVOP(bgeu, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
-    ir->branch_taken++;
-    if (ir->predict == 1)
+    if (ir->branch_taken) {
+        offset = ir->branch_taken;
         goto predict_op;
+    }
     return true;
 })
 
@@ -1233,33 +1228,33 @@ RVOP(cj, {
  */
 RVOP(cbeqz, {
     if (rv->X[ir->rs1]) {
-        ir->branch_not_taken++;
         rv->PC += ir->insn_len;
-        if (ir->predict != 2)
-            return true;
+        if (ir->branch_not_taken)
+            goto predict_op;
+        return true;
+    }
+    rv->PC += (uint32_t) ir->imm;
+    if (ir->branch_taken) {
+        offset = ir->branch_taken;
         goto predict_op;
     }
-    ir->branch_taken++;
-    rv->PC += (uint32_t) ir->imm;
-    if (ir->predict != 1)
-        return true;
-    goto predict_op;
+    return true;
 })
 
 /* C.BEQZ */
 RVOP(cbnez, {
     if (!rv->X[ir->rs1]) {
-        ir->branch_not_taken++;
         rv->PC += ir->insn_len;
-        if (ir->predict != 2)
-            return true;
+        if (ir->branch_not_taken)
+            goto predict_op;
+        return true;
+    }
+    rv->PC += (uint32_t) ir->imm;
+    if (ir->branch_taken) {
+        offset = ir->branch_taken;
         goto predict_op;
     }
-    ir->branch_taken++;
-    rv->PC += (uint32_t) ir->imm;
-    if (ir->predict != 1)
-        return true;
-    goto predict_op;
+    return true;
 })
 
 /* C.SLLI is a CI-format instruction that performs a logical left shift
@@ -1366,6 +1361,8 @@ static block_t *block_alloc(const uint8_t bits)
     block->insn_capacity = 1 << bits;
     block->n_insn = 0;
     block->predict = NULL;
+    block->get_time = 0;
+    block->extend = false;
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
     return block;
 }
@@ -1437,6 +1434,37 @@ static void block_translate(riscv_t *rv, block_t *block)
     block->ir[block->n_insn - 1].tailcall = true;
 }
 
+static uint32_t retranslate(riscv_t *rv, block_t *block)
+{
+    uint32_t n_insn = 0;
+    /* translate the basic block */
+    while (block->n_insn < block->insn_capacity) {
+        rv_insn_t *ir = block->ir + block->n_insn;
+        memset(ir, 0, sizeof(rv_insn_t));
+
+        /* fetch the next instruction */
+        const uint32_t insn = rv->io.mem_ifetch(rv, block->pc_end);
+
+        /* decode the instruction */
+        if (!rv_decode(ir, insn)) {
+            rv->compressed = (ir->insn_len == INSN_16);
+            rv_except_illegal_insn(rv, insn);
+            break;
+        }
+        ir->impl = dispatch_table[ir->opcode];
+        /* compute the end of pc */
+        block->pc_end += ir->insn_len;
+        block->n_insn++;
+        n_insn++;
+        if (insn_is_branch(ir->opcode))
+            break;
+
+        /* stop on branch */
+    }
+    block->ir[block->n_insn - 1].tailcall = true;
+    return n_insn;
+}
+
 static bool append_block(block_t *prev, const block_t *next_block)
 {
     if (prev->n_insn + next_block->n_insn > prev->insn_capacity)
@@ -1446,33 +1474,57 @@ static bool append_block(block_t *prev, const block_t *next_block)
     for (uint32_t i = 0; i < next_block->n_insn; i++) {
         memcpy(last_ir + i, next_block->ir + i, sizeof(rv_insn_t));
     }
-    prev->ir[prev->n_insn - 1].tailcall = false;
     prev->n_insn += next_block->n_insn;
     prev->pc_end = next_block->pc_end;
     return true;
 }
-
-#define BRANCH_PREDICT_THRESHOLD 10
+static bool insn_is_unconditional_jump(uint8_t opcode)
+{
+    switch (opcode) {
+    case rv_insn_ecall:
+    case rv_insn_ebreak:
+    case rv_insn_jal:
+    case rv_insn_jalr:
+    case rv_insn_mret:
+#if RV32_HAS(EXT_C)
+    case rv_insn_cj:
+    case rv_insn_cjalr:
+    case rv_insn_cjal:
+    case rv_insn_cjr:
+    case rv_insn_cebreak:
+#endif
+        return true;
+    }
+    return false;
+}
 static void extend_block(riscv_t *rv, block_t *block)
 {
     rv_insn_t *last_ir = block->ir + block->n_insn - 1;
-    if (last_ir->predict || last_ir->branch_taken + last_ir->branch_not_taken <=
-                                BRANCH_PREDICT_THRESHOLD)
+    if (insn_is_unconditional_jump(last_ir->opcode))
         return;
-    uint32_t predict_pc, predict;
-    if (last_ir->branch_taken > last_ir->branch_not_taken) {
-        predict = 1;
-        predict_pc = block->pc_end - last_ir->insn_len + last_ir->imm;
-    } else {
-        predict = 2;
-        predict_pc = block->pc_end;
-    }
-
+    uint32_t taken_pc = block->pc_end - last_ir->insn_len + last_ir->imm;
+    uint32_t not_taken_pc = block->pc_end, taken;
     block_map_t *map = &rv->block_map;
     /* lookup the next block in the block map */
-    block_t *next = block_find(map, predict_pc);
-    if (next && append_block(block, next))
-        last_ir->predict = predict;
+    block_t *next = block_find(map, not_taken_pc);
+    last_ir->branch_not_taken = 1;
+    if (next && append_block(block, next)) {
+        last_ir->tailcall = false;
+        taken = next->n_insn + 1;
+    } else {
+        taken = retranslate(rv, block) + 1;
+    }
+
+    /* update not taken */
+    next = block_find(map, taken_pc);
+    if (next) {
+        if (append_block(block, next))
+            last_ir->branch_taken = taken;
+    } else {
+        block->pc_end = taken_pc;
+        retranslate(rv, block);
+        last_ir->branch_taken = taken;
+    }
 }
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
@@ -1503,10 +1555,13 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
          */
         if (prev)
             prev->predict = next;
-    } else
+    }
+
+    next->get_time++;
+    if (!next->extend && next->get_time >= 50) {
+        next->extend = true;
         extend_block(rv, next);
-
-
+    }
     return next;
 }
 

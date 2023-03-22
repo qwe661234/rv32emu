@@ -58,7 +58,9 @@ typedef struct block {
     uint32_t pc_start, pc_end; /**< address range of the basic block */
     uint32_t insn_capacity;    /**< maximum of instructions encompased */
     struct block *predict;     /**< block prediction */
-    rv_insn_t *ir;             /**< IR as memory blocks */
+    uint16_t get_time;
+    bool extend;
+    rv_insn_t *ir; /**< IR as memory blocks */
 } block_t;
 
 typedef struct {
