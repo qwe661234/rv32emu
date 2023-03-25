@@ -1362,7 +1362,9 @@ static block_t *block_alloc(const uint8_t bits)
     block->n_insn = 0;
     block->predict = NULL;
     block->get_time = 0;
+    block->prev_pc = 0;
     block->extend = false;
+    block->can_merge = true;
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
     return block;
 }
@@ -1503,29 +1505,41 @@ static void extend_block(riscv_t *rv, block_t *block)
     if (insn_is_unconditional_jump(last_ir->opcode))
         return;
     uint32_t taken_pc = block->pc_end - last_ir->insn_len + last_ir->imm;
-    uint32_t not_taken_pc = block->pc_end, taken;
+    uint32_t not_taken_pc = block->pc_end, taken = 0;
     block_map_t *map = &rv->block_map;
-    /* lookup the next block in the block map */
-    block_t *next = block_find(map, not_taken_pc);
-    last_ir->branch_not_taken = 1;
-    if (next && append_block(block, next)) {
-        last_ir->tailcall = false;
-        taken = next->n_insn + 1;
-    } else {
-        taken = retranslate(rv, block) + 1;
+    block_t *not_taken_block = block_find(map, not_taken_pc),
+            *taken_block = block_find(map, taken_pc);
+
+    /* check branch not taken path can be extended or not */
+    if (not_taken_block && !not_taken_block->can_merge)
+        /* branch not taken path can not be extended */
+        taken = 1;
+    else {
+        /* branch not taken path can be extended */
+        last_ir->branch_not_taken = 1;
+        if (not_taken_block && append_block(block, not_taken_block)) {
+            last_ir->tailcall = false;
+            taken = not_taken_block->n_insn + 1;
+        } else {
+            taken = retranslate(rv, block) + 1;
+        }
     }
 
-    /* update not taken */
-    next = block_find(map, taken_pc);
-    if (next) {
-        if (append_block(block, next))
+    /* check branch taken path can be extended or not */
+    if (taken_block && !taken_block->can_merge)
+        return;
+    else {
+        /* branch taken path can be extended */
+        if (taken_block && append_block(block, taken_block))
             last_ir->branch_taken = taken;
-    } else {
-        block->pc_end = taken_pc;
-        retranslate(rv, block);
-        last_ir->branch_taken = taken;
+        else {
+            block->pc_end = taken_pc;
+            retranslate(rv, block);
+            last_ir->branch_taken = taken;
+        }
     }
 }
+
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
@@ -1553,12 +1567,21 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
          * but when it is updated after we find a particular block, it may
          * penalize us significantly.
          */
-        if (prev)
+        if (prev) {
             prev->predict = next;
+            next->prev_pc = prev->pc_start;
+        }
+    }
+
+    if (prev && next->can_merge) {
+        if (!next->prev_pc)
+            next->prev_pc = prev->pc_start;
+        else if (prev->pc_start != next->prev_pc)
+            next->can_merge = false;
     }
 
     next->get_time++;
-    if (!next->extend && next->get_time >= 50) {
+    if (!next->extend && next->get_time >= 100) {
         next->extend = true;
         extend_block(rv, next);
     }

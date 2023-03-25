@@ -59,7 +59,9 @@ typedef struct block {
     uint32_t insn_capacity;    /**< maximum of instructions encompased */
     struct block *predict;     /**< block prediction */
     uint16_t get_time;
+    uint32_t prev_pc;
     bool extend;
+    bool can_merge;
     rv_insn_t *ir; /**< IR as memory blocks */
 } block_t;
 
