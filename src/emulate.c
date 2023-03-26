@@ -267,18 +267,24 @@ enum {
 #define RVOP(inst, code)                                                  \
     static bool do_##inst(riscv_t *rv UNUSED, const rv_insn_t *ir UNUSED) \
     {                                                                     \
+        uint16_t offset = 1;                                              \
         rv->X[rv_reg_zero] = 0;                                           \
-        code;                                                             \
         rv->csr_cycle++;                                                  \
-        if (__rv_insn_##inst##_canbranch) {                               \
-            /* can branch */                                              \
-            return true;                                                  \
-        }                                                                 \
+        code;                                                             \
     nextop:                                                               \
         rv->PC += ir->insn_len;                                           \
+    mergeop:                                                              \
         if (ir->tailcall)                                                 \
             return true;                                                  \
-        const rv_insn_t *next = ir + 1;                                   \
+        if (__rv_insn_##inst##_canbranch) {                               \
+            if (ir->merge_pc[0] == rv->PC) {                              \
+                offset = ir->offset[0];                                   \
+            } else if (ir->merge_pc[1] == rv->PC) {                       \
+                offset = ir->offset[1];                                   \
+            } else                                                        \
+                return true;                                              \
+        }                                                                 \
+        const rv_insn_t *next = ir + offset;                              \
         MUST_TAIL return next->impl(rv, next);                            \
     }
 
@@ -319,6 +325,7 @@ RVOP(jal, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    return true;
 })
 
 /*The indirect jump instruction JALR uses the I-type encoding. The
@@ -341,6 +348,7 @@ RVOP(jalr, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    return true;
 })
 
 /* BEQ: Branch if Equal */
@@ -355,6 +363,7 @@ RVOP(beq, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    goto mergeop;
 })
 
 /* BNE: Branch if Not Equal */
@@ -369,6 +378,7 @@ RVOP(bne, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    goto mergeop;
 })
 
 /* BLT: Branch if Less Than */
@@ -383,6 +393,7 @@ RVOP(blt, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    goto mergeop;
 })
 
 /* BGE: Branch if Greater Than */
@@ -397,6 +408,7 @@ RVOP(bge, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    goto mergeop;
 })
 
 /* BLTU: Branch if Less Than Unsigned */
@@ -411,6 +423,7 @@ RVOP(bltu, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    goto mergeop;
 })
 
 /* BGEU: Branch if Greater Than Unsigned */
@@ -425,6 +438,7 @@ RVOP(bgeu, {
         rv_except_insn_misaligned(rv, pc);
         return false;
     }
+    goto mergeop;
 })
 
 /* LB: Load Byte */
@@ -583,12 +597,14 @@ RVOP(and, { rv->X[ir->rd] = rv->X[ir->rs1] & rv->X[ir->rs2]; })
 RVOP(ecall, {
     rv->compressed = false;
     rv->io.on_ecall(rv);
+    return true;
 })
 
 /* EBREAK: Environment Break */
 RVOP(ebreak, {
     rv->compressed = false;
     rv->io.on_ebreak(rv);
+    return true;
 })
 
 /* WFI: Wait for Interrupt */
@@ -622,6 +638,7 @@ RVOP(mret, { rv->PC = rv->csr_mepc; })
 RVOP(fencei, {
     rv->PC += ir->insn_len;
     /* FIXME: fill real implementations */
+    return true;
 })
 #endif
 
@@ -1085,6 +1102,7 @@ RVOP(cjal, {
         rv_except_insn_misaligned(rv, rv->PC);
         return false;
     }
+    return true;
 })
 
 /* C.LI loads the sign-extended 6-bit immediate, imm, into register rd.
@@ -1156,6 +1174,7 @@ RVOP(cj, {
         rv_except_insn_misaligned(rv, rv->PC);
         return false;
     }
+    return true;
 })
 
 /* C.BEQZ performs conditional control transfers. The offset is
@@ -1164,11 +1183,16 @@ RVOP(cj, {
  * the value in register rs1' is zero. It expands to beq rs1', x0,
  * offset[8:1].
  */
-RVOP(cbeqz,
-     { rv->PC += (!rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
+RVOP(cbeqz, {
+    rv->PC += (!rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len;
+    goto mergeop;
+})
 
 /* C.BEQZ */
-RVOP(cbnez, { rv->PC += (rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len; })
+RVOP(cbnez, {
+    rv->PC += (rv->X[ir->rs1]) ? (uint32_t) ir->imm : ir->insn_len;
+    goto mergeop;
+})
 
 /* C.SLLI is a CI-format instruction that performs a logical left shift
  * of the value in register rd then writes the result to rd. The shift
@@ -1189,7 +1213,10 @@ RVOP(clwsp, {
 })
 
 /* C.JR */
-RVOP(cjr, { rv->PC = rv->X[ir->rs1]; })
+RVOP(cjr, {
+    rv->PC = rv->X[ir->rs1];
+    return true;
+})
 
 /* C.MV */
 RVOP(cmv, { rv->X[ir->rd] = rv->X[ir->rs2]; })
@@ -1198,6 +1225,7 @@ RVOP(cmv, { rv->X[ir->rd] = rv->X[ir->rs2]; })
 RVOP(cebreak, {
     rv->compressed = true;
     rv->io.on_ebreak(rv);
+    return true;
 })
 
 /* C.JALR */
@@ -1211,6 +1239,7 @@ RVOP(cjalr, {
         rv_except_insn_misaligned(rv, rv->PC);
         return false;
     }
+    return true;
 })
 
 /* C.ADD adds the values in registers rd and rs2 and writes the
@@ -1270,6 +1299,14 @@ static block_t *block_alloc(const uint8_t bits)
     block->insn_capacity = 1 << bits;
     block->n_insn = 0;
     block->predict = NULL;
+    // cfg
+    block->can_merge = true;
+    block->extend = false;
+    block->get_time = 0;
+    block->prev_pc = 0;
+    block->left = NULL;
+    block->right = NULL;
+    //
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
     return block;
 }
@@ -1345,7 +1382,6 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
     block_map_t *map = &rv->block_map;
     /* lookup the next block in the block map */
     block_t *next = block_find(map, rv->PC);
-
     if (!next) {
         if (map->size * 1.25 > map->block_capacity) {
             block_map_clear(map);
@@ -1366,12 +1402,128 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
          * but when it is updated after we find a particular block, it may
          * penalize us significantly.
          */
-        if (prev)
+        if (prev) {
             prev->predict = next;
+            next->prev_pc = prev->pc_start;
+            if (prev->left)
+                prev->right = next;
+            else
+                prev->left = next;
+        }
     }
+
+    /* Check block have multiple entry point or not */
+    if (prev && next->can_merge) {
+        if (!next->prev_pc) {
+            next->prev_pc = prev->pc_start;
+            if (prev->left)
+                prev->right = next;
+            else
+                prev->left = next;
+        } else if (prev->pc_start != next->prev_pc)
+            next->can_merge = false;
+    }
+    next->get_time++;
 
     return next;
 }
+
+static bool append_block(block_t *prev, const block_t *next_block)
+{
+    if (prev->n_insn + next_block->n_insn > prev->insn_capacity)
+        return false;
+
+    rv_insn_t *last_ir = prev->ir + prev->n_insn;
+    for (uint32_t i = 0; i < next_block->n_insn; i++)
+        memcpy(last_ir + i, next_block->ir + i, sizeof(rv_insn_t));
+    prev->n_insn += next_block->n_insn;
+    prev->pc_end = next_block->pc_end;
+    return true;
+}
+
+static bool insn_is_unconditional_jump(uint8_t opcode)
+{
+    switch (opcode) {
+    case rv_insn_ecall:
+    case rv_insn_ebreak:
+    case rv_insn_jal:
+    case rv_insn_jalr:
+    case rv_insn_mret:
+#if RV32_HAS(EXT_C)
+    case rv_insn_cj:
+    case rv_insn_cjalr:
+    case rv_insn_cjal:
+    case rv_insn_cjr:
+    case rv_insn_cebreak:
+#endif
+        return true;
+    }
+    return false;
+}
+
+/* Check EBB need to retranslate or not */
+static void trace_cfg(block_t *block, uint32_t *total_insn)
+{
+    *total_insn += block->n_insn;
+    block_t *left = block->left, *right = block->right;
+    if (left && left->can_merge)
+        trace_cfg(left, total_insn);
+
+    if (right && right->can_merge)
+        trace_cfg(right, total_insn);
+}
+
+/* Trace CFG by DFS and extend basic block  */
+static void extend_block(block_t *block, block_t *next)
+{
+    rv_insn_t *last_ir = block->ir + block->n_insn - 1;
+    if (insn_is_unconditional_jump(last_ir->opcode))
+        return;
+    block_t *left = next->left, *right = next->right;
+    uint16_t tmp = block->n_insn;
+    if (!left && !right) {
+        return;
+    }
+    if (left) {
+        if (left->can_merge && left->pc_start != next->pc_start &&
+            append_block(block, left)) {
+            last_ir->tailcall = false;
+            last_ir->merge_pc[0] = left->pc_start;
+            last_ir->offset[0] = 1;
+            extend_block(block, left);
+        } else
+            block->left = NULL;
+    }
+    if (right) {
+        if (right->can_merge && right->pc_start != next->pc_start) {
+            tmp = block->n_insn - tmp + 1;
+            if (append_block(block, right)) {
+                last_ir->merge_pc[1] = right->pc_start;
+                if (left)
+                    last_ir->offset[1] = tmp;
+                else
+                    last_ir->offset[1] = 1;
+                extend_block(block, right);
+            }
+        } else
+            block->right = NULL;
+    }
+}
+
+static void trace_and_extend_block(riscv_t *rv, block_t *block)
+{
+    uint32_t total_insn = 0;
+    if (block->extend) {
+        trace_cfg(block, &total_insn);
+        if (total_insn == block->n_insn)
+            return;
+        block->n_insn = 0;
+        block_translate(rv, block);
+    }
+    extend_block(block, block);
+}
+
+#define BRANCH_PREDICT_THRESHOLD 1000
 
 void rv_step(riscv_t *rv, int32_t cycles)
 {
@@ -1398,6 +1550,12 @@ void rv_step(riscv_t *rv, int32_t cycles)
 
         /* we should have a block by now */
         assert(block);
+
+        if (block->get_time > BRANCH_PREDICT_THRESHOLD) {
+            block->get_time = 0;
+            trace_and_extend_block(rv, block);
+            block->extend = true;
+        }
 
         /* execute the block */
         const rv_insn_t *ir = block->ir;

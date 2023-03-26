@@ -244,6 +244,10 @@ typedef struct rv_insn {
     /* instruction length */
     uint8_t insn_len;
 
+    /* record merge_pc and IR offset of right node and left node */
+    uint32_t merge_pc[2];
+    uint16_t offset[2];
+
     /* According to tail-call optimization (TCO), if a C function ends with
      * a function call to another function or itself and simply returns that
      * function's result, the compiler can substitute a simple jump to the

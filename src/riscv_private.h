@@ -54,11 +54,16 @@ enum {
 
 /* translated basic block */
 typedef struct block {
-    uint32_t n_insn;           /**< number of instructions encompased */
-    uint32_t pc_start, pc_end; /**< address range of the basic block */
-    uint32_t insn_capacity;    /**< maximum of instructions encompased */
-    struct block *predict;     /**< block prediction */
-    rv_insn_t *ir;             /**< IR as memory blocks */
+    uint32_t n_insn;            /**< number of instructions encompased */
+    uint32_t pc_start, pc_end;  /**< address range of the basic block */
+    uint32_t insn_capacity;     /**< maximum of instructions encompased */
+    struct block *predict;      /**< block prediction */
+    rv_insn_t *ir;              /**< IR as memory blocks */
+    bool can_merge;             /**< record block has multiple entry ot not */
+    bool extend;                /**< block is BB or EBB */
+    uint16_t get_time;          /**< block using times */
+    uint32_t prev_pc;           /**< record PC of previous block */
+    struct block *left, *right; /**< record take path and not taken path */
 } block_t;
 
 typedef struct {
