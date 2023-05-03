@@ -7,30 +7,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cache.h"
 #include "riscv_private.h"
 
 /* initialize the block map */
-static void block_map_init(block_map_t *map, const uint8_t bits)
-{
-    map->block_capacity = 1 << bits;
-    map->size = 0;
-    map->map = calloc(map->block_capacity, sizeof(struct block *));
-}
+// static void block_map_init(block_map_t *map, const uint8_t bits)
+// {
+//     map->block_capacity = 1 << bits;
+//     map->size = 0;
+//     map->map = calloc(map->block_capacity, sizeof(struct block *));
+// }
 
 /* clear all block in the block map */
-void block_map_clear(block_map_t *map)
-{
-    assert(map);
-    for (uint32_t i = 0; i < map->block_capacity; i++) {
-        block_t *block = map->map[i];
-        if (!block)
-            continue;
-        free(block->ir);
-        free(block);
-        map->map[i] = NULL;
-    }
-    map->size = 0;
-}
+// void block_map_clear(block_map_t *map)
+// {
+//     assert(map);
+//     for (uint32_t i = 0; i < map->block_capacity; i++) {
+//         block_t *block = map->map[i];
+//         if (!block)
+//             continue;
+//         free(block->ir);
+//         free(block);
+//         map->map[i] = NULL;
+//     }
+//     map->size = 0;
+// }
 
 riscv_user_t rv_userdata(riscv_t *rv)
 {
@@ -87,7 +88,9 @@ riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
     rv->userdata = userdata;
 
     /* initialize the block map */
-    block_map_init(&rv->block_map, 10);
+    // block_map_init(&rv->block_map, 10);
+
+    rv->cache = cache_create(10);
 
     /* reset */
     rv_reset(rv, 0U);
@@ -105,11 +108,18 @@ bool rv_has_halted(riscv_t *rv)
     return rv->halt;
 }
 
+void release_block(void *block)
+{
+    free(((block_t *) block)->ir);
+    free(block);
+}
+
 void rv_delete(riscv_t *rv)
 {
+    cache_free(rv->cache, release_block);
     assert(rv);
-    block_map_clear(&rv->block_map);
-    free(rv->block_map.map);
+    // block_map_clear(&rv->block_map);
+    // free(rv->block_map.map);
     free(rv);
 }
 

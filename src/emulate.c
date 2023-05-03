@@ -28,6 +28,7 @@ static inline int isnanf(float x)
 extern struct target_ops gdbstub_ops;
 #endif
 
+#include "compile.h"
 #include "decode.h"
 #include "riscv.h"
 #include "riscv_private.h"
@@ -284,8 +285,8 @@ enum {
     static bool do_##inst(riscv_t *rv UNUSED, const rv_insn_t *ir UNUSED) \
     {                                                                     \
         rv->X[rv_reg_zero] = 0;                                           \
-        code;                                                             \
         rv->csr_cycle++;                                                  \
+        code;                                                             \
     nextop:                                                               \
         rv->PC += ir->insn_len;                                           \
         if (ir->tailcall)                                                 \
@@ -1262,16 +1263,16 @@ static bool insn_is_branch(uint8_t opcode)
 }
 
 /* hash function is used when mapping address into the block map */
-static uint32_t hash(size_t k)
-{
-    k ^= k << 21;
-    k ^= k >> 17;
-#if (SIZE_MAX > 0xFFFFFFFF)
-    k ^= k >> 35;
-    k ^= k >> 51;
-#endif
-    return k;
-}
+// static uint32_t hash(size_t k)
+// {
+//     k ^= k << 21;
+//     k ^= k >> 17;
+// #if (SIZE_MAX > 0xFFFFFFFF)
+//     k ^= k >> 35;
+//     k ^= k >> 51;
+// #endif
+//     return k;
+// }
 
 /* allocate a basic block */
 static block_t *block_alloc(const uint8_t bits)
@@ -1281,44 +1282,45 @@ static block_t *block_alloc(const uint8_t bits)
     block->n_insn = 0;
     block->predict = NULL;
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
+    block->hot = false;
     return block;
 }
 
-/* insert a block into block map */
-static void block_insert(block_map_t *map, const block_t *block)
-{
-    assert(map && block);
-    const uint32_t mask = map->block_capacity - 1;
-    uint32_t index = hash(block->pc_start);
+// /* insert a block into block map */
+// static void block_insert(block_map_t *map, const block_t *block)
+// {
+//     assert(map && block);
+//     const uint32_t mask = map->block_capacity - 1;
+//     uint32_t index = hash(block->pc_start);
 
-    /* insert into the block map */
-    for (;; index++) {
-        if (!map->map[index & mask]) {
-            map->map[index & mask] = (block_t *) block;
-            break;
-        }
-    }
-    map->size++;
-}
+//     /* insert into the block map */
+//     for (;; index++) {
+//         if (!map->map[index & mask]) {
+//             map->map[index & mask] = (block_t *) block;
+//             break;
+//         }
+//     }
+//     map->size++;
+// }
 
-/* try to locate an already translated block in the block map */
-static block_t *block_find(const block_map_t *map, const uint32_t addr)
-{
-    assert(map);
-    uint32_t index = hash(addr);
-    const uint32_t mask = map->block_capacity - 1;
+// /* try to locate an already translated block in the block map */
+// static block_t *block_find(const block_map_t *map, const uint32_t addr)
+// {
+//     assert(map);
+//     uint32_t index = hash(addr);
+//     const uint32_t mask = map->block_capacity - 1;
 
-    /* find block in block map */
-    for (;; index++) {
-        block_t *block = map->map[index & mask];
-        if (!block)
-            return NULL;
+//     /* find block in block map */
+//     for (;; index++) {
+//         block_t *block = map->map[index & mask];
+//         if (!block)
+//             return NULL;
 
-        if (block->pc_start == addr)
-            return block;
-    }
-    return NULL;
-}
+//         if (block->pc_start == addr)
+//             return block;
+//     }
+//     return NULL;
+// }
 
 static void block_translate(riscv_t *rv, block_t *block)
 {
@@ -1359,7 +1361,6 @@ static void extend_block(riscv_t *rv, block_t *block)
     uint32_t taken_pc = block->pc_end - last_ir->insn_len + last_ir->imm,
              not_taken_pc = block->pc_end;
 
-    block_map_t *map = &rv->block_map;
     block_t *next;
 
     /* check the branch_taken/branch_untaken pointer has been assigned and the
@@ -1367,24 +1368,25 @@ static void extend_block(riscv_t *rv, block_t *block)
      * not. If either of these conditions is not met, it will not be possible to
      * extend the path of the taken/untaken branches for basic block.
      */
-    if (!last_ir->branch_taken && (next = block_find(map, taken_pc)))
+    if (!last_ir->branch_taken && (next = cache_get(rv->cache, taken_pc)))
         last_ir->branch_taken = next->ir;
 
-    if (!last_ir->branch_untaken && (next = block_find(map, not_taken_pc)))
+    if (!last_ir->branch_untaken && (next = cache_get(rv->cache, not_taken_pc)))
         last_ir->branch_untaken = next->ir;
 }
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
-    block_map_t *map = &rv->block_map;
+    // block_map_t *map = &rv->block_map;
     /* lookup the next block in the block map */
-    block_t *next = block_find(map, rv->PC);
+    // block_t *next = block_find(map, rv->PC);
+    block_t *next = (block_t *) cache_get(rv->cache, rv->PC);
 
     if (!next) {
-        if (map->size * 1.25 > map->block_capacity) {
-            block_map_clear(map);
-            prev = NULL;
-        }
+        // if (map->size * 1.25 > map->block_capacity) {
+        //     block_map_clear(map);
+        //     prev = NULL;
+        // }
 
         /* allocate a new block */
         next = block_alloc(10);
@@ -1393,7 +1395,12 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
         block_translate(rv, next);
 
         /* insert the block into block map */
-        block_insert(&rv->block_map, next);
+        block_t *delete_target = cache_put(rv->cache, rv->PC, &(*next));
+        if (delete_target) {
+            free(delete_target->ir);
+            free(delete_target);
+        }
+        // block_insert(&rv->block_map, next);
 
         /* update the block prediction
          * When we translate a new block, the block predictor may benefit,
@@ -1405,9 +1412,10 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
     } else
         extend_block(rv, next);
 
-
     return next;
 }
+
+typedef bool (*exec_block_func_t)(riscv_t *rv);
 
 void rv_step(riscv_t *rv, int32_t cycles)
 {
@@ -1436,6 +1444,20 @@ void rv_step(riscv_t *rv, int32_t cycles)
         assert(block);
 
         /* execute the block */
+        uint8_t *code = NULL;
+        if (block->hot)
+            code = code_cache_lookup(rv->cache, block->pc_start);
+        if (!code) {
+            if ((block->hot = cache_hot(rv->cache, block->pc_start)))
+                code = block_compile(rv);
+        }
+        if (block->hot) {
+            if (unlikely(!((exec_block_func_t) code)(rv)))
+                break;
+            prev = block;
+            continue;
+        }
+
         const rv_insn_t *ir = block->ir;
         if (unlikely(!ir->impl(rv, ir)))
             break;
