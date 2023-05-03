@@ -10,6 +10,7 @@
 #include "breakpoint.h"
 #include "mini-gdbstub/include/gdbstub.h"
 #endif
+#include "cache.h"
 #include "decode.h"
 #include "riscv.h"
 
@@ -59,16 +60,17 @@ typedef struct block {
     uint32_t insn_capacity;    /**< maximum of instructions encompased */
     struct block *predict;     /**< block prediction */
     rv_insn_t *ir;             /**< IR as memory blocks */
+    bool hot;
 } block_t;
 
-typedef struct {
-    uint32_t block_capacity; /**< max number of entries in the block map */
-    uint32_t size;           /**< number of entries currently in the map */
-    block_t **map;           /**< block map */
-} block_map_t;
+// typedef struct {
+//     uint32_t block_capacity; /**< max number of entries in the block map */
+//     uint32_t size;           /**< number of entries currently in the map */
+//     block_t **map;           /**< block map */
+// } block_map_t;
 
-/* clear all block in the block map */
-void block_map_clear(block_map_t *map);
+// /* clear all block in the block map */
+// void block_map_clear(block_map_t *map);
 
 struct riscv_internal {
     bool halt;
@@ -82,6 +84,23 @@ struct riscv_internal {
 
     /* user provided data */
     riscv_user_t userdata;
+
+    /* csr registers */
+    uint64_t csr_cycle;
+    uint32_t csr_time[2];
+    uint32_t csr_mstatus;
+    uint32_t csr_mtvec;
+    uint32_t csr_misa;
+    uint32_t csr_mtval;
+    uint32_t csr_mcause;
+    uint32_t csr_mscratch;
+    uint32_t csr_mepc;
+    uint32_t csr_mip;
+    uint32_t csr_mbadaddr;
+
+    bool compressed; /**< current instruction is compressed or not */
+    // block_map_t block_map; /**< basic block map */
+    struct cache *cache;
 
 #if RV32_HAS(GDBSTUB)
     /* gdbstub instance */
@@ -105,22 +124,6 @@ struct riscv_internal {
     };
     uint32_t csr_fcsr;
 #endif
-
-    /* csr registers */
-    uint64_t csr_cycle;
-    uint32_t csr_time[2];
-    uint32_t csr_mstatus;
-    uint32_t csr_mtvec;
-    uint32_t csr_misa;
-    uint32_t csr_mtval;
-    uint32_t csr_mcause;
-    uint32_t csr_mscratch;
-    uint32_t csr_mepc;
-    uint32_t csr_mip;
-    uint32_t csr_mbadaddr;
-
-    bool compressed;       /**< current instruction is compressed or not */
-    block_map_t block_map; /**< basic block map */
 };
 
 /* sign extend a 16 bit value */

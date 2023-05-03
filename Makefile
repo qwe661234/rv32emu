@@ -99,6 +99,8 @@ OBJS := \
 	elf.o \
 	cache.o \
 	mpool.o \
+	codegen.o \
+	compile.o \
 	$(OBJS_EXT) \
 	main.o
 
