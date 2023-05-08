@@ -1282,7 +1282,7 @@ static block_t *block_alloc(const uint8_t bits)
     block->n_insn = 0;
     block->predict = NULL;
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
-    block->hot = false;
+    block->code = NULL;
     return block;
 }
 
@@ -1444,15 +1444,16 @@ void rv_step(riscv_t *rv, int32_t cycles)
         assert(block);
 
         /* execute the block */
-        uint8_t *code = NULL;
-        if (block->hot)
-            code = code_cache_lookup(rv->cache, block->pc_start);
-        if (!code) {
-            if ((block->hot = cache_hot(rv->cache, block->pc_start)))
-                code = block_compile(rv);
+        if (block->code) {
+            if (unlikely(!((exec_block_func_t) block->code)(rv)))
+                break;
+            prev = block;
+            continue;
         }
-        if (block->hot) {
-            if (unlikely(!((exec_block_func_t) code)(rv)))
+
+        if (cache_hot(rv->cache, block->pc_start)) {
+            block->code = block_compile(rv);
+            if (unlikely(!((exec_block_func_t) block->code)(rv)))
                 break;
             prev = block;
             continue;

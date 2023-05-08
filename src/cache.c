@@ -19,7 +19,7 @@
     (((val) * (GOLDEN_RATIO_32)) >> (32 - (cache_size_bits))) & (cache_size - 1)
 /* THRESHOLD is set to identify hot spots. Once the frequency of use for a block
  * exceeds the THRESHOLD, the JIT compiler flow is triggered. */
-#define THRESHOLD 100000
+#define THRESHOLD 10000
 #define CODE_CACHE_SIZE (64 * 1024 * 1024)
 #define sys_icache_invalidate(addr, size) \
     __builtin___clear_cache((char *) (addr), (char *) (addr) + (size));

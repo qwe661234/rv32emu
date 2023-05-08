@@ -88,6 +88,9 @@ $(OUT)/emulate.o: CFLAGS += -fomit-frame-pointer -fno-stack-check -fno-stack-pro
 
 all: $(BIN)
 
+CFLAGS += -I./mir
+LDFLAGS += mir/libmir.a -lpthread
+
 OBJS := \
 	map.o \
 	utils.o \
@@ -111,9 +114,17 @@ $(OUT)/%.o: src/%.c
 	$(VECHO) "  CC\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF $@.d $<
 
-$(BIN): $(OBJS)
+mir/GNUmakefile:
+	git submodule update --init $(dir $@)
+	
+mir/libmir.a: mir/GNUmakefile
+	$(MAKE) --quiet -C mir
+
+$(BIN): mir/libmir.a $(OBJS)
 	$(VECHO) "  LD\t$@\n"
 	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
+
+
 
 # RISC-V Architecture Tests
 include mk/riscv-arch-test.mk

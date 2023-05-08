@@ -1206,6 +1206,82 @@ void trace_ebb(riscv_t *rv, char *gencode)
     }
 }
 
+#define PROLOGUE                                                          \
+    "#include <stdint.h>\n"                                               \
+    "#include <stdbool.h>\n"                                              \
+    "typedef struct riscv_internal riscv_t;\n"                            \
+    "typedef void *riscv_user_t;\n"                                       \
+    "typedef uint32_t riscv_word_t;\n"                                    \
+    "typedef uint16_t riscv_half_t;\n"                                    \
+    "typedef uint8_t riscv_byte_t;\n"                                     \
+    "typedef uint32_t riscv_exception_t;\n"                               \
+    "typedef float riscv_float_t;\n"                                      \
+    "typedef riscv_word_t (*riscv_mem_ifetch)(riscv_t *rv, riscv_word_t " \
+    "addr);\n"                                                            \
+    "typedef riscv_word_t (*riscv_mem_read_w)(riscv_t *rv, riscv_word_t " \
+    "addr);\n"                                                            \
+    "typedef riscv_half_t (*riscv_mem_read_s)(riscv_t *rv, riscv_word_t " \
+    "addr);\n"                                                            \
+    "typedef riscv_byte_t (*riscv_mem_read_b)(riscv_t *rv, riscv_word_t " \
+    "addr);\n"                                                            \
+    "typedef void (*riscv_mem_write_w)(riscv_t *rv, riscv_word_t addr, "  \
+    "riscv_word_t data);\n"                                               \
+    "typedef void (*riscv_mem_write_s)(riscv_t *rv, riscv_word_t addr, "  \
+    "riscv_half_t data);\n"                                               \
+    "typedef void (*riscv_mem_write_b)(riscv_t *rv, riscv_word_t addr, "  \
+    "riscv_half_t data);\n"                                               \
+    "typedef void (*riscv_on_ecall)(riscv_t *rv);\n"                      \
+    "typedef void (*riscv_on_ebreak)(riscv_t *rv);\n"                     \
+    "typedef struct {\n"                                                  \
+    "    riscv_mem_ifetch mem_ifetch;\n"                                  \
+    "    riscv_mem_read_w mem_read_w;\n"                                  \
+    "    riscv_mem_read_s mem_read_s;\n"                                  \
+    "    riscv_mem_read_b mem_read_b;\n"                                  \
+    "    riscv_mem_write_w mem_write_w;\n"                                \
+    "    riscv_mem_write_s mem_write_s;\n"                                \
+    "    riscv_mem_write_b mem_write_b;\n"                                \
+    "    riscv_on_ecall on_ecall;\n"                                      \
+    "    riscv_on_ebreak on_ebreak;\n"                                    \
+    "    bool allow_misalign;\n"                                          \
+    "} riscv_io_t;\n"                                                     \
+    "struct riscv_internal {\n"                                           \
+    "    bool halt;\n"                                                    \
+    "    riscv_io_t io;\n"                                                \
+    "    riscv_word_t X[32];\n"                                           \
+    "    riscv_word_t PC;\n"                                              \
+    "    riscv_user_t userdata;\n"                                        \
+    "    uint64_t csr_cycle;\n"                                           \
+    "    uint32_t csr_time[2];\n"                                         \
+    "    uint32_t csr_mstatus;\n"                                         \
+    "    uint32_t csr_mtvec;\n"                                           \
+    "    uint32_t csr_misa;\n"                                            \
+    "    uint32_t csr_mtval;\n"                                           \
+    "    uint32_t csr_mcause;\n"                                          \
+    "    uint32_t csr_mscratch;\n"                                        \
+    "    uint32_t csr_mepc;\n"                                            \
+    "    uint32_t csr_mip;\n"                                             \
+    "    uint32_t csr_mbadaddr;\n"                                        \
+    "    bool compressed;\n"                                              \
+    "};\n"                                                                \
+    "typedef struct {\n"                                                  \
+    "    uint8_t data[0x10000];\n"                                        \
+    "} chunk_t;\n"                                                        \
+    "typedef struct {\n"                                                  \
+    "    chunk_t *chunks[0x10000];\n"                                     \
+    "} memory_t;\n"                                                       \
+    "typedef struct {\n"                                                  \
+    "    memory_t *mem;\n"                                                \
+    "    riscv_word_t break_addr;\n"                                      \
+    "} state_t;\n"                                                        \
+    "bool start(volatile riscv_t *rv) {\n"                                \
+    "   uint32_t pc, addr, udividend, udivisor, tmp, data, mask, ures, "  \
+    "a, b, jump_to;\n"                                                    \
+    "   int32_t dividend, divisor, res;\n"                                \
+    "   int64_t multiplicand, multiplier;\n"                              \
+    "   uint64_t umultiplier;\n"                                          \
+    "   memory_t *m = ((state_t *)rv->userdata)->mem;\n"                  \
+    "   chunk_t *c;\n"
+
 void trace_and_gencode(riscv_t *rv, char *gencode)
 {
 #define _(inst, can_branch) dispatch_table[rv_insn_##inst] = &gen_##inst;
@@ -1213,91 +1289,7 @@ void trace_and_gencode(riscv_t *rv, char *gencode)
 #undef _
 
     uint32_t pc = rv->PC;
-    strcat(gencode, "#include <stdint.h>\n");
-    strcat(gencode, "#include <stdbool.h>\n");
-    strcat(gencode,
-           "typedef struct riscv_internal riscv_t;\n"
-           "typedef void *riscv_user_t;\n"
-           "typedef uint32_t riscv_word_t;\n"
-           "typedef uint16_t riscv_half_t;\n"
-           "typedef uint8_t riscv_byte_t;\n"
-           "typedef uint32_t riscv_exception_t;\n"
-           "typedef float riscv_float_t;\n"
-           "typedef riscv_word_t (*riscv_mem_ifetch)(riscv_t *rv, riscv_word_t "
-           "addr);\n"
-           "typedef riscv_word_t (*riscv_mem_read_w)(riscv_t *rv, riscv_word_t "
-           "addr);\n"
-           "typedef riscv_half_t (*riscv_mem_read_s)(riscv_t *rv, riscv_word_t "
-           "addr);\n"
-           "typedef riscv_byte_t (*riscv_mem_read_b)(riscv_t *rv, riscv_word_t "
-           "addr);\n"
-           "typedef void (*riscv_mem_write_w)(riscv_t *rv, riscv_word_t addr, "
-           "riscv_word_t data);\n"
-           "typedef void (*riscv_mem_write_s)(riscv_t *rv, riscv_word_t addr, "
-           "riscv_half_t data);\n"
-           "typedef void (*riscv_mem_write_b)(riscv_t *rv, riscv_word_t addr, "
-           "riscv_half_t data);\n"
-           "typedef void (*riscv_on_ecall)(riscv_t *rv);\n"
-           "typedef void (*riscv_on_ebreak)(riscv_t *rv);\n"
-           "typedef struct {\n"
-           "    riscv_mem_ifetch mem_ifetch;\n"
-           "    riscv_mem_read_w mem_read_w;\n"
-           "    riscv_mem_read_s mem_read_s;\n"
-           "    riscv_mem_read_b mem_read_b;\n"
-           "    riscv_mem_write_w mem_write_w;\n"
-           "    riscv_mem_write_s mem_write_s;\n"
-           "    riscv_mem_write_b mem_write_b;\n"
-           "    riscv_on_ecall on_ecall;\n"
-           "    riscv_on_ebreak on_ebreak;\n"
-           "    bool allow_misalign;\n"
-           "} riscv_io_t;\n"
-           "struct riscv_internal {\n"
-           "    bool halt;\n"
-           "    riscv_io_t io;\n"
-           "    riscv_word_t X[32];\n"
-           "    riscv_word_t PC;\n"
-           "    riscv_user_t userdata;\n"
-           "    uint64_t csr_cycle;\n"
-           "    uint32_t csr_time[2];\n"
-           "    uint32_t csr_mstatus;\n"
-           "    uint32_t csr_mtvec;\n"
-           "    uint32_t csr_misa;\n"
-           "    uint32_t csr_mtval;\n"
-           "    uint32_t csr_mcause;\n"
-           "    uint32_t csr_mscratch;\n"
-           "    uint32_t csr_mepc;\n"
-           "    uint32_t csr_mip;\n"
-           "    uint32_t csr_mbadaddr;\n"
-           "    bool compressed;\n"
-           "};\n"
-           "typedef struct {\n"
-           "    uint8_t data[0x10000];\n"
-           "} chunk_t;\n"
-           "typedef struct {\n"
-           "    chunk_t *chunks[0x10000];\n"
-           "} memory_t;\n"
-           "typedef struct {\n"
-           "    memory_t *mem;\n"
-           "    riscv_word_t break_addr;\n"
-           "} state_t;\n"
-           "static inline uint32_t sign_extend_h(const uint32_t x)\n"
-           "{\n"
-           "    return (int32_t) ((int16_t) x);\n"
-           "}\n"
-           "static inline uint32_t sign_extend_b(const uint32_t x)\n"
-           "{\n"
-           "    return (int32_t) ((int8_t) x);\n"
-           "}\n");
-    strcat(gencode, "bool start(volatile riscv_t *rv) {\n");
-    strcat(
-        gencode,
-        "   uint32_t pc, addr, udividend, udivisor, tmp, data, mask, ures, a, b"
-        "jump_to;\n");
-    strcat(gencode, "   int32_t dividend, divisor, res;\n");
-    strcat(gencode, "   int64_t multiplicand, multiplier;\n");
-    strcat(gencode, "   uint64_t umultiplier;\n");
-    strcat(gencode, "   memory_t *m = ((state_t *)rv->userdata)->mem;\n");
-    strcat(gencode, "   chunk_t *c;\n");
+    strcat(gencode, PROLOGUE);
     set_reset(&set);
     stack_reset(&stack);
     trace_ebb(rv, gencode);
