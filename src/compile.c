@@ -17,7 +17,6 @@ static uint8_t elfbuf[BINBUF_CAP] = {0};
 
 uint8_t *compile(riscv_t *rv, char *source)
 {
-    // printf("%s\n", source);
     int saved_stdout = dup(STDOUT_FILENO);
     int outp[2];
 
