@@ -267,6 +267,7 @@ typedef struct rv_insn {
      * branches, so we can jump to the specific IR array directly.
      */
     struct rv_insn *branch_taken, *branch_untaken;
+    uint32_t pc;
 } rv_insn_t;
 
 /* decode the RISC-V instruction */

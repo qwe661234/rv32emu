@@ -1282,7 +1282,9 @@ static block_t *block_alloc(const uint8_t bits)
     block->n_insn = 0;
     block->predict = NULL;
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
+    block->code = NULL;
     block->hot = false;
+    block->extend = false;
     return block;
 }
 
@@ -1341,6 +1343,7 @@ static void block_translate(riscv_t *rv, block_t *block)
             break;
         }
         ir->impl = dispatch_table[ir->opcode];
+        ir->pc = block->pc_end;
         /* compute the end of pc */
         block->pc_end += ir->insn_len;
         block->n_insn++;
@@ -1352,27 +1355,124 @@ static void block_translate(riscv_t *rv, block_t *block)
     block->ir[block->n_insn - 1].tailcall = true;
 }
 
-static void extend_block(riscv_t *rv, block_t *block)
+static bool insn_is_unconditional_jump(uint8_t opcode)
+{
+    switch (opcode) {
+    case rv_insn_ecall:
+    case rv_insn_ebreak:
+    case rv_insn_jal:
+    case rv_insn_jalr:
+    case rv_insn_mret:
+#if RV32_HAS(EXT_C)
+    case rv_insn_cj:
+    case rv_insn_cjalr:
+    case rv_insn_cjal:
+    case rv_insn_cjr:
+    case rv_insn_cebreak:
+#endif
+        return true;
+    }
+    return false;
+}
+
+#define SET_SIZE 1024
+typedef struct {
+    uint32_t table[SET_SIZE][32];
+} set_t;
+
+
+static inline uint32_t set_hash(uint32_t key)
+{
+    return (key >> 1) & (SET_SIZE - 1);
+}
+
+static void set_reset(set_t *set)
+{
+    memset(set, 0, sizeof(set_t));
+}
+
+static bool set_add(set_t *set, uint32_t key)
+{
+    uint32_t index = set_hash(key);
+    uint8_t count = 0;
+    while (set->table[index][count] != 0) {
+        if (set->table[index][count++] == key)
+            return false;
+    }
+
+    set->table[index][count] = key;
+    return true;
+}
+
+static set_t set;
+
+static void extend_block(riscv_t *rv, block_t *block, uint32_t PC)
 {
     rv_insn_t *last_ir = block->ir + block->n_insn - 1;
-    if (last_ir->branch_taken && last_ir->branch_untaken)
+    if (insn_is_unconditional_jump(last_ir->opcode))
         return;
     /* calculate the PC of taken and untaken branches to find block */
-    uint32_t taken_pc = block->pc_end - last_ir->insn_len + last_ir->imm,
-             not_taken_pc = block->pc_end;
+    uint32_t taken_pc = PC - last_ir->insn_len + last_ir->imm,
+             not_taken_pc = PC;
 
-    block_t *next;
+    if (set_add(&set, not_taken_pc)) {
+        last_ir->branch_untaken = block->ir + block->n_insn;
+        while (1) {
+            rv_insn_t *ir = block->ir + block->n_insn;
+            memset(ir, 0, sizeof(rv_insn_t));
 
-    /* check the branch_taken/branch_untaken pointer has been assigned and the
-     * first basic block in the path of the taken/untaken branches exists or
-     * not. If either of these conditions is not met, it will not be possible to
-     * extend the path of the taken/untaken branches for basic block.
-     */
-    if (!last_ir->branch_taken && (next = cache_get(rv->cache, taken_pc)))
-        last_ir->branch_taken = next->ir;
+            /* fetch the next instruction */
+            const uint32_t insn = rv->io.mem_ifetch(rv, not_taken_pc);
 
-    if (!last_ir->branch_untaken && (next = cache_get(rv->cache, not_taken_pc)))
-        last_ir->branch_untaken = next->ir;
+            /* decode the instruction */
+            if (!rv_decode(ir, insn)) {
+                rv->compressed = (ir->insn_len == INSN_16);
+                rv_except_illegal_insn(rv, insn);
+                break;
+            }
+            ir->impl = dispatch_table[ir->opcode];
+            ir->pc = not_taken_pc;
+            /* compute the end of pc */
+            not_taken_pc += ir->insn_len;
+            block->n_insn++;
+
+            /* stop on branch */
+            if (insn_is_branch(ir->opcode)) {
+                ir->tailcall = true;
+                break;
+            }
+        }
+        extend_block(rv, block, not_taken_pc);
+    }
+    if (set_add(&set, taken_pc)) {
+        last_ir->branch_taken = block->ir + block->n_insn;
+        while (1) {
+            rv_insn_t *ir = block->ir + block->n_insn;
+            memset(ir, 0, sizeof(rv_insn_t));
+
+            /* fetch the next instruction */
+            const uint32_t insn = rv->io.mem_ifetch(rv, taken_pc);
+
+            /* decode the instruction */
+            if (!rv_decode(ir, insn)) {
+                rv->compressed = (ir->insn_len == INSN_16);
+                rv_except_illegal_insn(rv, insn);
+                break;
+            }
+            ir->impl = dispatch_table[ir->opcode];
+            ir->pc = taken_pc;
+            /* compute the end of pc */
+            taken_pc += ir->insn_len;
+            block->n_insn++;
+
+            /* stop on branch */
+            if (insn_is_branch(ir->opcode)) {
+                ir->tailcall = true;
+                break;
+            }
+        }
+        extend_block(rv, block, taken_pc);
+    }
 }
 
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
@@ -1409,8 +1509,12 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
          */
         if (prev)
             prev->predict = next;
-    } else
-        extend_block(rv, next);
+    } else if (!next->extend) {
+        set_reset(&set);
+        set_add(&set, next->pc_start);
+        extend_block(rv, next, next->pc_end);
+        next->extend = true;
+    }
 
     return next;
 }
@@ -1444,15 +1548,16 @@ void rv_step(riscv_t *rv, int32_t cycles)
         assert(block);
 
         /* execute the block */
-        uint8_t *code = NULL;
-        if (block->hot)
-            code = code_cache_lookup(rv->cache, block->pc_start);
-        if (!code) {
-            if ((block->hot = cache_hot(rv->cache, block->pc_start)))
-                code = block_compile(rv);
+        if (block->code) {
+            if (unlikely(!((exec_block_func_t) block->code)(rv)))
+                break;
+            prev = block;
+            continue;
         }
-        if (block->hot) {
-            if (unlikely(!((exec_block_func_t) code)(rv)))
+
+        if (block->n_insn >= 5 && cache_hot(rv->cache, block->pc_start)) {
+            block->code = block_compile(rv);
+            if (unlikely(!((exec_block_func_t) block->code)(rv)))
                 break;
             prev = block;
             continue;

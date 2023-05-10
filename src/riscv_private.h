@@ -61,6 +61,8 @@ typedef struct block {
     struct block *predict;     /**< block prediction */
     rv_insn_t *ir;             /**< IR as memory blocks */
     bool hot;
+    bool extend;
+    void *code;
 } block_t;
 
 // typedef struct {
