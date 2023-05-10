@@ -19,7 +19,7 @@
     (((val) * (GOLDEN_RATIO_32)) >> (32 - (cache_size_bits))) & (cache_size - 1)
 /* THRESHOLD is set to identify hot spots. Once the frequency of use for a block
  * exceeds the THRESHOLD, the JIT compiler flow is triggered. */
-#define THRESHOLD 10000
+#define MAX_THRESHOLD 100000
 #define CODE_CACHE_SIZE (64 * 1024 * 1024)
 #define sys_icache_invalidate(addr, size) \
     __builtin___clear_cache((char *) (addr), (char *) (addr) + (size));
@@ -96,12 +96,13 @@ typedef struct cache {
     uint32_t list_size[N_CACHE_LIST_TYPES];
     uint32_t lru_capacity;
 #else /* !RV32_HAS(ARC) */
-    struct list_head *lists[THRESHOLD];
+    struct list_head *lists[MAX_THRESHOLD];
     uint32_t list_size;
 #endif
     hashtable_t *map;
     uint32_t capacity;
 #if JIT
+    uint32_t threshold;
     uint8_t *jitcode;
     uint64_t offset;
 #endif
@@ -272,7 +273,7 @@ cache_t *cache_create(int size_bits)
     cache_mp =
         mpool_create(cache_size * 2 * sizeof(arc_entry_t), sizeof(arc_entry_t));
 #else /* !RV32_HAS(ARC) */
-    for (int i = 0; i < THRESHOLD; i++) {
+    for (int i = 0; i < MAX_THRESHOLD; i++) {
         cache->lists[i] = malloc(sizeof(struct list_head));
         INIT_LIST_HEAD(cache->lists[i]);
     }
@@ -299,6 +300,7 @@ cache_t *cache_create(int size_bits)
 #endif
     cache->capacity = cache_size;
 #if JIT
+    cache->threshold = 5000;
     cache->jitcode = (uint8_t *) mmap(NULL, CODE_CACHE_SIZE,
                                       PROT_READ | PROT_WRITE | PROT_EXEC,
                                       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
@@ -373,7 +375,7 @@ void *cache_get(cache_t *cache, uint32_t key)
     }
     if (!entry)
         return NULL;
-    if (entry->frequency < THRESHOLD)
+    if (entry->frequency < cache->threshold)
         entry->frequency++;
     /* cache hit in LRU_list */
     if (entry->type == LRU_list && cache->lru_capacity != cache->capacity)
@@ -425,7 +427,7 @@ void *cache_get(cache_t *cache, uint32_t key)
      * THRESHOLD, we dispatch the block to the code generator for the purpose of
      * generating C code. Subsequently, the generated C code is compiled into
      * machine code by the target compiler. */
-    if (entry->frequency < THRESHOLD) {
+    if (entry->frequency < cache->threshold) {
         list_del_init(&entry->list);
         list_add(&entry->list, cache->lists[entry->frequency++]);
     }
@@ -506,7 +508,7 @@ void *cache_put(cache_t *cache, uint32_t key, void *value)
     assert(cache->list_size <= cache->capacity);
     /* check the cache is full or not before adding a new entry */
     if (cache->list_size == cache->capacity) {
-        for (int i = 0; i < THRESHOLD; i++) {
+        for (uint32_t i = 0; i < cache->threshold; i++) {
             if (list_empty(cache->lists[i]))
                 continue;
             lfu_entry_t *delete_target =
@@ -543,7 +545,7 @@ void cache_free(cache_t *cache, void (*callback)(void *))
                                   arc_entry_t)
 #endif
 #else /* !RV32_HAS(ARC) */
-    for (int i = 0; i < THRESHOLD; i++) {
+    for (uint32_t i = 0; i < cache->threshold; i++) {
         if (list_empty(cache->lists[i]))
             continue;
         lfu_entry_t *entry, *safe;
@@ -575,7 +577,7 @@ bool cache_hot(struct cache *cache, uint32_t key)
                           arc_entry_t)
 #endif
     {
-        if (entry->key == key && entry->frequency == THRESHOLD)
+        if (entry->key == key && entry->frequency == cache->threshold)
             return true;
     }
 #else
@@ -587,8 +589,12 @@ bool cache_hot(struct cache *cache, uint32_t key)
                           lfu_entry_t)
 #endif
     {
-        if (entry->key == key && entry->frequency == THRESHOLD)
+        if (entry->key == key && entry->frequency == cache->threshold) {
+            cache->threshold = cache->threshold + 1000 > MAX_THRESHOLD
+                                   ? MAX_THRESHOLD
+                                   : cache->threshold + 1000;
             return true;
+        }
     }
 #endif
     return false;
