@@ -41,6 +41,17 @@ bool set_add(set_t *set, uint32_t key)
     return true;
 }
 
+bool set_has(set_t *set, uint32_t key)
+{
+    uint32_t index = hash(key);
+    uint8_t count = 0;
+    while (set->table[index][count] != 0) {
+        if (set->table[index][count++] == key)
+            return true;
+    }
+    return false;
+}
+
 static set_t set;
 static bool insn_is_branch(uint8_t opcode)
 {
@@ -92,7 +103,8 @@ RVOP(jal, {
         sprintf(funcbuf, "    rv->X[%u] = pc + %u;\n", ir->rd, ir->insn_len);
         strcat(gencode, funcbuf);
     }
-    strcat(gencode, "    return true;\n");
+    sprintf(funcbuf, "        goto insn_%x;\n", (pc + ir->imm));
+    strcat(gencode, funcbuf);
 })
 
 RVOP(jalr, {
@@ -107,20 +119,31 @@ RVOP(jalr, {
     strcat(gencode, "    return true;\n");
 })
 
-#define BRNACH_FUNC(type, comp)                                             \
-    sprintf(funcbuf, "    if ((%s) rv->X[%u] %s (%s) rv->X[%u]){\n", #type, \
-            ir->rs1, #comp, #type, ir->rs2);                                \
-    strcat(gencode, funcbuf);                                               \
-    sprintf(funcbuf, "        rv->PC += %u;\n", ir->imm);                   \
-    strcat(gencode, funcbuf);                                               \
-    sprintf(funcbuf, "        goto insn_%x;\n", (pc + ir->imm));            \
-    strcat(gencode, funcbuf);                                               \
-    strcat(gencode, "   }\n");                                              \
-    sprintf(funcbuf, "    rv->PC += %u;\n", ir->insn_len);                  \
-    strcat(gencode, funcbuf);                                               \
-    sprintf(funcbuf, "    goto insn_%x;\n", (pc + ir->insn_len));           \
-    strcat(gencode, funcbuf);
-
+#define BRNACH_FUNC(type, comp)                                              \
+    sprintf(funcbuf, "    if ((%s) rv->X[%u] %s (%s) rv->X[%u]) {\n", #type, \
+            ir->rs1, #comp, #type, ir->rs2);                                 \
+    strcat(gencode, funcbuf);                                                \
+    if (ir->branch_taken) {                                                  \
+        sprintf(funcbuf, "        rv->PC += %u;\n", ir->imm);                \
+        strcat(gencode, funcbuf);                                            \
+        sprintf(funcbuf, "        goto insn_%x;\n", (pc + ir->imm));         \
+        strcat(gencode, funcbuf);                                            \
+    } else {                                                                 \
+        sprintf(funcbuf, "        rv->PC += %u;\n", ir->imm);                \
+        strcat(gencode, funcbuf);                                            \
+        strcat(gencode, "        return true;\n");                           \
+    }                                                                        \
+    strcat(gencode, "   }\n");                                               \
+    if (ir->branch_untaken) {                                                \
+        sprintf(funcbuf, "    rv->PC += %u;\n", ir->insn_len);               \
+        strcat(gencode, funcbuf);                                            \
+        sprintf(funcbuf, "    goto insn_%x;\n", (pc + ir->insn_len));        \
+        strcat(gencode, funcbuf);                                            \
+    } else {                                                                 \
+        sprintf(funcbuf, "        rv->PC += %u;\n", ir->insn_len);           \
+        strcat(gencode, funcbuf);                                            \
+        strcat(gencode, "        return true;\n");                           \
+    }
 
 RVOP(beq, { BRNACH_FUNC(uint32_t, ==); })
 
@@ -962,7 +985,8 @@ RVOP(cjal, {
     strcat(gencode, funcbuf);
     sprintf(funcbuf, "    rv->PC += %u;\n", ir->imm);
     strcat(gencode, funcbuf);
-    sprintf(funcbuf, "    return true;\n");
+    sprintf(funcbuf, "    goto insn_%x;\n", (pc + ir->imm));
+    strcat(gencode, funcbuf);
 })
 
 RVOP(cli, {
@@ -1028,7 +1052,8 @@ RVOP(cand, {
 RVOP(cj, {
     sprintf(funcbuf, "    rv->PC += %u;\n", ir->imm);
     strcat(gencode, funcbuf);
-    sprintf(funcbuf, "    return true;\n");
+    sprintf(funcbuf, "    goto insn_%x;\n", (pc + ir->imm));
+    strcat(gencode, funcbuf);
 })
 
 RVOP(cbeqz, {
@@ -1114,14 +1139,20 @@ RVOP(cswsp, {
 })
 #endif
 
-void trace_ebb(riscv_t *rv, char *gencode)
+void trace_ebb(riscv_t *rv, char *gencode, rv_insn_t *ir)
 {
-    block_t *block = cache_get(rv->cache, rv->PC);
-    for (uint32_t i = 0; i < block->n_insn; i++) {
-        rv_insn_t *ir = block->ir + i;
+    while (1) {
         if (set_add(&set, ir->pc))
             dispatch_table[ir->opcode](rv, ir, gencode, ir->pc);
+
+        if (ir->tailcall)
+            break;
+        ir++;
     }
+    if (ir->branch_untaken && !set_has(&set, ir->branch_untaken->pc))
+        trace_ebb(rv, gencode, ir->branch_untaken);
+    if (ir->branch_taken && !set_has(&set, ir->branch_taken->pc))
+        trace_ebb(rv, gencode, ir->branch_taken);
 }
 
 #define PROLOGUE                                                          \
@@ -1206,10 +1237,9 @@ void trace_and_gencode(riscv_t *rv, char *gencode)
     RISCV_INSN_LIST
 #undef _
 
-    uint32_t pc = rv->PC;
     strcat(gencode, PROLOGUE);
     set_reset(&set);
-    trace_ebb(rv, gencode);
+    block_t *block = cache_get(rv->cache, rv->PC);
+    trace_ebb(rv, gencode, block->ir);
     strcat(gencode, "}");
-    rv->PC = pc;
 }

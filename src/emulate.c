@@ -288,6 +288,8 @@ enum {
 #define RVOP_RUN_NEXT (!ir->tailcall)
 #endif
 
+static bool branch_take = false;
+static uint32_t last_pc = 0;
 #define RVOP(inst, code)                                                  \
     static bool do_##inst(riscv_t *rv UNUSED, const rv_insn_t *ir UNUSED) \
     {                                                                     \
@@ -335,7 +337,7 @@ RVOP(jal, {
         rv->X[ir->rd] = pc + ir->insn_len;
     /* check instruction misaligned */
     RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-    return true;
+    return ir->branch_taken->impl(rv, ir->branch_taken);
 })
 
 /*The indirect jump instruction JALR uses the I-type encoding. The
@@ -357,107 +359,43 @@ RVOP(jalr, {
     return true;
 })
 
-/* BEQ: Branch if Equal */
-RVOP(beq, {
-    const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] != rv->X[ir->rs2]) {
-        if (!ir->branch_untaken)
-            goto nextop;
-        rv->PC += ir->insn_len;
-        return ir->branch_untaken->impl(rv, ir->branch_untaken);
-    }
-    rv->PC += ir->imm;
-    /* check instruction misaligned */
-    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-    if (ir->branch_taken)
-        return ir->branch_taken->impl(rv, ir->branch_taken);
+#define BRNACH_FUNC(type, comp)                                  \
+    const uint32_t pc = rv->PC;                                  \
+    if ((type) rv->X[ir->rs1] comp(type) rv->X[ir->rs2]) {       \
+        branch_take = false;                                     \
+        if (!ir->branch_untaken)                                 \
+            goto nextop;                                         \
+        rv->PC += ir->insn_len;                                  \
+        last_pc = rv->PC;                                        \
+        return ir->branch_untaken->impl(rv, ir->branch_untaken); \
+    }                                                            \
+    branch_take = true;                                          \
+    rv->PC += ir->imm;                                           \
+    /* check instruction misaligned */                           \
+    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);                 \
+    if (ir->branch_taken) {                                      \
+        last_pc = rv->PC;                                        \
+        return ir->branch_taken->impl(rv, ir->branch_taken);     \
+    }                                                            \
     return true;
-})
+
+/* BEQ: Branch if Equal */
+RVOP(beq, { BRNACH_FUNC(uint32_t, !=); })
 
 /* BNE: Branch if Not Equal */
-RVOP(bne, {
-    const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] == rv->X[ir->rs2]) {
-        if (!ir->branch_untaken)
-            goto nextop;
-        rv->PC += ir->insn_len;
-        return ir->branch_untaken->impl(rv, ir->branch_untaken);
-    }
-    rv->PC += ir->imm;
-    /* check instruction misaligned */
-    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-    if (ir->branch_taken)
-        return ir->branch_taken->impl(rv, ir->branch_taken);
-    return true;
-})
+RVOP(bne, { BRNACH_FUNC(uint32_t, ==); })
 
 /* BLT: Branch if Less Than */
-RVOP(blt, {
-    const uint32_t pc = rv->PC;
-    if ((int32_t) rv->X[ir->rs1] >= (int32_t) rv->X[ir->rs2]) {
-        if (!ir->branch_untaken)
-            goto nextop;
-        rv->PC += ir->insn_len;
-        return ir->branch_untaken->impl(rv, ir->branch_untaken);
-    }
-    rv->PC += ir->imm;
-    /* check instruction misaligned */
-    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-    if (ir->branch_taken)
-        return ir->branch_taken->impl(rv, ir->branch_taken);
-    return true;
-})
+RVOP(blt, { BRNACH_FUNC(int32_t, >=); })
 
 /* BGE: Branch if Greater Than */
-RVOP(bge, {
-    const uint32_t pc = rv->PC;
-    if ((int32_t) rv->X[ir->rs1] < (int32_t) rv->X[ir->rs2]) {
-        if (!ir->branch_untaken)
-            goto nextop;
-        rv->PC += ir->insn_len;
-        return ir->branch_untaken->impl(rv, ir->branch_untaken);
-    }
-    rv->PC += ir->imm;
-    /* check instruction misaligned */
-    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-    if (ir->branch_taken)
-        return ir->branch_taken->impl(rv, ir->branch_taken);
-    return true;
-})
+RVOP(bge, { BRNACH_FUNC(int32_t, <); })
 
 /* BLTU: Branch if Less Than Unsigned */
-RVOP(bltu, {
-    const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] >= rv->X[ir->rs2]) {
-        if (!ir->branch_untaken)
-            goto nextop;
-        rv->PC += ir->insn_len;
-        return ir->branch_untaken->impl(rv, ir->branch_untaken);
-    }
-    rv->PC += ir->imm;
-    /* check instruction misaligned */
-    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-    if (ir->branch_taken)
-        return ir->branch_taken->impl(rv, ir->branch_taken);
-    return true;
-})
+RVOP(bltu, { BRNACH_FUNC(uint32_t, >=); })
 
 /* BGEU: Branch if Greater Than Unsigned */
-RVOP(bgeu, {
-    const uint32_t pc = rv->PC;
-    if (rv->X[ir->rs1] < rv->X[ir->rs2]) {
-        if (!ir->branch_untaken)
-            goto nextop;
-        rv->PC += ir->insn_len;
-        return ir->branch_untaken->impl(rv, ir->branch_untaken);
-    }
-    rv->PC += ir->imm;
-    /* check instruction misaligned */
-    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-    if (ir->branch_taken)
-        return ir->branch_taken->impl(rv, ir->branch_taken);
-    return true;
-})
+RVOP(bgeu, { BRNACH_FUNC(uint32_t, <); })
 
 /* LB: Load Byte */
 RVOP(lb, {
@@ -1091,7 +1029,7 @@ RVOP(cjal, {
     rv->X[1] = rv->PC + ir->insn_len;
     rv->PC += ir->imm;
     RV_EXC_MISALIGN_HANDLER(rv->PC, insn, true, 0);
-    return true;
+    return ir->branch_taken->impl(rv, ir->branch_taken);
 })
 
 /* C.LI loads the sign-extended 6-bit immediate, imm, into register rd.
@@ -1159,7 +1097,7 @@ RVOP(cand, { rv->X[ir->rd] = rv->X[ir->rs1] & rv->X[ir->rs2]; })
 RVOP(cj, {
     rv->PC += ir->imm;
     RV_EXC_MISALIGN_HANDLER(rv->PC, insn, true, 0);
-    return true;
+    return ir->branch_taken->impl(rv, ir->branch_taken);
 })
 
 /* C.BEQZ performs conditional control transfers. The offset is
@@ -1269,18 +1207,6 @@ static bool insn_is_branch(uint8_t opcode)
     return false;
 }
 
-/* hash function is used when mapping address into the block map */
-// static uint32_t hash(size_t k)
-// {
-//     k ^= k << 21;
-//     k ^= k >> 17;
-// #if (SIZE_MAX > 0xFFFFFFFF)
-//     k ^= k >> 35;
-//     k ^= k >> 51;
-// #endif
-//     return k;
-// }
-
 /* allocate a basic block */
 static block_t *block_alloc(const uint8_t bits)
 {
@@ -1294,42 +1220,6 @@ static block_t *block_alloc(const uint8_t bits)
     block->extend = false;
     return block;
 }
-
-// /* insert a block into block map */
-// static void block_insert(block_map_t *map, const block_t *block)
-// {
-//     assert(map && block);
-//     const uint32_t mask = map->block_capacity - 1;
-//     uint32_t index = hash(block->pc_start);
-
-//     /* insert into the block map */
-//     for (;; index++) {
-//         if (!map->map[index & mask]) {
-//             map->map[index & mask] = (block_t *) block;
-//             break;
-//         }
-//     }
-//     map->size++;
-// }
-
-// /* try to locate an already translated block in the block map */
-// static block_t *block_find(const block_map_t *map, const uint32_t addr)
-// {
-//     assert(map);
-//     uint32_t index = hash(addr);
-//     const uint32_t mask = map->block_capacity - 1;
-
-//     /* find block in block map */
-//     for (;; index++) {
-//         block_t *block = map->map[index & mask];
-//         if (!block)
-//             return NULL;
-
-//         if (block->pc_start == addr)
-//             return block;
-//     }
-//     return NULL;
-// }
 
 static void block_translate(riscv_t *rv, block_t *block)
 {
@@ -1356,8 +1246,14 @@ static void block_translate(riscv_t *rv, block_t *block)
         block->n_insn++;
 
         /* stop on branch */
-        if (insn_is_branch(ir->opcode))
+        if (insn_is_branch(ir->opcode)) {
+            if (ir->opcode == rv_insn_jal || ir->opcode == rv_insn_cj || ir->opcode == rv_insn_cjal) {
+                block->pc_end = block->pc_end - ir->insn_len + ir->imm;
+                ir->branch_taken = ir + 1;
+                continue;
+            }
             break;
+        }
     }
     block->ir[block->n_insn - 1].tailcall = true;
 }
@@ -1382,119 +1278,11 @@ static bool insn_is_unconditional_jump(uint8_t opcode)
     return false;
 }
 
-#define SET_SIZE 1024
-typedef struct {
-    uint32_t table[SET_SIZE][32];
-} set_t;
-
-
-static inline uint32_t set_hash(uint32_t key)
-{
-    return (key >> 1) & (SET_SIZE - 1);
-}
-
-static void set_reset(set_t *set)
-{
-    memset(set, 0, sizeof(set_t));
-}
-
-static bool set_add(set_t *set, uint32_t key)
-{
-    uint32_t index = set_hash(key);
-    uint8_t count = 0;
-    while (set->table[index][count] != 0) {
-        if (set->table[index][count++] == key)
-            return false;
-    }
-
-    set->table[index][count] = key;
-    return true;
-}
-
-static set_t set;
-
-static void extend_block(riscv_t *rv, block_t *block, uint32_t PC)
-{
-    rv_insn_t *last_ir = block->ir + block->n_insn - 1;
-    if (insn_is_unconditional_jump(last_ir->opcode))
-        return;
-    /* calculate the PC of taken and untaken branches to find block */
-    uint32_t taken_pc = PC - last_ir->insn_len + last_ir->imm,
-             not_taken_pc = PC;
-
-    if (set_add(&set, not_taken_pc)) {
-        last_ir->branch_untaken = block->ir + block->n_insn;
-        while (1) {
-            rv_insn_t *ir = block->ir + block->n_insn;
-            memset(ir, 0, sizeof(rv_insn_t));
-
-            /* fetch the next instruction */
-            const uint32_t insn = rv->io.mem_ifetch(rv, not_taken_pc);
-
-            /* decode the instruction */
-            if (!rv_decode(ir, insn)) {
-                rv->compressed = (ir->insn_len == INSN_16);
-                rv_except_illegal_insn(rv, insn);
-                break;
-            }
-            ir->impl = dispatch_table[ir->opcode];
-            ir->pc = not_taken_pc;
-            /* compute the end of pc */
-            not_taken_pc += ir->insn_len;
-            block->n_insn++;
-
-            /* stop on branch */
-            if (insn_is_branch(ir->opcode)) {
-                ir->tailcall = true;
-                break;
-            }
-        }
-        extend_block(rv, block, not_taken_pc);
-    }
-    if (set_add(&set, taken_pc)) {
-        last_ir->branch_taken = block->ir + block->n_insn;
-        while (1) {
-            rv_insn_t *ir = block->ir + block->n_insn;
-            memset(ir, 0, sizeof(rv_insn_t));
-
-            /* fetch the next instruction */
-            const uint32_t insn = rv->io.mem_ifetch(rv, taken_pc);
-
-            /* decode the instruction */
-            if (!rv_decode(ir, insn)) {
-                rv->compressed = (ir->insn_len == INSN_16);
-                rv_except_illegal_insn(rv, insn);
-                break;
-            }
-            ir->impl = dispatch_table[ir->opcode];
-            ir->pc = taken_pc;
-            /* compute the end of pc */
-            taken_pc += ir->insn_len;
-            block->n_insn++;
-
-            /* stop on branch */
-            if (insn_is_branch(ir->opcode)) {
-                ir->tailcall = true;
-                break;
-            }
-        }
-        extend_block(rv, block, taken_pc);
-    }
-}
-
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
-    // block_map_t *map = &rv->block_map;
-    /* lookup the next block in the block map */
-    // block_t *next = block_find(map, rv->PC);
     block_t *next = (block_t *) cache_get(rv->cache, rv->PC);
 
     if (!next) {
-        // if (map->size * 1.25 > map->block_capacity) {
-        //     block_map_clear(map);
-        //     prev = NULL;
-        // }
-
         /* allocate a new block */
         next = block_alloc(10);
 
@@ -1507,7 +1295,6 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
             free(delete_target->ir);
             free(delete_target);
         }
-        // block_insert(&rv->block_map, next);
 
         /* update the block prediction
          * When we translate a new block, the block predictor may benefit,
@@ -1516,24 +1303,18 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
          */
         if (prev)
             prev->predict = next;
-    } else if (!next->extend) {
-        set_reset(&set);
-        set_add(&set, next->pc_start);
-        extend_block(rv, next, next->pc_end);
-        next->extend = true;
     }
 
     return next;
 }
 
 typedef bool (*exec_block_func_t)(riscv_t *rv);
-
+static block_t *prev = NULL;
 void rv_step(riscv_t *rv, int32_t cycles)
 {
     assert(rv);
 
     /* find or translate a block for starting PC */
-    block_t *prev = NULL;
 
     const uint64_t cycles_target = rv->csr_cycle + cycles;
 
@@ -1554,6 +1335,20 @@ void rv_step(riscv_t *rv, int32_t cycles)
         /* we should have a block by now */
         assert(block);
 
+        if (prev) {
+            if (prev->pc_start != last_pc) {
+                prev = cache_get(rv->cache, last_pc);
+            }
+            rv_insn_t *last_ir = prev->ir + prev->n_insn - 1;
+            if (!insn_is_unconditional_jump(last_ir->opcode)) {
+                if (branch_take && !last_ir->branch_taken)
+                    last_ir->branch_taken = block->ir;
+                else if (!last_ir->branch_untaken)
+                    last_ir->branch_untaken = block->ir;
+            }
+        }
+        last_pc = rv->PC;
+
         /* execute the block */
         if (block->code) {
             if (unlikely(!((exec_block_func_t) block->code)(rv)))
@@ -1562,7 +1357,7 @@ void rv_step(riscv_t *rv, int32_t cycles)
             continue;
         }
 
-        if (block->n_insn >= 5 && cache_hot(rv->cache, block->pc_start)) {
+        if (cache_hot(rv->cache, block->pc_start)) {
             block->code = block_compile(rv);
             if (unlikely(!((exec_block_func_t) block->code)(rv)))
                 break;

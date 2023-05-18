@@ -90,7 +90,7 @@ riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
     /* initialize the block map */
     // block_map_init(&rv->block_map, 10);
 
-    rv->cache = cache_create(10);
+    rv->cache = cache_create(11);
 
     /* reset */
     rv_reset(rv, 0U);
