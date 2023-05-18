@@ -64,7 +64,7 @@ static bool insn_is_branch(uint8_t opcode)
     return false;
 }
 typedef void (*gen_func_t)(riscv_t *, const rv_insn_t *, char *, uint32_t);
-static gen_func_t dispatch_table[124];
+static gen_func_t dispatch_table[128];
 static char funcbuf[128] = {0};
 #define RVOP(inst, code)                                                  \
     static void gen_##inst(riscv_t *rv UNUSED, const rv_insn_t *ir,       \
@@ -1139,6 +1139,24 @@ RVOP(cswsp, {
 })
 #endif
 
+RVOP(fuse1, {
+    sprintf(funcbuf, "    rv->X[%u] = (int32_t) (rv->PC + %u + %u);\n", ir->rd,
+            ir->imm, ir->imm2);
+    strcat(gencode, funcbuf);
+})
+
+RVOP(fuse2, {
+    sprintf(
+        funcbuf,
+        "    rv->X[%u] = (int32_t) (rv->X[%u]) + (int32_t) (rv->PC + %u);\n",
+        ir->rd, ir->rs1, ir->imm);
+    strcat(gencode, funcbuf);
+})
+
+RVOP(fuse3, {
+    sprintf(funcbuf, "    rv->X[%u] = %u + %u;\n", ir->rd, ir->imm, ir->imm2);
+    strcat(gencode, funcbuf);
+})
 void trace_ebb(riscv_t *rv, char *gencode, rv_insn_t *ir)
 {
     while (1) {

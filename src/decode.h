@@ -156,7 +156,10 @@
         _(cjalr, 1)                        \
         _(cadd, 0)                         \
         _(cswsp, 0)                        \
-    )
+    )                                      \
+    _(fuse1, 0)                            \
+    _(fuse2, 0)                            \
+    _(fuse3, 0)
 /* clang-format on */
 
 /* IR list */
@@ -240,7 +243,7 @@ typedef struct rv_insn {
 #if RV32_HAS(EXT_C)
     uint8_t shamt;
 #endif
-
+    int32_t imm2;
     /* instruction length */
     uint8_t insn_len;
 

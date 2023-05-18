@@ -288,6 +288,8 @@ enum {
 #define RVOP_RUN_NEXT (!ir->tailcall)
 #endif
 
+
+
 static bool branch_take = false;
 static uint32_t last_pc = 0;
 #define RVOP(inst, code)                                                  \
@@ -1189,6 +1191,16 @@ RVOP(cswsp, {
     rv->io.mem_write_w(rv, addr, rv->X[ir->rs2]);
 })
 #endif
+/* auipc + addi */
+RVOP(fuse1, { rv->X[ir->rd] = (int32_t) (rv->PC + ir->imm + ir->imm2); })
+
+/* auipc + add */
+RVOP(fuse2, {
+    rv->X[ir->rd] = (int32_t) (rv->X[ir->rs1]) + (int32_t) (rv->PC + ir->imm);
+})
+
+/* lui + addi */
+RVOP(fuse3, { rv->X[ir->rd] = ir->imm + ir->imm2; })
 
 static const void *dispatch_table[] = {
 #define _(inst, can_branch) [rv_insn_##inst] = do_##inst,
@@ -1247,7 +1259,11 @@ static void block_translate(riscv_t *rv, block_t *block)
 
         /* stop on branch */
         if (insn_is_branch(ir->opcode)) {
-            if (ir->opcode == rv_insn_jal || ir->opcode == rv_insn_cj || ir->opcode == rv_insn_cjal) {
+            if (ir->opcode == rv_insn_jal
+#if RV32_HAS(EXT_C)
+                || ir->opcode == rv_insn_cj || ir->opcode == rv_insn_cjal
+#endif
+            ) {
                 block->pc_end = block->pc_end - ir->insn_len + ir->imm;
                 ir->branch_taken = ir + 1;
                 continue;
@@ -1278,6 +1294,43 @@ static bool insn_is_unconditional_jump(uint8_t opcode)
     return false;
 }
 
+static void match_pattern(block_t *block)
+{
+    for (uint32_t i = 0; i < block->n_insn - 1; i++) {
+        rv_insn_t *ir = block->ir + i;
+        if (ir->opcode == rv_insn_auipc) {
+            rv_insn_t *next_ir = ir + 1;
+            if (next_ir->opcode == rv_insn_addi) {
+                if (ir->rd == next_ir->rs1) {
+                    ir->opcode = rv_insn_fuse1;
+                    ir->rd = next_ir->rd;
+                    ir->imm2 = next_ir->imm;
+                    ir->impl = dispatch_table[ir->opcode];
+                    next_ir->opcode = rv_insn_nop;
+                    next_ir->impl = dispatch_table[next_ir->opcode];
+                } else if (ir->rd == next_ir->rs2) {
+                    ir->opcode = rv_insn_fuse2;
+                    ir->rd = next_ir->rd;
+                    ir->rs1 = next_ir->rs1;
+                    ir->impl = dispatch_table[ir->opcode];
+                    next_ir->opcode = rv_insn_nop;
+                    next_ir->impl = dispatch_table[next_ir->opcode];
+                }
+            }
+        } else if (ir->opcode == rv_insn_lui) {
+            rv_insn_t *next_ir = ir + 1;
+            if (next_ir->opcode == rv_insn_addi && ir->rd == next_ir->rs1) {
+                ir->opcode = rv_insn_fuse3;
+                ir->rd = next_ir->rd;
+                ir->imm2 = next_ir->imm;
+                ir->impl = dispatch_table[ir->opcode];
+                next_ir->opcode = rv_insn_nop;
+                next_ir->impl = dispatch_table[next_ir->opcode];
+            }
+        }
+    }
+}
+
 static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 {
     block_t *next = (block_t *) cache_get(rv->cache, rv->PC);
@@ -1288,7 +1341,7 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 
         /* translate the basic block */
         block_translate(rv, next);
-
+        match_pattern(next);
         /* insert the block into block map */
         block_t *delete_target = cache_put(rv->cache, rv->PC, &(*next));
         if (delete_target) {
