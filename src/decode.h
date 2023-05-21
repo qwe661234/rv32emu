@@ -159,7 +159,9 @@
     )                                      \
     _(fuse1, 0)                            \
     _(fuse2, 0)                            \
-    _(fuse3, 0)
+    _(fuse3, 0)                            \
+    _(fuse4, 0)                            \
+    _(empty, 0)
 /* clang-format on */
 
 /* IR list */
@@ -167,6 +169,7 @@ enum {
 #define _(inst, can_branch) rv_insn_##inst,
     RISCV_INSN_LIST
 #undef _
+        rv_insn_qty,
 };
 
 /* clang-format off */
@@ -231,6 +234,11 @@ enum {
     INSN_32 = 4,
 };
 
+typedef struct mem_fuse {
+    int32_t imm;
+    uint8_t rd, rs1, rs2;
+} mem_fuse_t;
+
 typedef struct rv_insn {
     union {
         int32_t imm;
@@ -243,7 +251,10 @@ typedef struct rv_insn {
 #if RV32_HAS(EXT_C)
     uint8_t shamt;
 #endif
+    /* fuse operation */
     int32_t imm2;
+    mem_fuse_t *mem_fuse;
+
     /* instruction length */
     uint8_t insn_len;
 

@@ -292,18 +292,18 @@ enum {
 
 static bool branch_take = false;
 static uint32_t last_pc = 0;
-#define RVOP(inst, code)                                                  \
-    static bool do_##inst(riscv_t *rv UNUSED, const rv_insn_t *ir UNUSED) \
-    {                                                                     \
-        rv->X[rv_reg_zero] = 0;                                           \
-        rv->csr_cycle++;                                                  \
-        code;                                                             \
-    nextop:                                                               \
-        rv->PC += ir->insn_len;                                           \
-        if (!RVOP_RUN_NEXT)                                               \
-            return true;                                                  \
-        const rv_insn_t *next = ir + 1;                                   \
-        MUST_TAIL return next->impl(rv, next);                            \
+#define RVOP(inst, code)                                    \
+    static bool do_##inst(riscv_t *rv, const rv_insn_t *ir) \
+    {                                                       \
+        rv->X[rv_reg_zero] = 0;                             \
+        rv->csr_cycle++;                                    \
+        code;                                               \
+    nextop:                                                 \
+        rv->PC += ir->insn_len;                             \
+        if (!RVOP_RUN_NEXT)                                 \
+            return true;                                    \
+        const rv_insn_t *next = ir + 1;                     \
+        MUST_TAIL return next->impl(rv, next);              \
     }
 
 /* RV32I Base Instruction Set */
@@ -1192,15 +1192,46 @@ RVOP(cswsp, {
 })
 #endif
 /* auipc + addi */
-RVOP(fuse1, { rv->X[ir->rd] = (int32_t) (rv->PC + ir->imm + ir->imm2); })
+RVOP(fuse1, {
+    rv->X[ir->rd] = (int32_t) (rv->PC + ir->imm + ir->imm2);
+    rv->PC += ir->insn_len;
+})
 
 /* auipc + add */
 RVOP(fuse2, {
     rv->X[ir->rd] = (int32_t) (rv->X[ir->rs1]) + (int32_t) (rv->PC + ir->imm);
+    rv->PC += ir->insn_len;
 })
 
-/* lui + addi */
-RVOP(fuse3, { rv->X[ir->rd] = ir->imm + ir->imm2; })
+/* multiple sw */
+RVOP(fuse3, {
+    mem_fuse_t *mem_fuse = ir->mem_fuse;
+    for (int i = 0; i < ir->imm2; i++) {
+        const uint32_t addr = rv->X[mem_fuse[i].rs1] + mem_fuse[i].imm;
+        RV_EXC_MISALIGN_HANDLER(3, store, false, 1);
+        rv->io.mem_write_w(rv, addr, rv->X[mem_fuse[i].rs2]);
+    }
+    rv->PC += ir->insn_len * (ir->imm2 - 1);
+})
+
+/* multiple lw */
+RVOP(fuse4, {
+    mem_fuse_t *mem_fuse = ir->mem_fuse;
+    for (int i = 0; i < ir->imm2; i++) {
+        const uint32_t addr = rv->X[mem_fuse[i].rs1] + mem_fuse[i].imm;
+        RV_EXC_MISALIGN_HANDLER(3, load, false, 1);
+        rv->X[mem_fuse[i].rd] = rv->io.mem_read_w(rv, addr);
+    }
+    rv->PC += ir->insn_len * (ir->imm2 - 1);
+})
+
+static bool do_empty(riscv_t *rv UNUSED, const rv_insn_t *ir UNUSED)
+{
+    rv->X[rv_reg_zero] = 0;
+    rv->csr_cycle++;
+    const rv_insn_t *next = ir + 1;
+    MUST_TAIL return next->impl(rv, next);
+}
 
 static const void *dispatch_table[] = {
 #define _(inst, can_branch) [rv_insn_##inst] = do_##inst,
@@ -1229,7 +1260,6 @@ static block_t *block_alloc(const uint8_t bits)
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
     block->code = NULL;
     block->hot = false;
-    block->extend = false;
     return block;
 }
 
@@ -1297,36 +1327,85 @@ static bool insn_is_unconditional_jump(uint8_t opcode)
 static void match_pattern(block_t *block)
 {
     for (uint32_t i = 0; i < block->n_insn - 1; i++) {
-        rv_insn_t *ir = block->ir + i;
-        if (ir->opcode == rv_insn_auipc) {
-            rv_insn_t *next_ir = ir + 1;
+        rv_insn_t *ir = block->ir + i, *next_ir = NULL;
+        int32_t count = 0;
+        switch (ir->opcode) {
+        case rv_insn_auipc:
+            next_ir = ir + 1;
             if (next_ir->opcode == rv_insn_addi) {
                 if (ir->rd == next_ir->rs1) {
                     ir->opcode = rv_insn_fuse1;
                     ir->rd = next_ir->rd;
                     ir->imm2 = next_ir->imm;
                     ir->impl = dispatch_table[ir->opcode];
-                    next_ir->opcode = rv_insn_nop;
+                    next_ir->opcode = rv_insn_empty;
                     next_ir->impl = dispatch_table[next_ir->opcode];
                 } else if (ir->rd == next_ir->rs2) {
                     ir->opcode = rv_insn_fuse2;
                     ir->rd = next_ir->rd;
                     ir->rs1 = next_ir->rs1;
                     ir->impl = dispatch_table[ir->opcode];
-                    next_ir->opcode = rv_insn_nop;
+                    next_ir->opcode = rv_insn_empty;
                     next_ir->impl = dispatch_table[next_ir->opcode];
                 }
             }
-        } else if (ir->opcode == rv_insn_lui) {
-            rv_insn_t *next_ir = ir + 1;
-            if (next_ir->opcode == rv_insn_addi && ir->rd == next_ir->rs1) {
-                ir->opcode = rv_insn_fuse3;
-                ir->rd = next_ir->rd;
-                ir->imm2 = next_ir->imm;
-                ir->impl = dispatch_table[ir->opcode];
-                next_ir->opcode = rv_insn_nop;
-                next_ir->impl = dispatch_table[next_ir->opcode];
+            break;
+        case rv_insn_sw:
+            count = 1;
+            for (uint32_t j = 1; j < block->n_insn - 1 - i; j++) {
+                next_ir = ir + j;
+                if (next_ir->opcode != rv_insn_sw)
+                    break;
+                count++;
             }
+            if (count >= 5) {
+                ir->opcode = rv_insn_fuse3;
+                ir->mem_fuse = malloc(count * sizeof(mem_fuse_t));
+                ir->imm2 = count;
+                ir->mem_fuse[0].imm = ir->imm;
+                ir->mem_fuse[0].rd = ir->rd;
+                ir->mem_fuse[0].rs1 = ir->rs1;
+                ir->mem_fuse[0].rs2 = ir->rs2;
+                ir->impl = dispatch_table[ir->opcode];
+                for (int j = 1; j < count; j++) {
+                    next_ir = ir + j;
+                    ir->mem_fuse[j].imm = next_ir->imm;
+                    ir->mem_fuse[j].rd = next_ir->rd;
+                    ir->mem_fuse[j].rs1 = next_ir->rs1;
+                    ir->mem_fuse[j].rs2 = next_ir->rs2;
+                    next_ir->opcode = rv_insn_empty;
+                    next_ir->impl = dispatch_table[next_ir->opcode];
+                }
+            }
+            break;
+        case rv_insn_lw:
+            count = 1;
+            for (uint32_t j = 1; j < block->n_insn - 1 - i; j++) {
+                next_ir = ir + j;
+                if (next_ir->opcode != rv_insn_lw)
+                    break;
+                count++;
+            }
+            if (count >= 5) {
+                ir->opcode = rv_insn_fuse4;
+                ir->mem_fuse = malloc(count * sizeof(mem_fuse_t));
+                ir->imm2 = count;
+                ir->mem_fuse[0].imm = ir->imm;
+                ir->mem_fuse[0].rd = ir->rd;
+                ir->mem_fuse[0].rs1 = ir->rs1;
+                ir->mem_fuse[0].rs2 = ir->rs2;
+                ir->impl = dispatch_table[ir->opcode];
+                for (int j = 1; j < count; j++) {
+                    next_ir = ir + j;
+                    ir->mem_fuse[j].imm = next_ir->imm;
+                    ir->mem_fuse[j].rd = next_ir->rd;
+                    ir->mem_fuse[j].rs1 = next_ir->rs1;
+                    ir->mem_fuse[j].rs2 = next_ir->rs2;
+                    next_ir->opcode = rv_insn_empty;
+                    next_ir->impl = dispatch_table[next_ir->opcode];
+                }
+            }
+            break;
         }
     }
 }
@@ -1341,7 +1420,10 @@ static block_t *block_find_or_translate(riscv_t *rv, block_t *prev)
 
         /* translate the basic block */
         block_translate(rv, next);
+
+        /* fuse operation */
         match_pattern(next);
+
         /* insert the block into block map */
         block_t *delete_target = cache_put(rv->cache, rv->PC, &(*next));
         if (delete_target) {

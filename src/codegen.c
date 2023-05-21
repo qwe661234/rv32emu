@@ -64,7 +64,7 @@ static bool insn_is_branch(uint8_t opcode)
     return false;
 }
 typedef void (*gen_func_t)(riscv_t *, const rv_insn_t *, char *, uint32_t);
-static gen_func_t dispatch_table[128];
+static gen_func_t dispatch_table[rv_insn_qty];
 static char funcbuf[128] = {0};
 #define RVOP(inst, code)                                                  \
     static void gen_##inst(riscv_t *rv UNUSED, const rv_insn_t *ir,       \
@@ -716,19 +716,19 @@ RVOP(fadds, {
     strcat(gencode, funcbuf);
     sprintf(funcbuf, "        rv->csr_fcsr |= %u;\n", FFLAG_INVALID_OP);
     strcat(gencode, funcbuf);
-    printf(funcbuf, "    } else {\n");
+    sprintf(funcbuf, "    } else {\n");
     strcat(gencode, funcbuf);
     sprintf(funcbuf, "        rv->F[%u] = rv->F[%u] + rv->F[%u];\n", ir->rd,
             ir->rs1, ir->rs2);
     strcat(gencode, funcbuf);
-    printf(funcbuf, "    }\n");
+    sprintf(funcbuf, "    }\n");
     strcat(gencode, funcbuf);
     sprintf(funcbuf, "    if (isinff(rv->F[%d])) {\n", ir->rd);
     sprintf(funcbuf, "        rv->csr_fcsr |= %u;\n", FFLAG_OVERFLOW);
     strcat(gencode, funcbuf);
     sprintf(funcbuf, "        rv->csr_fcsr |= %u;\n", FFLAG_INEXACT);
     strcat(gencode, funcbuf);
-    printf(funcbuf, "    }\n");
+    sprintf(funcbuf, "    }\n");
 })
 
 /* FSUB.S */
@@ -738,7 +738,7 @@ RVOP(fsubs, {
     strcat(gencode, funcbuf);
     sprintf(funcbuf, "        rv->F_int[%u] = %u;\n", ir->rd, RV_NAN);
     strcat(gencode, funcbuf);
-    printf(funcbuf, "    else\n");
+    sprintf(funcbuf, "    else\n");
     strcat(gencode, funcbuf);
     sprintf(funcbuf, "        rv->F[%u] = rv->F[%u] - rv->F[%u];\n", ir->rd,
             ir->rs1, ir->rs2);
@@ -1154,9 +1154,46 @@ RVOP(fuse2, {
 })
 
 RVOP(fuse3, {
-    sprintf(funcbuf, "    rv->X[%u] = %u + %u;\n", ir->rd, ir->imm, ir->imm2);
+    mem_fuse_t *mem_fuse = ir->mem_fuse;
+    for (int i = 0; i < ir->imm2; i++) {
+        sprintf(funcbuf, "   addr = rv->X[%u] + %u;\n", mem_fuse[i].rs1,
+                mem_fuse[i].imm);
+        strcat(gencode, funcbuf);
+        strcat(gencode, "   c = m->chunks[addr >> 16];\n");
+        sprintf(funcbuf,
+                "*(uint32_t *) (c->data + (addr & 0xffff)) = rv->X[%u];\n",
+                mem_fuse[i].rs2);
+        strcat(gencode, funcbuf);
+    }
+    sprintf(funcbuf, "    rv->PC += %u;\n", ir->imm2 * ir->insn_len);
     strcat(gencode, funcbuf);
+    sprintf(funcbuf, "    goto insn_%x;\n", (pc + ir->imm2 * ir->insn_len));
+    strcat(gencode, funcbuf);
+    return;
 })
+
+RVOP(fuse4, {
+    mem_fuse_t *mem_fuse = ir->mem_fuse;
+    for (int i = 0; i < ir->imm2; i++) {
+        sprintf(funcbuf, "   addr = rv->X[%u] + %u;\n", mem_fuse[i].rs1,
+                mem_fuse[i].imm);
+        strcat(gencode, funcbuf);
+        strcat(gencode, "   c = m->chunks[addr >> 16];\n");
+        sprintf(funcbuf,
+                "   rv->X[%u] = * (const uint32_t *) (c->data + (addr & "
+                "0xffff));\n",
+                mem_fuse[i].rd);
+        strcat(gencode, funcbuf);
+    }
+    sprintf(funcbuf, "    rv->PC += %u;\n", ir->imm2 * ir->insn_len);
+    strcat(gencode, funcbuf);
+    sprintf(funcbuf, "    goto insn_%x;\n", (pc + ir->imm2 * ir->insn_len));
+    strcat(gencode, funcbuf);
+    return;
+})
+
+RVOP(empty, {})
+
 void trace_ebb(riscv_t *rv, char *gencode, rv_insn_t *ir)
 {
     while (1) {
