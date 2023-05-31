@@ -322,7 +322,7 @@ bool elf_get_data_section_range(elf_t *e, uint32_t *start, uint32_t *end)
  * Finding data for section headers:
  *   File start + section_header.offset -> section Data
  */
-bool elf_load(elf_t *e, riscv_t *rv, memory_t *mem)
+bool elf_load(elf_t *e, riscv_t *rv)
 {
     /* set the entry point */
     if (!rv_set_pc(rv, e->hdr->e_entry))
@@ -342,13 +342,12 @@ bool elf_load(elf_t *e, riscv_t *rv, memory_t *mem)
         /* memcpy required range */
         const int to_copy = min(phdr->p_memsz, phdr->p_filesz);
         if (to_copy)
-            memory_write(mem, phdr->p_vaddr, e->raw_data + phdr->p_offset,
-                         to_copy);
+            memory_write(phdr->p_vaddr, e->raw_data + phdr->p_offset, to_copy);
 
         /* zero fill required range */
         const int to_zero = max(phdr->p_memsz, phdr->p_filesz) - to_copy;
         if (to_zero)
-            memory_fill(mem, phdr->p_vaddr + to_copy, to_zero, 0);
+            memory_fill(phdr->p_vaddr + to_copy, to_zero, 0);
     }
 
     return true;

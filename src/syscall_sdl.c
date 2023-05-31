@@ -86,12 +86,11 @@ static submission_queue_t submission_queue = {
     .start = 0,
 };
 
-static submission_t submission_pop(riscv_t *rv)
+static submission_t submission_pop()
 {
-    state_t *s = rv_userdata(rv);
     submission_t submission;
     memory_read(
-        s->mem, (void *) &submission,
+        (void *) &submission,
         submission_queue.base + submission_queue.start * sizeof(submission_t),
         sizeof(submission_t));
     ++submission_queue.start;
@@ -99,18 +98,17 @@ static submission_t submission_pop(riscv_t *rv)
     return submission;
 }
 
-static void event_push(riscv_t *rv, event_t event)
+static void event_push(event_t event)
 {
-    state_t *s = rv_userdata(rv);
-    memory_write(s->mem, event_queue.base + event_queue.end * sizeof(event_t),
+    memory_write(event_queue.base + event_queue.end * sizeof(event_t),
                  (void *) &event, sizeof(event_t));
     ++event_queue.end;
     event_queue.end &= queues_capacity - 1;
 
     uint32_t count;
-    memory_read(s->mem, (void *) &count, event_count, sizeof(uint32_t));
+    memory_read((void *) &count, event_count, sizeof(uint32_t));
     count += 1;
-    memory_write_w(s->mem, event_count, (void *) &count);
+    memory_write_w(event_count, (void *) &count);
 }
 
 static inline uint32_t round_pow2(uint32_t x)
@@ -177,7 +175,7 @@ static bool check_sdl(riscv_t *rv, int width, int height)
                 .state = (bool) (event.key.state == SDL_PRESSED),
             };
             memcpy(&new_event.key_event, &key_event, sizeof(key_event));
-            event_push(rv, new_event);
+            event_push(new_event);
             break;
         }
         case SDL_MOUSEMOTION: {
@@ -190,7 +188,7 @@ static bool check_sdl(riscv_t *rv, int width, int height)
             };
             memcpy(&new_event.mouse.motion, &mouse_motion,
                    sizeof(mouse_motion));
-            event_push(rv, new_event);
+            event_push(new_event);
             break;
         }
         case SDL_MOUSEBUTTONDOWN:
@@ -204,7 +202,7 @@ static bool check_sdl(riscv_t *rv, int width, int height)
             };
             memcpy(&new_event.mouse.button, &mouse_button,
                    sizeof(mouse_button));
-            event_push(rv, new_event);
+            event_push(new_event);
             break;
         }
         default:
@@ -216,8 +214,6 @@ static bool check_sdl(riscv_t *rv, int width, int height)
 
 void syscall_draw_frame(riscv_t *rv)
 {
-    state_t *s = rv_userdata(rv); /* access userdata */
-
     /* draw_frame(base, width, height) */
     const uint32_t screen = rv_get_reg(rv, rv_reg_a0);
     const int width = rv_get_reg(rv, rv_reg_a1);
@@ -231,7 +227,7 @@ void syscall_draw_frame(riscv_t *rv)
     void *pixels_ptr;
     if (SDL_LockTexture(texture, NULL, &pixels_ptr, &pitch))
         exit(-1);
-    memory_read(s->mem, pixels_ptr, screen, width * height * 4);
+    memory_read(pixels_ptr, screen, width * height * 4);
     SDL_UnlockTexture(texture);
 
     int actual_width, actual_height;
@@ -267,7 +263,7 @@ void syscall_submit_queue(riscv_t *rv)
         count = deferred_submissions;
 
     while (count--) {
-        submission_t submission = submission_pop(rv);
+        submission_t submission = submission_pop();
 
         switch (submission.type) {
         case RELATIVE_MODE_SUBMISSION:

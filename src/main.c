@@ -29,16 +29,13 @@ static const char *opt_prog_name = "a.out";
 static bool opt_misaligned = false;
 
 #define MEMIO(op) on_mem_##op
-#define IO_HANDLER_IMPL(type, op, RW)                                        \
-    static IIF(RW)(                                                          \
-        /* W */ void MEMIO(op)(riscv_t * rv, riscv_word_t addr,              \
-                               riscv_##type##_t data),                       \
-        /* R */ riscv_##type##_t MEMIO(op)(riscv_t * rv, riscv_word_t addr)) \
-    {                                                                        \
-        state_t *s = rv_userdata(rv);                                        \
-        IIF(RW)                                                              \
-        (memory_##op(s->mem, addr, (uint8_t *) &data),                       \
-         return memory_##op(s->mem, addr));                                  \
+#define IO_HANDLER_IMPL(type, op, RW)                                     \
+    static IIF(RW)(                                                       \
+        /* W */ void MEMIO(op)(riscv_word_t addr, riscv_##type##_t data), \
+        /* R */ riscv_##type##_t MEMIO(op)(riscv_word_t addr))            \
+    {                                                                     \
+        IIF(RW)                                                           \
+        (memory_##op(addr, (uint8_t *) &data), return memory_##op(addr)); \
     }
 
 #define R 0
@@ -143,7 +140,7 @@ static bool parse_args(int argc, char **args)
     return true;
 }
 
-static void dump_test_signature(riscv_t *rv, elf_t *elf)
+static void dump_test_signature(elf_t *elf)
 {
     uint32_t start = 0, end = 0;
     const struct Elf32_Sym *sym;
@@ -162,11 +159,9 @@ static void dump_test_signature(riscv_t *rv, elf_t *elf)
     if ((sym = elf_get_symbol(elf, "end_signature")))
         end = sym->st_value;
 
-    state_t *s = rv_userdata(rv);
-
     /* dump it word by word */
     for (uint32_t addr = start; addr < end; addr += 4)
-        fprintf(f, "%08x\n", memory_read_w(s->mem, addr));
+        fprintf(f, "%08x\n", memory_read_w(addr));
 
     fclose(f);
 }
@@ -219,7 +214,7 @@ int main(int argc, char **args)
     }
 
     /* load the ELF file into the memory abstraction */
-    if (!elf_load(elf, rv, state->mem)) {
+    if (!elf_load(elf, rv)) {
         fprintf(stderr, "Unable to load ELF file '%s'\n", args[1]);
         return 1;
     }
@@ -239,7 +234,7 @@ int main(int argc, char **args)
 
     /* dump test result in test mode */
     if (opt_arch_test)
-        dump_test_signature(rv, elf);
+        dump_test_signature(elf);
 
     /* finalize the RISC-V runtime */
     elf_delete(elf);
