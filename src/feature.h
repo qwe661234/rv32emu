@@ -55,7 +55,7 @@
 
 /* Cache */
 #ifndef RV32_FEATURE_JIT
-#define RV32_FEATURE_JIT 1
+#define RV32_FEATURE_JIT 0
 #endif
 
 /* Feature test macro */

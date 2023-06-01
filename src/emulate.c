@@ -33,8 +33,10 @@ extern struct target_ops gdbstub_ops;
 #include "riscv_private.h"
 #include "state.h"
 #include "utils.h"
-#if !RV32_HAS(JIT)
+#if RV32_HAS(JIT)
 #include "cache.h"
+#include "compile.h"
+typedef bool (*exec_block_func_t)(riscv_t *rv);
 #endif
 
 /* RISC-V exception code list */
@@ -1393,6 +1395,9 @@ static void block_translate(riscv_t *rv, block_t *block)
             break;
         }
         ir->impl = dispatch_table[ir->opcode];
+#if RV32_HAS(JIT)
+        ir->pc = block->pc_end;
+#endif
         /* compute the end of pc */
         block->pc_end += ir->insn_len;
         block->n_insn++;
@@ -1595,23 +1600,27 @@ void rv_step(riscv_t *rv, int32_t cycles)
         }
         last_pc = rv->PC;
 
-        /* execute the block */
-        // #if RV32_HAS(JIT)
-        //         uint8_t *code = NULL;
-        //         if (block->hot)
-        //             code = code_cache_lookup(rv->cache, block->pc_start);
-        //         if (!code) {
-        //             if ((block->hot = cache_hot(rv->cache, block->pc_start)))
-        //                 code = block_compile(rv);
-        //         }
-        //         if (block->hot) {
-        //             if (unlikely(!((exec_block_func_t) code)(rv)))
-        //                 break;
-        //             prev = block;
-        //             continue;
-        //         }
-        // #endif
-
+#if RV32_HAS(JIT)
+        /* execute the block by JIT compiler */
+        uint8_t *code = NULL;
+        if (block->hot)
+            code = code_cache_lookup(rv->cache, block->pc_start);
+        if (!code) {
+            /* check if using frequency of block exceed threshold */
+            if ((block->hot = cache_hot(rv->cache, block->pc_start)))
+                code = block_compile(rv);
+        }
+        if (block->hot) {
+            /* execute machine code */
+            /* clang-format off */
+            if (unlikely(!((exec_block_func_t) code)(rv)))
+                break;
+            /* clang-format on */
+            prev = block;
+            continue;
+        }
+#endif
+        /* execute the block by interpreter */
         const rv_insn_t *ir = block->ir;
         if (unlikely(!ir->impl(rv, ir)))
             break;

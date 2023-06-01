@@ -78,6 +78,21 @@ gdbstub-test: $(BIN)
 	$(Q).ci/gdbstub-test.sh && $(call notice, [OK])
 endif
 
+ENABLE_JIT ?= 1
+$(call set-feature, JIT)
+ifeq ($(call has, JIT), 1)
+CFLAGS += -I./mir
+LDFLAGS += mir/libmir.a -lpthread
+
+OBJS_EXT += codegen.o compile.o
+
+mir/GNUmakefile:
+	git submodule update --init $(dir $@)
+	
+mir/libmir.a: mir/GNUmakefile
+	$(MAKE) --quiet -C mir
+endif
+
 # For tail-call elimination, we need a specific set of build flags applied.
 # FIXME: On macOS + Apple Silicon, -fno-stack-protector might have a negative impact.
 $(OUT)/emulate.o: CFLAGS += -fomit-frame-pointer -fno-stack-check -fno-stack-protector
@@ -109,9 +124,15 @@ $(OUT)/%.o: src/%.c
 	$(VECHO) "  CC\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF $@.d $<
 
+ifeq ($(call has, JIT), 0)
 $(BIN): $(OBJS)
 	$(VECHO) "  LD\t$@\n"
 	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
+else
+$(BIN): mir/libmir.a $(OBJS)
+	$(VECHO) "  LD\t$@\n"
+	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
+endif
 
 # RISC-V Architecture Tests
 include mk/riscv-arch-test.mk
