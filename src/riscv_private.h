@@ -12,7 +12,9 @@
 #endif
 #include "decode.h"
 #include "riscv.h"
-
+#if RV32_HAS(JIT)
+#include "cache.h"
+#endif
 /* CSRs */
 enum {
     /* floating point */
@@ -59,8 +61,12 @@ typedef struct block {
     uint32_t insn_capacity;    /**< maximum of instructions encompased */
     struct block *predict;     /**< block prediction */
     rv_insn_t *ir;             /**< IR as memory blocks */
+#if RV32_HAS(JIT)
+    bool hot;
+#endif
 } block_t;
 
+#if !RV32_HAS(JIT)
 typedef struct {
     uint32_t block_capacity; /**< max number of entries in the block map */
     uint32_t size;           /**< number of entries currently in the map */
@@ -69,6 +75,7 @@ typedef struct {
 
 /* clear all block in the block map */
 void block_map_clear(block_map_t *map);
+#endif
 
 struct riscv_internal {
     bool halt;
@@ -88,10 +95,8 @@ struct riscv_internal {
     gdbstub_t gdbstub;
 
     bool debug_mode;
-
     /* GDB instruction breakpoint */
     breakpoint_map_t breakpoint_map;
-
     /* The flag to notify interrupt from GDB client: it should
      * be accessed by atomic operation when starting the GDBSTUB. */
     bool is_interrupted;
@@ -119,8 +124,12 @@ struct riscv_internal {
     uint32_t csr_mip;
     uint32_t csr_mbadaddr;
 
-    bool compressed;       /**< current instruction is compressed or not */
+    bool compressed; /**< current instruction is compressed or not */
+#if !RV32_HAS(JIT)
     block_map_t block_map; /**< basic block map */
+#else
+    struct cache *cache;
+#endif
 };
 
 /* sign extend a 16 bit value */

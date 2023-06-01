@@ -9,6 +9,7 @@
 
 #include "riscv_private.h"
 
+#if !RV32_HAS(JIT)
 /* initialize the block map */
 static void block_map_init(block_map_t *map, const uint8_t bits)
 {
@@ -33,6 +34,7 @@ void block_map_clear(block_map_t *map)
     }
     map->size = 0;
 }
+#endif
 
 riscv_user_t rv_userdata(riscv_t *rv)
 {
@@ -88,8 +90,12 @@ riscv_t *rv_create(const riscv_io_t *io, riscv_user_t userdata)
     /* copy over the userdata */
     rv->userdata = userdata;
 
+#if !RV32_HAS(JIT)
     /* initialize the block map */
     block_map_init(&rv->block_map, 10);
+#else
+    rv->cache = cache_create(10);
+#endif
 
     /* reset */
     rv_reset(rv, 0U);
@@ -107,11 +113,23 @@ bool rv_has_halted(riscv_t *rv)
     return rv->halt;
 }
 
+#if RV32_HAS(JIT)
+void release_block(void *block)
+{
+    free(((block_t *) block)->ir);
+    free(block);
+}
+#endif
+
 void rv_delete(riscv_t *rv)
 {
     assert(rv);
+#if !RV32_HAS(JIT)
     block_map_clear(&rv->block_map);
     free(rv->block_map.map);
+#else
+    cache_free(rv->cache, release_block);
+#endif
     free(rv);
 }
 

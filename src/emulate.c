@@ -33,6 +33,9 @@ extern struct target_ops gdbstub_ops;
 #include "riscv_private.h"
 #include "state.h"
 #include "utils.h"
+#if !RV32_HAS(JIT)
+#include "cache.h"
+#endif
 
 /* RISC-V exception code list */
 #define RV_EXCEPTION_LIST                                       \
@@ -1305,6 +1308,7 @@ static inline bool insn_is_unconditional_branch(uint8_t opcode)
     return false;
 }
 
+#if !RV32_HAS(JIT)
 /* hash function is used when mapping address into the block map */
 static inline uint32_t hash(size_t k)
 {
@@ -1316,6 +1320,7 @@ static inline uint32_t hash(size_t k)
 #endif
     return k;
 }
+#endif
 
 /* allocate a basic block */
 static block_t *block_alloc(const uint8_t bits)
@@ -1325,9 +1330,13 @@ static block_t *block_alloc(const uint8_t bits)
     block->n_insn = 0;
     block->predict = NULL;
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
+#if RV32_HAS(JIT)
+    block->hot = false;
+#endif
     return block;
 }
 
+#if !RV32_HAS(JIT)
 /* insert a block into block map */
 static void block_insert(block_map_t *map, const block_t *block)
 {
@@ -1363,6 +1372,7 @@ static block_t *block_find(const block_map_t *map, const uint32_t addr)
     }
     return NULL;
 }
+#endif
 
 static void block_translate(riscv_t *rv, block_t *block)
 {
@@ -1486,16 +1496,23 @@ static void match_pattern(block_t *block)
 static block_t *prev = NULL;
 static block_t *block_find_or_translate(riscv_t *rv)
 {
+#if !RV32_HAS(JIT)
     block_map_t *map = &rv->block_map;
+
     /* lookup the next block in the block map */
     block_t *next = block_find(map, rv->PC);
+#else
+    /* lookup the next block in the block cache */
+    block_t *next = (block_t *) cache_get(rv->cache, rv->PC);
+#endif
 
     if (!next) {
+#if !RV32_HAS(JIT)
         if (map->size * 1.25 > map->block_capacity) {
             block_map_clear(map);
             prev = NULL;
         }
-
+#endif
         /* allocate a new block */
         next = block_alloc(10);
 
@@ -1507,10 +1524,17 @@ static block_t *block_find_or_translate(riscv_t *rv)
             /* macro operation fusion */
             match_pattern(next);
 
-
+#if !RV32_HAS(JIT)
         /* insert the block into block map */
         block_insert(&rv->block_map, next);
-
+#else
+        /* insert the block into block cache */
+        block_t *delete_target = cache_put(rv->cache, rv->PC, &(*next));
+        if (delete_target) {
+            free(delete_target->ir);
+            free(delete_target);
+        }
+#endif
         /* update the block prediction.
          * When translating a new block, the block predictor may benefit,
          * but updating it after finding a particular block may penalize
@@ -1554,7 +1578,11 @@ void rv_step(riscv_t *rv, int32_t cycles)
         if (prev) {
             /* updtae previous block */
             if (prev->pc_start != last_pc)
+#if !RV32_HAS(JIT)
                 prev = block_find(&rv->block_map, last_pc);
+#else
+                prev = cache_get(rv->cache, last_pc);
+#endif
 
             rv_insn_t *last_ir = prev->ir + prev->n_insn - 1;
             /* chain block */
@@ -1568,6 +1596,22 @@ void rv_step(riscv_t *rv, int32_t cycles)
         last_pc = rv->PC;
 
         /* execute the block */
+        // #if RV32_HAS(JIT)
+        //         uint8_t *code = NULL;
+        //         if (block->hot)
+        //             code = code_cache_lookup(rv->cache, block->pc_start);
+        //         if (!code) {
+        //             if ((block->hot = cache_hot(rv->cache, block->pc_start)))
+        //                 code = block_compile(rv);
+        //         }
+        //         if (block->hot) {
+        //             if (unlikely(!((exec_block_func_t) code)(rv)))
+        //                 break;
+        //             prev = block;
+        //             continue;
+        //         }
+        // #endif
+
         const rv_insn_t *ir = block->ir;
         if (unlikely(!ir->impl(rv, ir)))
             break;
