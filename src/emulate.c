@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "cfg.h"
 
 #if RV32_HAS(EXT_F)
 #include <math.h>
@@ -236,7 +237,7 @@ static block_t *block_alloc(const uint8_t bits)
     block_t *block = malloc(sizeof(struct block));
     block->insn_capacity = 1 << bits;
     block->n_insn = 0;
-    block->predict = NULL;
+    block->predict = block->left = block->right = NULL;
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
 #if RV32_HAS(JIT)
     block->hot = false;
@@ -481,7 +482,6 @@ void rv_step(riscv_t *rv, int32_t cycles)
              */
             block = block_find_or_translate(rv);
         }
-
         /* by now, a block should be available */
         assert(block);
         /* After emulating the previous block, it is determined whether the
@@ -500,33 +500,40 @@ void rv_step(riscv_t *rv, int32_t cycles)
             assert(prev);
             rv_insn_t *last_ir = prev->ir + prev->n_insn - 1;
             if (clear_flag) {
-                if (branch_taken)
+                if (branch_taken) {
                     last_ir->branch_taken = NULL;
-                else
+                    block->left = NULL;
+                } else {
                     last_ir->branch_untaken = NULL;
-
+                    block->right = NULL;
+                }
                 clear_flag = false;
             }
             /* chain block */
             if (!insn_is_unconditional_branch(last_ir->opcode)) {
-                if (branch_taken && !last_ir->branch_taken)
+                if (branch_taken && !last_ir->branch_taken) {
                     last_ir->branch_taken = block->ir;
-                else if (!branch_taken && !last_ir->branch_untaken)
+                    prev->left = block;
+                } else if (!branch_taken && !last_ir->branch_untaken) {
                     last_ir->branch_untaken = block->ir;
+                    prev->right = block;
+                }
             }
         }
         last_pc = rv->PC;
-
 #if RV32_HAS(JIT)
         /* execute the block by JIT compiler */
         exec_block_func_t code = NULL;
         if (block->hot)
             code = (exec_block_func_t) cache_get(rv->code_cache, rv->PC);
-        if (!code) {
+        if (!code && !block->hot) {
             /* check if using frequency of block exceed threshold */
             if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
-                code = (exec_block_func_t) block_compile(rv);
-                cache_put(rv->code_cache, rv->PC, code);
+                block_vector_t *block_vec = detect_loop(block);
+                if (block_vec->size > 1) {
+                    code = (exec_block_func_t) block_compile(rv, block_vec);
+                    cache_put(rv->code_cache, rv->PC, code);
+                }
             }
         }
         if (code) {

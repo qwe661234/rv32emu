@@ -5,6 +5,7 @@
 
 #pragma once
 #include <stdbool.h>
+#include <stdint.h>
 
 #if RV32_HAS(GDBSTUB)
 #include "breakpoint.h"
@@ -60,12 +61,17 @@ typedef struct block {
     uint32_t n_insn;           /**< number of instructions encompased */
     uint32_t pc_start, pc_end; /**< address range of the basic block */
     uint32_t insn_capacity;    /**< maximum of instructions encompased */
-    struct block *predict;     /**< block prediction */
-    rv_insn_t *ir;             /**< IR as memory blocks */
+    struct block *predict, *left, *right; /**< block prediction */
+    rv_insn_t *ir;                        /**< IR as memory blocks */
 #if RV32_HAS(JIT)
     bool hot; /**< Determine the block is hotspot or not */
 #endif
 } block_t;
+
+typedef struct {
+    int size;
+    block_t *arr[1024];
+} block_vector_t;
 
 /* Map the translated basic block to its program counter to accelerate the
  * searching process. It's important to note that this data structure is not

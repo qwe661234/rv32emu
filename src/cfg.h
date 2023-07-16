@@ -4,9 +4,6 @@
  */
 
 #pragma once
-#include <stdint.h>
-
-#include "riscv.h"
 #include "riscv_private.h"
 
-uint8_t *block_compile(riscv_t *rv, block_vector_t* block_vec);
+block_vector_t *detect_loop(block_t *root);

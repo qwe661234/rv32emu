@@ -304,34 +304,30 @@ RVOP(fuse4, {
 })
 #undef RVOP
 
-static void trace_ebb(riscv_t *rv, char *gencode, rv_insn_t *ir, set_t *set)
-{
-    while (1) {
-        if (set_add(set, ir->pc))
-            dispatch_table[ir->opcode](rv, ir, gencode, ir->pc);
-
-        if (ir->tailcall)
-            break;
-        ir++;
-    }
-    if (ir->branch_untaken && !set_has(set, ir->branch_untaken->pc))
-        trace_ebb(rv, gencode, ir->branch_untaken, set);
-    if (ir->branch_taken && !set_has(set, ir->branch_taken->pc))
-        trace_ebb(rv, gencode, ir->branch_taken, set);
-}
-
 #define EPILOGUE "}"
 
-static void trace_and_gencode(riscv_t *rv, char *gencode)
+set_t exist;
+static void trace_and_gencode(riscv_t *rv,
+                              block_vector_t *block_vec,
+                              char *gencode)
 {
 #define _(inst, can_branch) dispatch_table[rv_insn_##inst] = &gen_##inst;
     RISCV_INSN_LIST
 #undef _
-    set_t set;
     strcat(gencode, PROLOGUE);
-    set_reset(&set);
-    block_t *block = cache_get(rv->block_cache, rv->PC);
-    trace_ebb(rv, gencode, block->ir, &set);
+    set_reset(&exist);
+    for (int i = 0; i < block_vec->size; i++) {
+        block_t *block = block_vec->arr[i];
+        if (set_has(&exist, block->pc_start))
+            continue;
+        for (uint32_t j = 0; j < block->n_insn; j++) {
+            rv_insn_t *ir = block->ir + j;
+            if (set_has(&exist, ir->pc))
+                break;
+            set_add(&exist, ir->pc);
+            dispatch_table[ir->opcode](rv, ir, gencode, ir->pc);
+        }
+    }
     strcat(gencode, EPILOGUE);
 }
 
@@ -410,7 +406,7 @@ static uint8_t *compile(riscv_t *rv)
     return code;
 }
 
-uint8_t *block_compile(riscv_t *rv)
+uint8_t *block_compile(riscv_t *rv, block_vector_t *block_vec)
 {
     if (!jit) {
         jit = calloc(1, sizeof(riscv_jit_t));
@@ -426,7 +422,7 @@ uint8_t *block_compile(riscv_t *rv)
         memset(jit_code_string->code, 0, 1024 * 1024);
     }
     jit_code_string->curr = 0;
-    trace_and_gencode(rv, jit_code_string->code);
+    trace_and_gencode(rv, block_vec, jit_code_string->code);
     jit_code_string->code_size = strlen(jit_code_string->code);
     return compile(rv);
 }
