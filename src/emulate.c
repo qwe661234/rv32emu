@@ -312,16 +312,7 @@ static uint32_t last_pc = 0;
 
 /* RV32I Base Instruction Set */
 
-/* Internal */
-static bool do_nop(riscv_t *rv, const rv_insn_t *ir)
-{
-    rv->X[rv_reg_zero] = 0;
-    rv->csr_cycle++;
-    rv->PC += ir->insn_len;
-    const rv_insn_t *next = ir + 1;
-    MUST_TAIL return next->impl(rv, next);
-}
-
+RVOP(nop, {/* no operation */})
 
 /* LUI is used to build 32-bit constants and uses the U-type format. LUI
  * places the U-immediate value in the top 20 bits of the destination
@@ -1252,15 +1243,36 @@ RVOP(cswsp, {
 #endif
 
 /* auipc + addi */
-RVOP(fuse1, { rv->X[ir->rd] = (int32_t) (rv->PC + ir->imm + ir->imm2); })
+static bool do_fuse1(riscv_t *rv, const rv_insn_t *ir)
+{
+    rv->X[rv_reg_zero] = 0;
+    rv->csr_cycle += 2;
+    rv->X[ir->rd] = (int32_t) (rv->PC + ir->imm + ir->imm2);
+    rv->PC += 2 * ir->insn_len;
+    if (!RVOP_RUN_NEXT)
+        return true;
+    const rv_insn_t *next = ir + 2;
+    MUST_TAIL return next->impl(rv, next);
+}
 
 /* auipc + add */
-RVOP(fuse2, {
-    rv->X[ir->rd] = (int32_t) (rv->X[ir->rs1]) + (int32_t) (rv->PC + ir->imm);
-})
+static bool do_fuse2(riscv_t *rv, const rv_insn_t *ir)
+{
+    rv->X[rv_reg_zero] = 0;
+    rv->csr_cycle += 2;
+    rv->X[ir->rd] = ir->imm + ir->imm2;
+    rv->PC += 2 * ir->insn_len;
+    if (!RVOP_RUN_NEXT)
+        return true;
+    const rv_insn_t *next = ir + 2;
+    MUST_TAIL return next->impl(rv, next);
+}
 
 /* multiple sw */
-RVOP(fuse3, {
+static bool do_fuse3(riscv_t *rv, const rv_insn_t *ir)
+{
+    rv->X[rv_reg_zero] = 0;
+    rv->csr_cycle += ir->imm2;
     opcode_fuse_t *fuse = ir->fuse;
     uint32_t addr = rv->X[fuse[0].rs1] + fuse[0].imm;
     /* the memory addresses of the sw instructions are contiguous, so we only
@@ -1273,10 +1285,18 @@ RVOP(fuse3, {
         addr = rv->X[fuse[i].rs1] + fuse[i].imm;
         rv->io.mem_write_w(addr, rv->X[fuse[i].rs2]);
     }
-})
+    rv->PC += ir->imm2 * ir->insn_len;
+    if (!RVOP_RUN_NEXT)
+        return true;
+    const rv_insn_t *next = ir + ir->imm2;
+    MUST_TAIL return next->impl(rv, next);
+}
 
 /* multiple lw */
-RVOP(fuse4, {
+static bool do_fuse4(riscv_t *rv, const rv_insn_t *ir)
+{
+    rv->X[rv_reg_zero] = 0;
+    rv->csr_cycle += ir->imm2;
     opcode_fuse_t *fuse = ir->fuse;
     uint32_t addr = rv->X[fuse[0].rs1] + fuse[0].imm;
     /* the memory addresses of the lw instructions are contiguous, so we only
@@ -1289,7 +1309,12 @@ RVOP(fuse4, {
         addr = rv->X[fuse[i].rs1] + fuse[i].imm;
         rv->X[fuse[i].rd] = rv->io.mem_read_w(addr);
     }
-})
+    rv->PC += ir->imm2 * ir->insn_len;
+    if (!RVOP_RUN_NEXT)
+        return true;
+    const rv_insn_t *next = ir + ir->imm2;
+    MUST_TAIL return next->impl(rv, next);
+}
 
 static const void *dispatch_table[] = {
 #define _(inst, can_branch) [rv_insn_##inst] = do_##inst,
@@ -1449,8 +1474,6 @@ static void block_translate(riscv_t *rv, block_t *block)
         for (int j = 1; j < count; j++) {                                  \
             next_ir = ir + j;                                              \
             memcpy(ir->fuse + j, next_ir, sizeof(opcode_fuse_t));          \
-            next_ir->opcode = rv_insn_nop;                                 \
-            next_ir->impl = dispatch_table[next_ir->opcode];               \
         }                                                                  \
     }
 
@@ -1469,25 +1492,30 @@ static void match_pattern(block_t *block)
         switch (ir->opcode) {
         case rv_insn_auipc:
             next_ir = ir + 1;
-            if (next_ir->opcode == rv_insn_addi && ir->rd == next_ir->rs1) {
+            if (next_ir->opcode == rv_insn_addi && ir->rd == next_ir->rs1 &&
+                next_ir->rd == next_ir->rs1) {
                 /* the destination register of instruction auipc is equal to the
-                 * source register 1 of next instruction addi */
+                 * source register 1 of next instruction addi, and the
+                 * destination register of next instruction addi is equal to its
+                 * register 1.
+                 */
                 ir->opcode = rv_insn_fuse1;
-                ir->rd = next_ir->rd;
                 ir->imm2 = next_ir->imm;
                 ir->impl = dispatch_table[ir->opcode];
-                next_ir->opcode = rv_insn_nop;
-                next_ir->impl = dispatch_table[next_ir->opcode];
-            } else if (next_ir->opcode == rv_insn_add &&
-                       ir->rd == next_ir->rs2) {
-                /* the destination register of instruction auipc is equal to the
-                 * source register 2 of next instruction add */
+            }
+            break;
+        case rv_insn_lui:
+            next_ir = ir + 1;
+            if (next_ir->opcode == rv_insn_addi && ir->rd == next_ir->rs1 &&
+                next_ir->rd == next_ir->rs1) {
+                /* the destination register of instruction lui is equal to
+                 * the source register 1 of next instruction addi, and the
+                 * destination register of next instruction addi is equal to
+                 * its register 1.
+                 */
                 ir->opcode = rv_insn_fuse2;
-                ir->rd = next_ir->rd;
-                ir->rs1 = next_ir->rs1;
+                ir->imm2 = next_ir->imm;
                 ir->impl = dispatch_table[ir->opcode];
-                next_ir->opcode = rv_insn_nop;
-                next_ir->impl = dispatch_table[next_ir->opcode];
             }
             break;
         /* If the memory addresses of a sequence of store or load instructions
@@ -1499,7 +1527,6 @@ static void match_pattern(block_t *block)
         case rv_insn_lw:
             COMBINE_MEM_OPS(1);
             break;
-            /* FIXME: lui + addi */
             /* TODO: mixture of sw and lw */
             /* TODO: reorder insturction to match pattern */
         }

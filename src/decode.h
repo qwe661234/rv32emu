@@ -253,7 +253,7 @@ typedef struct rv_insn {
     uint8_t shamt;
 #endif
     /* fuse operation */
-    int16_t imm2;
+    int32_t imm2;
     opcode_fuse_t *fuse;
 
     /* instruction length */
