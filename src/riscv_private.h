@@ -64,6 +64,7 @@ typedef struct block {
     rv_insn_t *ir;             /**< IR as memory blocks */
 #if RV32_HAS(JIT)
     bool hot; /**< Determine the block is hotspot or not */
+    bool hot2;
 #endif
 } block_t;
 

@@ -9,3 +9,5 @@
 #include "riscv.h"
 
 uint8_t *block_compile(riscv_t *rv);
+
+uint8_t *block_compile2(riscv_t *rv);
