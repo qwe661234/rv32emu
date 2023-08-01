@@ -5,10 +5,12 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <sys/mman.h>
+#include <unistd.h>
 #if RV32_HAS(EXT_F)
 #include <math.h>
 #include "softfloat.h"
@@ -29,6 +31,7 @@ static inline int isnanf(float x)
 extern struct target_ops gdbstub_ops;
 #endif
 
+#include "DBT.h"
 #include "decode.h"
 #include "riscv.h"
 #include "riscv_private.h"
@@ -292,7 +295,7 @@ enum {
 
 /* record whether the branch is taken or not during emulation */
 static bool branch_taken = false;
-
+static uint8_t *tbtb;
 /* record the program counter of the previous block */
 static uint32_t last_pc = 0;
 
@@ -444,9 +447,26 @@ RVOP(sh, {
 
 /* SW: Store Word */
 RVOP(sw, {
-    const uint32_t addr = rv->X[ir->rs1] + ir->imm;
-    RV_EXC_MISALIGN_HANDLER(3, store, false, 1);
-    rv->io.mem_write_w(addr, rv->X[ir->rs2]);
+    if (!tbtb)
+        tbtb = mmap(NULL, 1024, PROT_READ | PROT_WRITE | PROT_EXEC,
+                    MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    memset(tbtb, 0, 1024);
+    uint8_t *tmp = tbtb;
+    tmp += prologue(tmp);
+    tmp += move_first_para(tmp);
+    tmp += movrax(tmp, ir->rs1);
+    tmp += movrbx(tmp, ir->rs2);
+    tmp += movrsi(tmp, rv->X[ir->rs2]);
+    tmp += load_ebx(tmp);
+    tmp += add_ebx(tmp, ir->imm);
+    tmp += move_ebx_edi(tmp);
+    tmp += invoke_sw(tmp);
+    tmp += clear_eax(tmp);
+    epilogue(tmp);
+    __builtin___clear_cache(tbtb, tbtb + 1024);
+    ((func) tbtb)(rv);
+    // const uint32_t addr = rv->X[ir->rs1] + ir->imm;
+    // rv->io.mem_write_w(addr, rv->X[ir->rs2]);
 })
 
 /* ADDI adds the sign-extended 12-bit immediate to register rs1. Arithmetic
@@ -454,7 +474,24 @@ RVOP(sw, {
  * result. ADDI rd, rs1, 0 is used to implement the MV rd, rs1 assembler
  * pseudo-instruction.
  */
-RVOP(addi, { rv->X[ir->rd] = (int32_t) (rv->X[ir->rs1]) + ir->imm; })
+RVOP(addi, {
+    if (!tbtb)
+        tbtb = mmap(NULL, 1024, PROT_READ | PROT_WRITE | PROT_EXEC,
+                    MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    memset(tbtb, 0, 1024);
+    uint8_t *tmp = tbtb;
+    tmp += prologue(tmp);
+    tmp += move_first_para(tmp);
+    tmp += movrax(tmp, ir->rs1);
+    tmp += load_ebx(tmp);
+    tmp += add_ebx(tmp, ir->imm);
+    tmp += movrax(tmp, ir->rd);
+    tmp += store_ebx(tmp);
+    tmp += clear_eax(tmp);
+    epilogue(tmp);
+    __builtin___clear_cache(tbtb, tbtb + 1024);
+    ((func) tbtb)(rv);
+})
 
 /* SLTI place the value 1 in register rd if register rs1 is less than the
  * signextended immediate when both are treated as signed numbers, else 0 is
@@ -536,6 +573,17 @@ RVOP(and, { rv->X[ir->rd] = rv->X[ir->rs1] & rv->X[ir->rs2]; })
 /* ECALL: Environment Call */
 RVOP(ecall, {
     rv->compressed = false;
+    // if (!tbtb)
+    //     tbtb = mmap(NULL, 1024, PROT_READ | PROT_WRITE | PROT_EXEC,
+    //                 MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    // memset(tbtb, 0, 1024);
+    // uint8_t *tmp = tbtb;
+    // tmp += prologue(tmp);
+    // tmp += move_first_para(tmp);
+    // tmp += invoke_ecall(tmp);
+    // __builtin___clear_cache(tbtb, tbtb + 1024);
+    // epilogue(tmp);
+    // ((func) tbtb)(rv);
     rv->io.on_ecall(rv);
     return true;
 })
@@ -1426,6 +1474,8 @@ static void block_translate(riscv_t *rv, block_t *block)
 
         /* decode the instruction */
         if (!rv_decode(ir, insn)) {
+            printf("%#x\n", block->pc_end);
+            assert(NULL);
             rv->compressed = (ir->insn_len == INSN_16);
             rv_except_illegal_insn(rv, insn);
             break;
