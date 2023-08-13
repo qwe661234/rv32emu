@@ -142,7 +142,19 @@ RVOP(jal, {
     if (ir->rd) {
         GEN("  rv->X[%u] = pc + %u;\n", ir->rd, ir->insn_len);
     }
-    NEXT_INSN(ir->pc + ir->imm);
+    if (ir->branch_taken) {
+        block_t *block = cache_get(rv->block_cache, ir->pc + ir->imm);
+        if (!block) {
+            ir->branch_taken = NULL;
+            GEN("    return true;\n");
+        } else {
+            if (ir->branch_taken->pc != ir->pc + ir->imm)
+                ir->branch_taken = block->ir;
+            NEXT_INSN(ir->pc + ir->imm);
+        }
+    } else {
+        GEN("    return true;\n");
+    }
 })
 
 #define BRNACH_FUNC(type, comp)                                               \
@@ -252,12 +264,36 @@ RVOP(csw, {
 RVOP(cjal, {
     GEN("  rv->X[1] = rv->PC + %u;\n", ir->insn_len);
     UPDATE_PC(ir->imm);
-    NEXT_INSN(ir->pc + ir->imm);
+    if (ir->branch_taken) {
+        block_t *block = cache_get(rv->block_cache, ir->pc + ir->imm);
+        if (!block) {
+            ir->branch_taken = NULL;
+            GEN("    return true;\n");
+        } else {
+            if (ir->branch_taken->pc != ir->pc + ir->imm)
+                ir->branch_taken = block->ir;
+            NEXT_INSN(ir->pc + ir->imm);
+        }
+    } else {
+        GEN("    return true;\n");
+    }
 })
 
 RVOP(cj, {
     UPDATE_PC(ir->imm);
-    NEXT_INSN(ir->pc + ir->imm);
+    if (ir->branch_taken) {
+        block_t *block = cache_get(rv->block_cache, ir->pc + ir->imm);
+        if (!block) {
+            ir->branch_taken = NULL;
+            GEN("    return true;\n");
+        } else {
+            if (ir->branch_taken->pc != ir->pc + ir->imm)
+                ir->branch_taken = block->ir;
+            NEXT_INSN(ir->pc + ir->imm);
+        }
+    } else {
+        GEN("    return true;\n");
+    }
 })
 
 RVOP(cbeqz, {
