@@ -4,10 +4,11 @@
  */
 
 #pragma once
-#include <stdint.h>
-
-#include "riscv.h"
 #include "riscv_private.h"
-#include "cfg.h"
 
-uint8_t *block_compile(riscv_t *rv, block_vector_t* block_vec);
+typedef struct {
+    int size;
+    block_t *arr[1024];
+} block_vector_t;
+
+block_vector_t *detect_loop(riscv_t *rv, block_t *root);

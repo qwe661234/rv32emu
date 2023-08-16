@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "cfg.h"
 
 #if RV32_HAS(EXT_F)
 #include <math.h>
@@ -624,17 +625,19 @@ void rv_step(riscv_t *rv, int32_t cycles)
         }
         clear_flag = false;
         last_pc = rv->PC;
-
 #if RV32_HAS(JIT)
         /* execute the block by JIT compiler */
         exec_block_func_t code = NULL;
         if (block->hot)
             code = (exec_block_func_t) cache_get(rv->code_cache, rv->PC);
-        if (!code) {
+        if (!code && !block->hot) {
             /* check if using frequency of block exceed threshold */
             if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
-                code = (exec_block_func_t) block_compile(rv);
-                cache_put(rv->code_cache, rv->PC, code);
+                block_vector_t *block_vec = detect_loop(rv, block);
+                if (block_vec->size > 1) {
+                    code = (exec_block_func_t) block_compile(rv, block_vec);
+                    cache_put(rv->code_cache, rv->PC, code);
+                }
             }
         }
         if (code) {

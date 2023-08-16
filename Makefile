@@ -122,6 +122,7 @@ OBJS := \
 	elf.o \
 	cache.o \
 	mpool.o \
+	cfg.o \
 	$(OBJS_EXT) \
 	main.o
 
