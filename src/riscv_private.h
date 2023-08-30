@@ -12,6 +12,7 @@
 #endif
 #include "decode.h"
 #include "riscv.h"
+#include "cache.h"
 
 /* CSRs */
 enum {
@@ -120,7 +121,7 @@ struct riscv_internal {
     uint32_t csr_mbadaddr;
 
     bool compressed;       /**< current instruction is compressed or not */
-    block_map_t block_map; /**< basic block map */
+    struct cache *block_cache;; /**< basic block cache */
 
     /* print exit code on syscall_exit */
     bool output_exit_code;

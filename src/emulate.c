@@ -29,6 +29,7 @@ static inline int isnanf(float x)
 extern struct target_ops gdbstub_ops;
 #endif
 
+#include "cache.h"
 #include "decode.h"
 #include "riscv.h"
 #include "riscv_private.h"
@@ -295,6 +296,10 @@ static bool branch_taken = false;
 /* record the program counter of the previous block */
 static uint32_t last_pc = 0;
 
+/* record whether the block is replaced by cache. If so, clear the EBB
+ * information */
+static bool clear_flag = false;
+
 /* Interpreter-based execution path */
 #define RVOP(inst, code)                                    \
     static bool do_##inst(riscv_t *rv, const rv_insn_t *ir) \
@@ -500,18 +505,6 @@ static inline bool insn_is_unconditional_branch(uint8_t opcode)
     return false;
 }
 
-/* hash function is used when mapping address into the block map */
-static inline uint32_t hash(size_t k)
-{
-    k ^= k << 21;
-    k ^= k >> 17;
-#if (SIZE_MAX > 0xFFFFFFFF)
-    k ^= k >> 35;
-    k ^= k >> 51;
-#endif
-    return k;
-}
-
 /* allocate a basic block */
 static block_t *block_alloc(const uint8_t bits)
 {
@@ -521,42 +514,6 @@ static block_t *block_alloc(const uint8_t bits)
     block->predict = NULL;
     block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
     return block;
-}
-
-/* insert a block into block map */
-static void block_insert(block_map_t *map, const block_t *block)
-{
-    assert(map && block);
-    const uint32_t mask = map->block_capacity - 1;
-    uint32_t index = hash(block->pc_start);
-
-    /* insert into the block map */
-    for (;; index++) {
-        if (!map->map[index & mask]) {
-            map->map[index & mask] = (block_t *) block;
-            break;
-        }
-    }
-    map->size++;
-}
-
-/* try to locate an already translated block in the block map */
-static block_t *block_find(const block_map_t *map, const uint32_t addr)
-{
-    assert(map);
-    uint32_t index = hash(addr);
-    const uint32_t mask = map->block_capacity - 1;
-
-    /* find block in block map */
-    for (;; index++) {
-        block_t *block = map->map[index & mask];
-        if (!block)
-            return NULL;
-
-        if (block->pc_start == addr)
-            return block;
-    }
-    return NULL;
 }
 
 static void block_translate(riscv_t *rv, block_t *block)
@@ -578,6 +535,7 @@ static void block_translate(riscv_t *rv, block_t *block)
             break;
         }
         ir->impl = dispatch_table[ir->opcode];
+        ir->pc = block->pc_end;
         /* compute the end of pc */
         block->pc_end += ir->insn_len;
         block->n_insn++;
@@ -985,18 +943,12 @@ static void match_pattern(riscv_t *rv, block_t *block)
 static block_t *prev = NULL;
 static block_t *block_find_or_translate(riscv_t *rv)
 {
-    block_map_t *map = &rv->block_map;
-    /* lookup the next block in the block map */
-    block_t *next = block_find(map, rv->PC);
+    /* lookup the next block in the block cache */
+    block_t *next = (block_t *) cache_get(rv->block_cache, rv->PC);
 
     if (!next) {
-        if (map->size * 1.25 > map->block_capacity) {
-            block_map_clear(map);
-            prev = NULL;
-        }
-
         /* allocate a new block */
-        next = block_alloc(10);
+        next = block_alloc(5);
 
         /* translate the basic block */
         block_translate(rv, next);
@@ -1006,8 +958,12 @@ static block_t *block_find_or_translate(riscv_t *rv)
             /* macro operation fusion */
             match_pattern(rv, next);
 
-        /* insert the block into block map */
-        block_insert(&rv->block_map, next);
+        /* insert the block into block cache */
+        block_t *delete_target = cache_put(rv->block_cache, rv->PC, &(*next));
+        if (delete_target) {
+            free(delete_target->ir);
+            free(delete_target);
+        }
 
         /* update the block prediction.
          * When translating a new block, the block predictor may benefit,
@@ -1052,24 +1008,32 @@ void rv_step(riscv_t *rv, int32_t cycles)
         if (prev) {
             /* update previous block */
             if (prev->pc_start != last_pc)
-                prev = block_find(&rv->block_map, last_pc);
+                prev = cache_get(rv->block_cache, last_pc);
 
             rv_insn_t *last_ir = prev->ir + prev->n_insn - 1;
-            /* chain block */
-            if (!insn_is_unconditional_branch(last_ir->opcode)) {
-                if (branch_taken && !last_ir->branch_taken)
-                    last_ir->branch_taken = block->ir;
-                else if (!last_ir->branch_untaken)
-                    last_ir->branch_untaken = block->ir;
-            } else if (last_ir->opcode == rv_insn_jal
-#if RV32_HAS(EXT_C)
-                       || last_ir->opcode == rv_insn_cj ||
-                       last_ir->opcode == rv_insn_cjal
-#endif
-            ) {
-                if (!last_ir->branch_taken)
-                    last_ir->branch_taken = block->ir;
+            if (clear_flag) {
+                if (branch_taken)
+                    last_ir->branch_taken = NULL;
+                else
+                    last_ir->branch_untaken = NULL;
+
+                clear_flag = false;
             }
+            /* chain block */
+//             if (!insn_is_unconditional_branch(last_ir->opcode)) {
+//                 if (branch_taken && !last_ir->branch_taken)
+//                     last_ir->branch_taken = block->ir;
+//                 else if (!last_ir->branch_untaken)
+//                     last_ir->branch_untaken = block->ir;
+//             } else if (last_ir->opcode == rv_insn_jal
+// #if RV32_HAS(EXT_C)
+//                        || last_ir->opcode == rv_insn_cj ||
+//                        last_ir->opcode == rv_insn_cjal
+// #endif
+//             ) {
+//                 if (!last_ir->branch_taken)
+//                     last_ir->branch_taken = block->ir;
+//             }
         }
         last_pc = rv->PC;
 

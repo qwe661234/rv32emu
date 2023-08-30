@@ -1,14 +1,7 @@
 /* RV32I Base Instruction Set */
 
 /* Internal */
-static bool do_nop(riscv_t *rv, const rv_insn_t *ir)
-{
-    rv->X[rv_reg_zero] = 0;
-    rv->csr_cycle++;
-    rv->PC += ir->insn_len;
-    const rv_insn_t *next = ir + 1;
-    MUST_TAIL return next->impl(rv, next);
-}
+RVOP(nop, {})
 
 /* LUI is used to build 32-bit constants and uses the U-type format. LUI
  * places the U-immediate value in the top 20 bits of the destination
@@ -37,8 +30,16 @@ RVOP(jal, {
         rv->X[ir->rd] = pc + ir->insn_len;
     /* check instruction misaligned */
     RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-    if (ir->branch_taken)
+    if (ir->branch_taken) {
+        branch_taken = true;                                     
+        if (ir->branch_taken->pc != rv->PC ||
+            !cache_get(rv->block_cache, rv->PC)) {
+            clear_flag = true;
+            return true;
+        }
+        last_pc = rv->PC;
         return ir->branch_taken->impl(rv, ir->branch_taken);
+    }
     return true;
 })
 
@@ -62,24 +63,34 @@ RVOP(jalr, {
 })
 
 /* clang-format off */
-#define BRANCH_FUNC(type, cond)                                  \
-    const uint32_t pc = rv->PC;                                  \
-    if ((type) rv->X[ir->rs1] cond (type) rv->X[ir->rs2]) {      \
-        branch_taken = false;                                    \
-        if (!ir->branch_untaken)                                 \
-            goto nextop;                                         \
-        rv->PC += ir->insn_len;                                  \
-        last_pc = rv->PC;                                        \
-        return ir->branch_untaken->impl(rv, ir->branch_untaken); \
-    }                                                            \
-    branch_taken = true;                                         \
-    rv->PC += ir->imm;                                           \
-    /* check instruction misaligned */                           \
-    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);                 \
-    if (ir->branch_taken) {                                      \
-        last_pc = rv->PC;                                        \
-        return ir->branch_taken->impl(rv, ir->branch_taken);     \
-    }                                                            \
+#define BRANCH_FUNC(type, cond)                                   \
+    const uint32_t pc = rv->PC;                                   \
+    if ((type) rv->X[ir->rs1] cond(type) rv->X[ir->rs2]) {        \
+        branch_taken = false;                                     \
+        if (!ir->branch_untaken)                                  \
+            goto nextop;                                          \
+        if (ir->branch_untaken->pc != rv->PC + ir->insn_len ||    \
+            !cache_get(rv->block_cache, rv->PC + ir->insn_len)) { \
+            clear_flag = true;                                    \
+            goto nextop;                                          \
+        }                                                         \
+        rv->PC += ir->insn_len;                                   \
+        last_pc = rv->PC;                                         \
+        return ir->branch_untaken->impl(rv, ir->branch_untaken);  \
+    }                                                             \
+    branch_taken = true;                                          \
+    rv->PC += ir->imm;                                            \
+    /* check instruction misaligned */                            \
+    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);                  \
+    if (ir->branch_taken) {                                       \
+        if (ir->branch_taken->pc != rv->PC ||                     \
+            !cache_get(rv->block_cache, rv->PC)) {                \
+            clear_flag = true;                                    \
+            return true;                                          \
+        }                                                         \
+        last_pc = rv->PC;                                         \
+        return ir->branch_taken->impl(rv, ir->branch_taken);      \
+    }                                                             \
     return true;
 /* clang-format on */
 
@@ -781,8 +792,14 @@ RVOP(cjal, {
     rv->X[rv_reg_ra] = rv->PC + ir->insn_len;
     rv->PC += ir->imm;
     RV_EXC_MISALIGN_HANDLER(rv->PC, insn, true, 0);
-    if (ir->branch_taken)
+    if (ir->branch_taken) {
+        if (ir->branch_taken->pc != rv->PC ||
+            !cache_get(rv->block_cache, rv->PC)) {
+            clear_flag = true;
+            return true;
+        }
         return ir->branch_taken->impl(rv, ir->branch_taken);
+    }
     return true;
 })
 
@@ -849,8 +866,14 @@ RVOP(cand, { rv->X[ir->rd] = rv->X[ir->rs1] & rv->X[ir->rs2]; })
 RVOP(cj, {
     rv->PC += ir->imm;
     RV_EXC_MISALIGN_HANDLER(rv->PC, insn, true, 0);
-    if (ir->branch_taken)
+    if (ir->branch_taken) {
+        if (ir->branch_taken->pc != rv->PC ||
+            !cache_get(rv->block_cache, rv->PC)) {
+            clear_flag = true;
+            return true;
+        }
         return ir->branch_taken->impl(rv, ir->branch_taken);
+    }
     return true;
 })
 
@@ -864,13 +887,23 @@ RVOP(cbeqz, {
         branch_taken = false;
         if (!ir->branch_untaken)
             goto nextop;
+        if (ir->branch_untaken->pc != rv->PC + ir->insn_len ||
+            !cache_get(rv->block_cache, rv->PC + ir->insn_len)) {
+            clear_flag = true;
+            goto nextop;
+        }
         rv->PC += ir->insn_len;
         last_pc = rv->PC;
         return ir->branch_untaken->impl(rv, ir->branch_untaken);
     }
     branch_taken = true;
-    rv->PC += (uint32_t) ir->imm;
+    rv->PC += ir->imm;
     if (ir->branch_taken) {
+        if (ir->branch_taken->pc != rv->PC ||
+            !cache_get(rv->block_cache, rv->PC)) {
+            clear_flag = true;
+            return true;
+        }
         last_pc = rv->PC;
         return ir->branch_taken->impl(rv, ir->branch_taken);
     }
@@ -883,18 +916,29 @@ RVOP(cbnez, {
         branch_taken = false;
         if (!ir->branch_untaken)
             goto nextop;
+        if (ir->branch_untaken->pc != rv->PC + ir->insn_len ||
+            !cache_get(rv->block_cache, rv->PC + ir->insn_len)) {
+            clear_flag = true;
+            goto nextop;
+        }
         rv->PC += ir->insn_len;
         last_pc = rv->PC;
         return ir->branch_untaken->impl(rv, ir->branch_untaken);
     }
     branch_taken = true;
-    rv->PC += (uint32_t) ir->imm;
+    rv->PC += ir->imm;
     if (ir->branch_taken) {
+        if (ir->branch_taken->pc != rv->PC ||
+            !cache_get(rv->block_cache, rv->PC)) {
+            clear_flag = true;
+            return true;
+        }
         last_pc = rv->PC;
         return ir->branch_taken->impl(rv, ir->branch_taken);
     }
     return true;
 })
+
 
 /* C.SLLI is a CI-format instruction that performs a logical left shift of
  * the value in register rd then writes the result to rd. The shift amount

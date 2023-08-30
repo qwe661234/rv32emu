@@ -298,6 +298,7 @@ typedef struct rv_insn {
      * specific IR array without the need for additional copying.
      */
     struct rv_insn *branch_taken, *branch_untaken;
+    uint32_t pc;
 } rv_insn_t;
 
 /* decode the RISC-V instruction */
