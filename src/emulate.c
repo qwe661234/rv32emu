@@ -31,6 +31,7 @@ extern struct target_ops gdbstub_ops;
 
 #include "cache.h"
 #include "decode.h"
+#include "mpool.h"
 #include "riscv.h"
 #include "riscv_private.h"
 #include "state.h"
@@ -506,13 +507,13 @@ static inline bool insn_is_unconditional_branch(uint8_t opcode)
 }
 
 /* allocate a basic block */
-static block_t *block_alloc(const uint8_t bits)
+static block_t *block_alloc(riscv_t *rv)
 {
-    block_t *block = malloc(sizeof(struct block));
-    block->insn_capacity = 1 << bits;
+    block_t *block = mpool_alloc(rv->block_mp);
+    block->insn_capacity = 1024;
     block->n_insn = 0;
     block->predict = NULL;
-    block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
+    block->ir = mpool_alloc(rv->block_ir_mp);
     return block;
 }
 
@@ -948,7 +949,7 @@ static block_t *block_find_or_translate(riscv_t *rv)
 
     if (!next) {
         /* allocate a new block */
-        next = block_alloc(5);
+        next = block_alloc(rv);
 
         /* translate the basic block */
         block_translate(rv, next);
@@ -961,8 +962,9 @@ static block_t *block_find_or_translate(riscv_t *rv)
         /* insert the block into block cache */
         block_t *delete_target = cache_put(rv->block_cache, rv->PC, &(*next));
         if (delete_target) {
-            free(delete_target->ir);
-            free(delete_target);
+            // printf("DELETE\n");
+            mpool_free(rv->block_ir_mp, delete_target->ir);
+            mpool_free(rv->block_mp, delete_target);
         }
 
         /* update the block prediction.
@@ -1020,20 +1022,20 @@ void rv_step(riscv_t *rv, int32_t cycles)
                 clear_flag = false;
             }
             /* chain block */
-//             if (!insn_is_unconditional_branch(last_ir->opcode)) {
-//                 if (branch_taken && !last_ir->branch_taken)
-//                     last_ir->branch_taken = block->ir;
-//                 else if (!last_ir->branch_untaken)
-//                     last_ir->branch_untaken = block->ir;
-//             } else if (last_ir->opcode == rv_insn_jal
-// #if RV32_HAS(EXT_C)
-//                        || last_ir->opcode == rv_insn_cj ||
-//                        last_ir->opcode == rv_insn_cjal
-// #endif
-//             ) {
-//                 if (!last_ir->branch_taken)
-//                     last_ir->branch_taken = block->ir;
-//             }
+            if (!insn_is_unconditional_branch(last_ir->opcode)) {
+                if (branch_taken && !last_ir->branch_taken)
+                    last_ir->branch_taken = block->ir;
+                else if (!last_ir->branch_untaken)
+                    last_ir->branch_untaken = block->ir;
+            } else if (last_ir->opcode == rv_insn_jal
+#if RV32_HAS(EXT_C)
+                       || last_ir->opcode == rv_insn_cj ||
+                       last_ir->opcode == rv_insn_cjal
+#endif
+            ) {
+                if (!last_ir->branch_taken)
+                    last_ir->branch_taken = block->ir;
+            }
         }
         last_pc = rv->PC;
 

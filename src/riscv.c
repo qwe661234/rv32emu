@@ -7,9 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cache.h"
+#include "mpool.h"
 #include "riscv_private.h"
 #include "state.h"
-#include "cache.h"
+
+#define cache_size_bit 10
 
 riscv_user_t rv_userdata(riscv_t *rv)
 {
@@ -72,8 +75,11 @@ riscv_t *rv_create(const riscv_io_t *io,
     rv->output_exit_code = output_exit_code;
 
     /* initialize the block cache */
-    rv->block_cache = cache_create(10);
-
+    rv->block_cache = cache_create(cache_size_bit);
+    rv->block_mp =
+        mpool_create(sizeof(block_t) << cache_size_bit, sizeof(block_t));
+    rv->block_ir_mp = mpool_create(sizeof(rv_insn_t) << (cache_size_bit + 10),
+                                   sizeof(rv_insn_t) << 10);
     /* reset */
     rv_reset(rv, 0U, argc, args);
 
@@ -95,16 +101,12 @@ bool rv_enables_to_output_exit_code(riscv_t *rv)
     return rv->output_exit_code;
 }
 
-static void release_block(void *block)
-{
-    free(((block_t *) block)->ir);
-    free(block);
-}
-
 void rv_delete(riscv_t *rv)
 {
     assert(rv);
-    cache_free(rv->block_cache, release_block);
+    mpool_destory(rv->block_mp);
+    mpool_destory(rv->block_ir_mp);
+    cache_free(rv->block_cache, NULL);
     free(rv);
 }
 
