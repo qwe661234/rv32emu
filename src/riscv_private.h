@@ -10,6 +10,7 @@
 #include "breakpoint.h"
 #include "mini-gdbstub/include/gdbstub.h"
 #endif
+#include "cache.h"
 #include "decode.h"
 #include "riscv.h"
 
@@ -119,8 +120,9 @@ struct riscv_internal {
     uint32_t csr_mip;
     uint32_t csr_mbadaddr;
 
-    bool compressed;       /**< current instruction is compressed or not */
+    bool compressed;           /**< current instruction is compressed or not */
     block_map_t block_map; /**< basic block map */
+    struct mpool *block_mp, *block_ir_mp;
 
     /* print exit code on syscall_exit */
     bool output_exit_code;
