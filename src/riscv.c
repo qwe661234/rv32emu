@@ -7,9 +7,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cache.h"
+#include "mpool.h"
 #include "riscv_private.h"
 #include "state.h"
 #include "utils.h"
+#if RV32_HAS(JIT)
+#include "compile.h"
+#endif
+
+#define cache_size_bit 10
 
 #if !RV32_HAS(JIT)
 /* initialize the block map */
@@ -30,8 +37,6 @@ void block_map_clear(block_map_t *map)
             continue;
         for (uint32_t i = 0; i < block->n_insn; i++)
             free(block->ir[i].fuse);
-        free(block->ir);
-        free(block);
         map->map[i] = NULL;
     }
     map->size = 0;
@@ -98,14 +103,17 @@ riscv_t *rv_create(const riscv_io_t *io,
 
     rv->output_exit_code = output_exit_code;
 
+    rv->block_mp =
+        mpool_create(sizeof(block_t) << cache_size_bit, sizeof(block_t));
+    rv->block_ir_mp = mpool_create(sizeof(rv_insn_t) << (cache_size_bit + 10),
+                                   sizeof(rv_insn_t) << 10);
 #if !RV32_HAS(JIT)
     /* initialize the block map */
-    block_map_init(&rv->block_map, 10);
+    block_map_init(&rv->block_map, cache_size_bit);
 #else
     rv->block_cache = cache_create(10);
     rv->code_cache = cache_create(10);
 #endif
-
     /* reset */
     rv_reset(rv, 0U, argc, args);
 
@@ -142,8 +150,10 @@ void rv_delete(riscv_t *rv)
     block_map_clear(&rv->block_map);
     free(rv->block_map.map);
 #else
-    cache_free(rv->block_cache, release_block);
+    // cache_free(rv->block_cache, release_block);
 #endif
+    mpool_destory(rv->block_mp);
+    mpool_destory(rv->block_ir_mp);
     free(rv);
 }
 

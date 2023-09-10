@@ -19,6 +19,7 @@ extern struct target_ops gdbstub_ops;
 #endif
 
 #include "decode.h"
+#include "mpool.h"
 #include "riscv.h"
 #include "riscv_private.h"
 #include "state.h"
@@ -328,13 +329,13 @@ static inline uint32_t hash(size_t k)
 #endif
 
 /* allocate a basic block */
-static block_t *block_alloc(const uint8_t bits)
+static block_t *block_alloc(riscv_t *rv)
 {
-    block_t *block = malloc(sizeof(struct block));
-    block->insn_capacity = 1 << bits;
+    block_t *block = mpool_alloc(rv->block_mp);
+    block->insn_capacity = 1024;
     block->n_insn = 0;
     block->predict = NULL;
-    block->ir = malloc(block->insn_capacity * sizeof(rv_insn_t));
+    block->ir = mpool_alloc(rv->block_ir_mp);
 #if RV32_HAS(JIT)
     block->hot = false;
 #endif
@@ -541,7 +542,7 @@ static block_t *block_find_or_translate(riscv_t *rv)
         }
 #endif
         /* allocate a new block */
-        next = block_alloc(10);
+        next = block_alloc(rv);
 
         /* translate the basic block */
         block_translate(rv, next);

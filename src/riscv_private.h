@@ -10,6 +10,7 @@
 #include "breakpoint.h"
 #include "mini-gdbstub/include/gdbstub.h"
 #endif
+#include "cache.h"
 #include "decode.h"
 #include "riscv.h"
 #if RV32_HAS(JIT)
@@ -137,6 +138,7 @@ struct riscv_internal {
     struct cache *block_cache;
     struct cache *code_cache;
 #endif
+    struct mpool *block_mp, *block_ir_mp;
 
     /* print exit code on syscall_exit */
     bool output_exit_code;
