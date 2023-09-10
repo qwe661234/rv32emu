@@ -29,6 +29,9 @@
 
 static uint32_t cache_size, cache_size_bits;
 static struct mpool *cache_mp;
+#if !RV32_HAS(ARC)
+static struct mpool *lfu_lists_mp;
+#endif
 
 #if RV32_HAS(ARC)
 /* The Adaptive Replacement Cache (ARC) improves the traditional LRU strategy
@@ -266,10 +269,9 @@ cache_t *cache_create(int size_bits)
     cache_mp =
         mpool_create(cache_size * 2 * sizeof(arc_entry_t), sizeof(arc_entry_t));
 #else /* !RV32_HAS(ARC) */
-    for (int i = 0; i < THRESHOLD; i++) {
-        cache->lists[i] = malloc(sizeof(struct list_head));
-        INIT_LIST_HEAD(cache->lists[i]);
-    }
+    lfu_lists_mp =
+        mpool_create(sizeof(struct list_head) << 10, sizeof(struct list_head));
+    memset(cache->lists, 0, sizeof(cache->lists));
 
     cache->map = malloc(sizeof(hashtable_t));
     if (!cache->map) {
@@ -414,9 +416,17 @@ void *cache_get(cache_t *cache, uint32_t key)
      * code. The generated C code is then compiled into machine code by the
      * target compiler.
      */
-    if (entry->frequency < THRESHOLD) {
+    if (entry->frequency < THRESHOLD - 1) {
         list_del_init(&entry->list);
-        list_add(&entry->list, cache->lists[entry->frequency++]);
+        if (list_empty(cache->lists[entry->frequency])) {
+            mpool_free(lfu_lists_mp, cache->lists[entry->frequency]);
+            cache->lists[entry->frequency] = NULL;
+        }
+        if (!cache->lists[++entry->frequency]) {
+            cache->lists[entry->frequency] = mpool_alloc(lfu_lists_mp);
+            INIT_LIST_HEAD(cache->lists[entry->frequency]);
+        }
+        list_add(&entry->list, cache->lists[entry->frequency]);
     }
 #endif
     /* return NULL if cache miss */
@@ -496,11 +506,15 @@ void *cache_put(cache_t *cache, uint32_t key, void *value)
     /* check the cache is full or not before adding a new entry */
     if (cache->list_size == cache->capacity) {
         for (int i = 0; i < THRESHOLD; i++) {
-            if (list_empty(cache->lists[i]))
+            if (!cache->lists[i])
                 continue;
             lfu_entry_t *delete_target =
                 list_last_entry(cache->lists[i], lfu_entry_t, list);
             list_del_init(&delete_target->list);
+            if (list_empty(cache->lists[i])) {
+                mpool_free(lfu_lists_mp, cache->lists[i]);
+                cache->lists[i] = NULL;
+            }
             hlist_del_init(&delete_target->ht_list);
             delete_value = delete_target->value;
             cache->list_size--;
@@ -512,7 +526,11 @@ void *cache_put(cache_t *cache, uint32_t key, void *value)
     new_entry->key = key;
     new_entry->value = value;
     new_entry->frequency = 0;
-    list_add(&new_entry->list, cache->lists[new_entry->frequency++]);
+    if (!cache->lists[new_entry->frequency]) {
+        cache->lists[new_entry->frequency] = mpool_alloc(lfu_lists_mp);
+        INIT_LIST_HEAD(cache->lists[new_entry->frequency]);
+    }
+    list_add(&new_entry->list, cache->lists[new_entry->frequency]);
     cache->list_size++;
     hlist_add_head(&new_entry->ht_list, &cache->map->ht_list_head[HASH(key)]);
     assert(cache->list_size <= cache->capacity);
@@ -523,30 +541,35 @@ void *cache_put(cache_t *cache, uint32_t key, void *value)
 void cache_free(cache_t *cache, void (*callback)(void *))
 {
 #if RV32_HAS(ARC)
-    for (int i = 0; i < N_CACHE_LIST_TYPES; i++) {
-        arc_entry_t *entry, *safe;
+    if (callback) {
+        for (int i = 0; i < N_CACHE_LIST_TYPES; i++) {
+            arc_entry_t *entry, *safe;
 #ifdef __HAVE_TYPEOF
-        list_for_each_entry_safe (entry, safe, cache->lists[i], list)
+            list_for_each_entry_safe (entry, safe, cache->lists[i], list)
 #else
-        list_for_each_entry_safe (entry, safe, cache->lists[i], list,
-                                  arc_entry_t)
+            list_for_each_entry_safe (entry, safe, cache->lists[i], list,
+                                      arc_entry_t)
 #endif
-            callback(entry->value);
+                callback(entry->value);
+        }
     }
 #else /* !RV32_HAS(ARC) */
-    for (int i = 0; i < THRESHOLD; i++) {
-        if (list_empty(cache->lists[i]))
-            continue;
-        lfu_entry_t *entry, *safe;
+    if (callback) {
+        for (int i = 0; i < THRESHOLD; i++) {
+            if (!cache->lists[i])
+                continue;
+            lfu_entry_t *entry, *safe;
 #ifdef __HAVE_TYPEOF
-        list_for_each_entry_safe (entry, safe, cache->lists[i], list)
+            list_for_each_entry_safe (entry, safe, cache->lists[i], list)
 #else
-        list_for_each_entry_safe (entry, safe, cache->lists[i], list,
-                                  lfu_entry_t)
+            list_for_each_entry_safe (entry, safe, cache->lists[i], list,
+                                      lfu_entry_t)
 
 #endif
-            callback(entry->value);
+                callback(entry->value);
+        }
     }
+    mpool_destory(lfu_lists_mp);
 #endif
     mpool_destory(cache_mp);
     free(cache->map->ht_list_head);
