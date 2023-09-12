@@ -920,14 +920,21 @@ void rv_step(riscv_t *rv, int32_t cycles)
         /* execute the block by JIT compiler */
         exec_block_func_t code = NULL;
         if (block->hot)
+#ifdef MIR
             code = (exec_block_func_t) cache_get(rv->code_cache, rv->PC);
+#else
+            code =
+                (exec_block_func_t) code_cache_lookup(rv->block_cache, rv->PC);
+#endif
         if (!code) {
             /* check if using frequency of block exceed threshold */
             if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
+#ifdef MIR
                 code = (exec_block_func_t) block_compile(rv);
-                assert(code);
                 cache_put(rv->code_cache, rv->PC, code);
-                assert(cache_get(rv->code_cache, rv->PC));
+#else
+                code = (exec_block_func_t) block_compile(rv);
+#endif
             }
         }
         if (code) {
