@@ -193,6 +193,15 @@ lines = re.sub('#endif\n', "", lines)
 output = output + "\"" + \
     re.sub("\n", "\"\\\n\"", re.findall(
         r'typedef[\S|\s]+?rv_insn_t;', lines)[0]) + "\"\\\n"
+output += '''\"static inline uint32_t sign_extend_h(const uint32_t x)\"\\
+\"{\"\\
+\"    return (int32_t) ((int16_t) x);\"\\
+\"}\"\\
+\"static inline uint32_t sign_extend_b(const uint32_t x)\"\\
+\"{\"\\
+\"    return (int32_t) ((int8_t) x);\"\\
+\"}\"\\
+'''
 output += "\"bool start(riscv_t *rv) {\"\\\n"
 output += "\" uint32_t pc, addr, udividend, udivisor, tmp, data, mask, ures, \"\\\n"
 output += "\"a, b, jump_to;\"\\\n"

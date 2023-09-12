@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #include "cache.h"
 #include "mpool.h"
@@ -22,9 +23,13 @@
  */
 #define THRESHOLD 32768
 
+
 #if RV32_HAS(JIT)
+#ifndef MIR
+#define CODE_CACHE_SIZE (64 * 1024 * 1024)
 #define sys_icache_invalidate(addr, size) \
     __builtin___clear_cache((char *) (addr), (char *) (addr) + (size));
+#endif
 #endif
 
 static uint32_t cache_size, cache_size_bits;
@@ -72,6 +77,7 @@ typedef struct {
     uint32_t key;
     uint32_t frequency;
     cache_list_t type;
+    uint64_t offset;
     struct list_head list;
     struct hlist_node ht_list;
 } arc_entry_t;
@@ -80,6 +86,7 @@ typedef struct {
     void *value;
     uint32_t key;
     uint32_t frequency;
+    uint64_t offset;
     struct list_head list;
     struct hlist_node ht_list;
 } lfu_entry_t;
@@ -100,6 +107,10 @@ typedef struct cache {
 #endif
     hashtable_t *map;
     uint32_t capacity;
+#ifndef MIR
+    uint8_t *jitcode;
+    uint64_t offset;
+#endif
 } cache_t;
 
 static inline void INIT_LIST_HEAD(struct list_head *head)
@@ -292,6 +303,12 @@ cache_t *cache_create(int size_bits)
         mpool_create(cache_size * sizeof(lfu_entry_t), sizeof(lfu_entry_t));
 #endif
     cache->capacity = cache_size;
+#ifndef MIR
+    cache->jitcode = (uint8_t *) mmap(NULL, CODE_CACHE_SIZE,
+                                      PROT_READ | PROT_WRITE | PROT_EXEC,
+                                      MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    cache->offset = 0;
+#endif
     return cache;
 }
 
@@ -580,10 +597,92 @@ bool cache_hot(struct cache *cache, uint32_t key)
                           lfu_entry_t)
 #endif
     {
-        if (entry->key == key && entry->frequency == THRESHOLD)
+        if (entry->key == key && entry->frequency == THRESHOLD - 1)
             return true;
     }
 #endif
     return false;
 }
+
+#ifndef MIR
+uint8_t *code_cache_lookup(cache_t *cache, uint32_t key)
+{
+    if (!cache->capacity || hlist_empty(&cache->map->ht_list_head[HASH(key)]))
+        return NULL;
+#if RV32_HAS(ARC)
+    arc_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[HASH(key)], ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[HASH(key)], ht_list,
+                          arc_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            return cache->jitcode + entry->offset;
+    }
+#else
+    lfu_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[HASH(key)], ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[HASH(key)], ht_list,
+                          lfu_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            return cache->jitcode + entry->offset;
+    }
+#endif
+    return NULL;
+}
+
+static inline uint64_t align_to(uint64_t val, uint64_t align)
+{
+    if (!align)
+        return val;
+    return (val + align - 1) & ~(align - 1);
+}
+
+uint8_t *code_cache_add(cache_t *cache,
+                        uint64_t key,
+                        uint8_t *code,
+                        size_t sz,
+                        uint64_t align)
+{
+    cache->offset = align_to(cache->offset, align);
+    if (!cache->capacity || hlist_empty(&cache->map->ht_list_head[HASH(key)]))
+        return NULL;
+#if RV32_HAS(ARC)
+    arc_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[HASH(key)], ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[HASH(key)], ht_list,
+                          arc_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            break;
+    }
+#else
+    lfu_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[HASH(key)], ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[HASH(key)], ht_list,
+                          lfu_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            break;
+    }
+#endif
+    memcpy(cache->jitcode + cache->offset, code, sz);
+    entry->offset = cache->offset;
+    cache->offset += sz;
+    sys_icache_invalidate(cache->jitcode + entry->offset, sz);
+    return cache->jitcode + entry->offset;
+}
+#endif
 #endif
