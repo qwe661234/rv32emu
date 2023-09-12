@@ -10,7 +10,6 @@
 #include "breakpoint.h"
 #include "mini-gdbstub/include/gdbstub.h"
 #endif
-#include "cache.h"
 #include "decode.h"
 #include "riscv.h"
 #if RV32_HAS(JIT)
@@ -136,7 +135,9 @@ struct riscv_internal {
     block_map_t block_map; /**< basic block map */
 #else
     struct cache *block_cache;
+#ifdef MIR
     struct cache *code_cache;
+#endif
 #endif
     struct mpool *block_mp, *block_ir_mp;
 

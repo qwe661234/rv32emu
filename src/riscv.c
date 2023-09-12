@@ -7,12 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cache.h"
 #include "mpool.h"
 #include "riscv_private.h"
 #include "state.h"
 #include "utils.h"
 #if RV32_HAS(JIT)
+#include "cache.h"
 #include "compile.h"
 #endif
 
@@ -112,7 +112,9 @@ riscv_t *rv_create(const riscv_io_t *io,
     block_map_init(&rv->block_map, cache_size_bit);
 #else
     rv->block_cache = cache_create(10);
+#ifdef MIR
     rv->code_cache = cache_create(10);
+#endif
 #endif
     /* reset */
     rv_reset(rv, 0U, argc, args);
@@ -135,14 +137,6 @@ bool rv_enables_to_output_exit_code(riscv_t *rv)
     return rv->output_exit_code;
 }
 
-#if RV32_HAS(JIT)
-static void release_block(void *block)
-{
-    free(((block_t *) block)->ir);
-    free(block);
-}
-#endif
-
 void rv_delete(riscv_t *rv)
 {
     assert(rv);
@@ -150,7 +144,10 @@ void rv_delete(riscv_t *rv)
     block_map_clear(&rv->block_map);
     free(rv->block_map.map);
 #else
-    // cache_free(rv->block_cache, release_block);
+    cache_free(rv->block_cache, NULL);
+#ifdef MIR
+    cache_free(rv->code_cache, NULL);
+#endif
 #endif
     mpool_destory(rv->block_mp);
     mpool_destory(rv->block_ir_mp);

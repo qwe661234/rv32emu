@@ -6,7 +6,6 @@
 #pragma once
 
 #include "feature.h"
-
 #if defined(__GNUC__) || defined(__clang__)
 #define UNUSED __attribute__((unused))
 #define likely(x) __builtin_expect(!!(x), 1)

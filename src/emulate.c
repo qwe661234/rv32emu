@@ -559,8 +559,8 @@ static block_t *block_find_or_translate(riscv_t *rv)
         /* insert the block into block cache */
         block_t *delete_target = cache_put(rv->block_cache, rv->PC, &(*next));
         if (delete_target) {
-            free(delete_target->ir);
-            free(delete_target);
+            mpool_free(rv->block_ir_mp, delete_target->ir);
+            mpool_free(rv->block_mp, delete_target);
         }
 #endif
         /* update the block prediction.
@@ -632,6 +632,7 @@ void rv_step(riscv_t *rv, int32_t cycles)
 #if RV32_HAS(JIT)
         /* execute the block by JIT compiler */
         exec_block_func_t code = NULL;
+#ifdef MIR
         if (block->hot)
             code = (exec_block_func_t) cache_get(rv->code_cache, rv->PC);
         if (!code) {
@@ -641,6 +642,17 @@ void rv_step(riscv_t *rv, int32_t cycles)
                 cache_put(rv->code_cache, rv->PC, code);
             }
         }
+#else
+        if (block->hot)
+            code =
+                (exec_block_func_t) code_cache_lookup(rv->block_cache, rv->PC);
+        if (!code) {
+            /* check if using frequency of block exceed threshold */
+            if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
+                code = (exec_block_func_t) block_compile(rv);
+            }
+        }
+#endif
         if (code) {
             /* execute machine code */
             code(rv);
