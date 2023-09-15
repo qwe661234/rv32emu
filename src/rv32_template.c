@@ -388,6 +388,7 @@ RVOP(divu, {
     rv->X[ir->rd] = !udivisor ? ~0U : udividend / udivisor;
 })
 
+/* clang-format off */
 /* REM: Remainder Signed */
 /* +------------------------+-----------+----------+---------+
  * |       Condition        |  Dividend |  Divisor |  REM[W] |
@@ -402,7 +403,8 @@ RVOP(rem, {
     rv->X[ir->rd] = !divisor ? dividend
                     : (divisor == -1 && rv->X[ir->rs1] == 0x80000000U)
                         ? 0 /* overflow */
-                        : (dividend % divisor);
+                        : (dividend 
+                        % divisor);
 })
 
 /* REMU: Remainder Unsigned */
@@ -415,8 +417,10 @@ RVOP(rem, {
 RVOP(remu, {
     const uint32_t udividend = rv->X[ir->rs1];
     const uint32_t udivisor = rv->X[ir->rs2];
-    rv->X[ir->rd] = !udivisor ? udividend : udividend % udivisor;
+    rv->X[ir->rd] = !udivisor ? udividend : udividend 
+    % udivisor;
 })
+/* clang-format on */
 #endif
 
 /* RV32A Standard Extension */
