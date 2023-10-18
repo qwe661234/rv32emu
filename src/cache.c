@@ -16,7 +16,11 @@
 /* THRESHOLD is set to identify hot spots. Once the frequency of use for a block
  * exceeds the THRESHOLD, the JIT compiler flow is triggered.
  */
-#define THRESHOLD 1000
+#define THRESHOLD 32768
+#if RV32_HAS(JIT)
+#define sys_icache_invalidate(addr, size) \
+    __builtin___clear_cache((char *) (addr), (char *) (addr) + (size));
+#endif
 
 static uint32_t cache_size, cache_size_bits;
 static struct mpool *cache_mp;
@@ -545,3 +549,40 @@ void cache_free(cache_t *cache, void (*callback)(void *))
     free(cache->map);
     free(cache);
 }
+
+#if RV32_HAS(JIT)
+bool cache_hot(struct cache *cache, uint32_t key)
+{
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+        return false;
+#if RV32_HAS(ARC)
+    arc_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, arc_entry_t)
+#endif
+    {
+        if (entry->key == key && entry->frequency == THRESHOLD)
+            return true;
+    }
+#else
+    lfu_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, lfu_entry_t)
+#endif
+    {
+        if (entry->key == key && entry->frequency == THRESHOLD)
+            return true;
+    }
+#endif
+    return false;
+}
+#endif
