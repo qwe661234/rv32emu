@@ -614,15 +614,17 @@ bool cache_hot(struct cache *cache, uint32_t key)
 #ifndef MIR
 uint8_t *code_cache_lookup(cache_t *cache, uint32_t key)
 {
-    if (!cache->capacity || hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
         return NULL;
 #if RV32_HAS(ARC)
     arc_entry_t *entry = NULL;
 #ifdef __HAVE_TYPEOF
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
 #else
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list,
-                          arc_entry_t)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, arc_entry_t)
 #endif
     {
         if (entry->key == key)
@@ -631,10 +633,11 @@ uint8_t *code_cache_lookup(cache_t *cache, uint32_t key)
 #else
     lfu_entry_t *entry = NULL;
 #ifdef __HAVE_TYPEOF
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
 #else
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list,
-                          lfu_entry_t)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, lfu_entry_t)
 #endif
     {
         if (entry->key == key)
@@ -658,15 +661,17 @@ uint8_t *code_cache_add(cache_t *cache,
                         uint64_t align)
 {
     cache->offset = align_to(cache->offset, align);
-    if (!cache->capacity || hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
         return NULL;
 #if RV32_HAS(ARC)
     arc_entry_t *entry = NULL;
 #ifdef __HAVE_TYPEOF
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
 #else
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list,
-                          arc_entry_t)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, arc_entry_t)
 #endif
     {
         if (entry->key == key)

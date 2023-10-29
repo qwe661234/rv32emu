@@ -345,42 +345,24 @@ static bool do_fuse4(riscv_t *rv, rv_insn_t *ir, uint64_t cycle, uint32_t PC)
 
 /* memset */
 static bool do_fuse5(riscv_t *rv,
-                     const rv_insn_t *ir,
+                     const rv_insn_t *ir UNUSED,
                      uint64_t cycle,
-                     uint32_t PC)
+                     uint32_t PC UNUSED)
 {
     cycle += 2;
-    memory_t *m = ((state_t *) rv->userdata)->mem;
-    memset((char *) m->mem_base + rv->X[rv_reg_a0], rv->X[rv_reg_a1],
-           rv->X[rv_reg_a2]);
-    PC = rv->X[rv_reg_ra] & ~1U;
-    if (unlikely(RVOP_NO_NEXT(ir))) {
-        rv->csr_cycle = cycle;
-        rv->PC = PC;
-        return true;
-    }
-    const rv_insn_t *next = ir->next;
-    MUST_TAIL return next->impl(rv, next, cycle, PC);
+    rv->io.on_memset(rv);
+    return true;
 }
 
 /* memcpy */
 static bool do_fuse6(riscv_t *rv,
-                     const rv_insn_t *ir,
+                     const rv_insn_t *ir UNUSED,
                      uint64_t cycle,
-                     uint32_t PC)
+                     uint32_t PC UNUSED)
 {
     cycle += 2;
-    memory_t *m = ((state_t *) rv->userdata)->mem;
-    memcpy((char *) m->mem_base + rv->X[rv_reg_a0],
-           (char *) m->mem_base + rv->X[rv_reg_a1], rv->X[rv_reg_a2]);
-    PC = rv->X[rv_reg_ra] & ~1U;
-    if (unlikely(RVOP_NO_NEXT(ir))) {
-        rv->csr_cycle = cycle;
-        rv->PC = PC;
-        return true;
-    }
-    const rv_insn_t *next = ir->next;
-    MUST_TAIL return next->impl(rv, next, cycle, PC);
+    rv->io.on_memcpy(rv);
+    return true;
 }
 
 /* multiple shift immediate */
@@ -967,6 +949,22 @@ void ecall_handler(riscv_t *rv)
     assert(rv);
     rv_except_ecall_M(rv, 0);
     syscall_handler(rv);
+}
+
+void memset_handler(riscv_t *rv)
+{
+    memory_t *m = ((state_t *) rv->userdata)->mem;
+    memset((char *) m->mem_base + rv->X[rv_reg_a0], rv->X[rv_reg_a1],
+           rv->X[rv_reg_a2]);
+    rv->PC = rv->X[rv_reg_ra] & ~1U;
+}
+
+void memcpy_handler(riscv_t *rv)
+{
+    memory_t *m = ((state_t *) rv->userdata)->mem;
+    memcpy((char *) m->mem_base + rv->X[rv_reg_a0],
+           (char *) m->mem_base + rv->X[rv_reg_a1], rv->X[rv_reg_a2]);
+    rv->PC = rv->X[rv_reg_ra] & ~1U;
 }
 
 void dump_registers(riscv_t *rv, char *out_file_path)

@@ -16,6 +16,29 @@ CFLAGS += -D DEFAULT_STACK_ADDR=0xFFFFE000
 # Set the default args starting address
 CFLAGS += -D DEFAULT_ARGS_ADDR=0xFFFFF000
 
+
+# Enable link-time optimization (LTO)
+ENABLE_LTO ?= 1
+ifeq ($(call has, LTO), 1)
+ifeq ("$(CC_IS_CLANG)$(CC_IS_GCC)",)
+$(warning LTO is only supported in clang and gcc.)
+override ENABLE_LTO := 0
+endif
+endif
+$(call set-feature, LTO)
+ifeq ($(call has, LTO), 1)
+ifeq ("$(CC_IS_GCC)", "1")
+CFLAGS += -flto
+endif
+ifeq ("$(CC_IS_CLANG)", "1")
+CFLAGS += -flto=thin -fsplit-lto-unit
+LDFLAGS += -flto=thin
+endif
+endif
+
+# Disable Intel's Control-flow Enforcement Technology (CET)
+CFLAGS += $(CFLAGS_NO_CET)
+
 OBJS_EXT :=
 
 # Control and Status Register (CSR)

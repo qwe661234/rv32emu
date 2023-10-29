@@ -79,7 +79,7 @@ enum {
 #define MSTATUS_MPIE (1 << MSTATUS_MPIE_SHIFT)
 #define MSTATUS_MPP (3 << MSTATUS_MPP_SHIFT)
 
-#define BLOCK_MAP_CAPACITY_BITS 10
+#define BLOCK_MAP_CAPACITY_BITS 11
 
 /* forward declaration for internal structure */
 typedef struct riscv_internal riscv_t;
@@ -105,7 +105,8 @@ typedef void (*riscv_mem_write_b)(riscv_word_t addr, riscv_byte_t data);
 /* system instruction handlers */
 typedef void (*riscv_on_ecall)(riscv_t *rv);
 typedef void (*riscv_on_ebreak)(riscv_t *rv);
-
+typedef void (*riscv_on_memset)(riscv_t *rv);
+typedef void (*riscv_on_memcpy)(riscv_t *rv);
 /* RISC-V emulator I/O interface */
 typedef struct {
     /* memory read interface */
@@ -122,7 +123,8 @@ typedef struct {
     /* system */
     riscv_on_ecall on_ecall;
     riscv_on_ebreak on_ebreak;
-
+    riscv_on_memset on_memset;
+    riscv_on_memcpy on_memcpy;
     /* enable misaligned memory access */
     bool allow_misalign;
 } riscv_io_t;
@@ -168,6 +170,12 @@ void syscall_handler(riscv_t *rv);
 
 /* environment call handler */
 void ecall_handler(riscv_t *rv);
+
+/* memset handler */
+void memset_handler(riscv_t *rv);
+
+/* memcpy handler */
+void memcpy_handler(riscv_t *rv);
 
 /* dump registers as JSON to out_file_path */
 void dump_registers(riscv_t *rv, char *out_file_path);

@@ -154,10 +154,9 @@ static char funcbuf[128] = {0};
  * code.
  */
 RVOP(jal, {
-    GEN("  pc = PC;\n");
     UPDATE_PC(ir->imm);
     if (ir->rd) {
-        GEN("  rv->X[%u] = pc + 4;\n", ir->rd);
+        GEN("  rv->X[%u] = %u;\n", ir->rd, ir->pc + 4);
     }
     if (ir->branch_taken) {
         NEXT_INSN(ir->pc + ir->imm);
@@ -167,10 +166,9 @@ RVOP(jal, {
 })
 
 RVOP(jalr, {
-    GEN("  pc = PC;\n");
     GEN("  PC = (rv->X[%u] + %d) & ~1U;\n", ir->rs1, ir->imm);
     if (ir->rd) {
-        GEN("  rv->X[%u] = pc + 4;\n", ir->rd);
+        GEN("  rv->X[%u] = %u;\n", ir->rd, ir->pc + 4);
     }
     END_INSN;
 })
@@ -425,9 +423,9 @@ static void gen_fuse5(riscv_t *rv UNUSED, rv_insn_t *ir, char *gencode)
     GEN("insn_%x:\n"
         "  cycle += 2;\n",
         (ir->pc));
-    GEN("   memset((char *) m->mem_base + rv->X[rv_reg_a0], rv->X[rv_reg_a1], "
-        "rv->X[rv_reg_a2]); ");
-    END_INSN;
+    GEN("    rv->io.on_memset(rv);\n");
+    GEN("    rv->csr_cycle = cycle;\n");
+    GEN("    return true;\n");
 }
 
 static void gen_fuse6(riscv_t *rv UNUSED, rv_insn_t *ir, char *gencode)
@@ -435,9 +433,9 @@ static void gen_fuse6(riscv_t *rv UNUSED, rv_insn_t *ir, char *gencode)
     GEN("insn_%x:\n"
         "  cycle += 2;\n",
         (ir->pc));
-    GEN("  memcpy((char *) m->mem_base + rv->X[rv_reg_a0], (char *) "
-        "m->mem_base + rv->X[rv_reg_a1], rv->X[rv_reg_a2]);");
-    END_INSN;
+    GEN("    rv->io.on_memcpy(rv);\n");
+    GEN("    rv->csr_cycle = cycle;\n");
+    GEN("    return true;\n");
 }
 
 static void gen_fuse7(riscv_t *rv UNUSED, rv_insn_t *ir, char *gencode)
