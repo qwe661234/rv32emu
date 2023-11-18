@@ -4,6 +4,7 @@
  */
 
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -136,7 +137,8 @@ riscv_t *rv_create(const riscv_io_t *io,
 #endif
     /* reset */
     rv_reset(rv, 0U, argc, args);
-
+    rv->JIT_PATH = 0;
+    rv->INTERP_PATH = 0;
     return rv;
 }
 
@@ -159,12 +161,14 @@ bool rv_enables_to_output_exit_code(riscv_t *rv)
 void rv_delete(riscv_t *rv)
 {
     assert(rv);
+    printf("INTERP_PATH = %lu\n", rv->INTERP_PATH);
+    printf("JIT_PATH = %lu\n", rv->JIT_PATH);
 #if !RV32_HAS(JIT)
     block_map_destroy(rv);
 #else
-    cache_free(rv->block_cache, NULL);
+    // cache_free(rv->block_cache, NULL);
 #ifdef MIR
-    cache_free(rv->code_cache, NULL);
+    // cache_free(rv->code_cache, NULL);
 #endif
 #endif
     free(rv);

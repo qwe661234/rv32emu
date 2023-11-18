@@ -5,6 +5,7 @@
 
 #pragma once
 #include <stdbool.h>
+#include <stdint.h>
 
 #if RV32_HAS(GDBSTUB)
 #include "breakpoint.h"
@@ -86,7 +87,8 @@ struct riscv_internal {
     /* integer registers */
     riscv_word_t X[N_RV_REGS];
     riscv_word_t PC;
-
+    uint64_t JIT_PATH;
+    uint64_t INTERP_PATH;
     /* user provided data */
     riscv_user_t userdata;
 

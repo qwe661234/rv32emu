@@ -244,6 +244,7 @@ static bool clear_flag = false;
     static bool do_##inst(riscv_t *rv, const rv_insn_t *ir, uint64_t cycle, \
                           uint32_t PC)                                      \
     {                                                                       \
+        rv->INTERP_PATH++;                                                      \
         cycle++;                                                            \
         code;                                                               \
     nextop:                                                                 \
@@ -265,6 +266,7 @@ static bool clear_flag = false;
 /* multiple lui */
 static bool do_fuse1(riscv_t *rv, rv_insn_t *ir, uint64_t cycle, uint32_t PC)
 {
+    rv->INTERP_PATH += ir->imm2;
     cycle += ir->imm2;
     opcode_fuse_t *fuse = ir->fuse;
     for (int i = 0; i < ir->imm2; i++)
@@ -282,6 +284,7 @@ static bool do_fuse1(riscv_t *rv, rv_insn_t *ir, uint64_t cycle, uint32_t PC)
 /* LUI + ADD */
 static bool do_fuse2(riscv_t *rv, rv_insn_t *ir, uint64_t cycle, uint32_t PC)
 {
+    rv->INTERP_PATH += 2;
     cycle += 2;
     rv->X[ir->rd] = ir->imm;
     rv->X[ir->rs2] = rv->X[ir->rd] + rv->X[ir->rs1];
@@ -298,6 +301,7 @@ static bool do_fuse2(riscv_t *rv, rv_insn_t *ir, uint64_t cycle, uint32_t PC)
 /* multiple SW */
 static bool do_fuse3(riscv_t *rv, rv_insn_t *ir, uint64_t cycle, uint32_t PC)
 {
+    rv->INTERP_PATH += ir->imm2;
     cycle += ir->imm2;
     opcode_fuse_t *fuse = ir->fuse;
     /* The memory addresses of the sw instructions are contiguous, thus only
@@ -371,6 +375,7 @@ static bool do_fuse7(riscv_t *rv,
                      uint64_t cycle,
                      uint32_t PC)
 {
+    rv->INTERP_PATH += ir->imm2;
     cycle += ir->imm2;
     opcode_fuse_t *fuse = ir->fuse;
     for (int i = 0; i < ir->imm2; i++)
@@ -789,16 +794,16 @@ static block_t *block_find_or_translate(riscv_t *rv)
         next = block_alloc(rv);
         block_translate(rv, next);
 
-        if (!libc_substitute(rv, next)) {
+        // if (!libc_substitute(rv, next)) {
 #if !RV32_HAS(JIT)
-            optimize_constant(rv, next);
+        optimize_constant(rv, next);
 #endif
 #if RV32_HAS(GDBSTUB)
-            if (likely(!rv->debug_mode))
+        if (likely(!rv->debug_mode))
 #endif
-                /* macro operation fusion */
-                match_pattern(rv, next);
-        }
+            /* macro operation fusion */
+            match_pattern(rv, next);
+            // }
 #if !RV32_HAS(JIT)
         /* insert the block into block map */
         block_insert(&rv->block_map, next);
@@ -832,7 +837,6 @@ static block_t *block_find_or_translate(riscv_t *rv)
 #if RV32_HAS(JIT)
 typedef bool (*exec_block_func_t)(riscv_t *rv, uint64_t, uint32_t);
 #endif
-
 void rv_step(riscv_t *rv, int32_t cycles)
 {
     assert(rv);

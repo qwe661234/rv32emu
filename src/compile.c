@@ -137,7 +137,8 @@ static char funcbuf[128] = {0};
     static void gen_##inst(riscv_t *rv UNUSED, rv_insn_t *ir, char *gencode) \
     {                                                                        \
         GEN("insn_%x:\n"                                                     \
-            "  cycle++;\n",                                                  \
+            "  cycle++;\n"                                                   \
+            "  rv->JIT_PATH++;\n",                                           \
             (ir->pc));                                                       \
         code;                                                                \
         if (!insn_is_branch(ir->opcode)) {                                   \
