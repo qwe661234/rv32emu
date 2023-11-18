@@ -451,12 +451,13 @@ static void gen_fuse7(riscv_t *rv UNUSED, rv_insn_t *ir, char *gencode)
 }
 #undef RVOP
 
+uint64_t count = 0;
 static void trace_ebb(riscv_t *rv, char *gencode, rv_insn_t *ir, set_t *set)
 {
     while (1) {
         if (set_add(set, ir->pc))
             dispatch_table[ir->opcode](rv, ir, gencode);
-
+        count++;
         if (!ir->next)
             break;
         ir = ir->next;

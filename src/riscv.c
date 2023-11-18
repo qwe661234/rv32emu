@@ -162,10 +162,10 @@ void rv_delete(riscv_t *rv)
 #if !RV32_HAS(JIT)
     block_map_destroy(rv);
 #else
-//     cache_free(rv->block_cache, NULL);
-// #ifdef MIR
-//     cache_free(rv->code_cache, NULL);
-// #endif
+    cache_free(rv->block_cache, NULL);
+#ifdef MIR
+    cache_free(rv->code_cache, NULL);
+#endif
 #endif
     free(rv);
 }

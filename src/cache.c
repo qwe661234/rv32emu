@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #ifndef MIR
@@ -18,7 +20,7 @@
 /* THRESHOLD is set to identify hot spots. Once the frequency of use for a block
  * exceeds the THRESHOLD, the JIT compiler flow is triggered.
  */
-#define THRESHOLD 32768
+#define THRESHOLD 4096
 #if RV32_HAS(JIT)
 #ifndef MIR
 #define CODE_CACHE_SIZE (64 * 1024 * 1024)
@@ -544,8 +546,10 @@ void *cache_put(cache_t *cache, uint32_t key, void *value)
     return delete_value;
 }
 
+uint64_t freq[4097] = {0};
 void cache_free(cache_t *cache, void (*callback)(void *))
 {
+    uint64_t total_times = 0;
 #if RV32_HAS(ARC)
     for (int i = 0; i < N_CACHE_LIST_TYPES; i++) {
         arc_entry_t *entry, *safe;
@@ -567,12 +571,54 @@ void cache_free(cache_t *cache, void (*callback)(void *))
                                   lfu_entry_t)
 #endif
 #endif
-            callback(entry->value);
+        {
+            freq[entry->frequency]++;
+            total_times += entry->frequency;
+        }
     }
-    mpool_destroy(cache_mp);
     free(cache->map->ht_list_head);
     free(cache->map);
     free(cache);
+    for (int i = 0; i <= 4096; i++) {
+        if (freq[i]) {
+            printf("%4d | %10ld\n", i, freq[i]);
+        }
+    }
+}
+
+uint32_t cache_freq(struct cache *cache, uint32_t key)
+{
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+        return 0;
+#if RV32_HAS(ARC)
+    arc_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, arc_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            return entry->frequency;
+    }
+#else
+    lfu_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, lfu_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            return entry->frequency;
+    }
+#endif
+    return 0;
 }
 
 #if RV32_HAS(JIT)
