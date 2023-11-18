@@ -152,6 +152,7 @@ static block_t *block_alloc(riscv_t *rv)
     block->predict = NULL;
 #if RV32_HAS(JIT)
     block->hot = false;
+    block->backward = false;
 #endif
     return block;
 }
@@ -244,7 +245,7 @@ static bool clear_flag = false;
     static bool do_##inst(riscv_t *rv, const rv_insn_t *ir, uint64_t cycle, \
                           uint32_t PC)                                      \
     {                                                                       \
-        rv->INTERP_PATH++;                                                      \
+        rv->INTERP_PATH++;                                                  \
         cycle++;                                                            \
         code;                                                               \
     nextop:                                                                 \
@@ -466,9 +467,11 @@ static void block_translate(riscv_t *rv, block_t *block)
         block->n_insn++;
         prev_ir = ir;
         /* stop on branch */
-        if (insn_is_branch(ir->opcode))
+        if (insn_is_branch(ir->opcode)) {
+            if (ir->imm < 0)
+                block->backward = true;
             break;
-
+        }
         ir = mpool_alloc(rv->block_ir_mp);
     }
 
@@ -914,7 +917,8 @@ void rv_step(riscv_t *rv, int32_t cycles)
 #endif
         if (!code) {
             /* check if using frequency of block exceed threshold */
-            if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
+            if ((block->backward && cache_freq(rv->block_cache, block->pc_start) >= 2048) || cache_hot(rv->block_cache, block->pc_start)) {
+                block->hot = true;
 #ifdef MIR
                 code = (exec_block_func_t) block_compile(rv);
                 cache_put(rv->code_cache, rv->PC, code);
