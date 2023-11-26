@@ -121,6 +121,7 @@ struct riscv_internal {
     struct mpool *block_mp, *block_ir_mp;
     /* print exit code on syscall_exit */
     bool output_exit_code;
+    void *jit_state;
 };
 
 /* sign extend a 16 bit value */

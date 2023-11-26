@@ -24,6 +24,7 @@ extern struct target_ops gdbstub_ops;
 #include "riscv.h"
 #include "riscv_private.h"
 #include "state.h"
+#include "ubpf_jit_x86_64.h"
 #include "utils.h"
 
 /* Shortcuts for comparing each field of specified RISC-V instruction */
@@ -955,14 +956,14 @@ static block_t *block_find_or_translate(riscv_t *rv)
         next = block_alloc(rv);
         block_translate(rv, next);
 
-        if (!libc_substitute(rv, next)) {
-            optimize_constant(rv, next);
-#if RV32_HAS(GDBSTUB)
-            if (likely(!rv->debug_mode))
-#endif
-                /* macro operation fusion */
-                match_pattern(rv, next);
-        }
+        //         if (!libc_substitute(rv, next)) {
+        //             optimize_constant(rv, next);
+        // #if RV32_HAS(GDBSTUB)
+        //             if (likely(!rv->debug_mode))
+        // #endif
+        //                 /* macro operation fusion */
+        //                 match_pattern(rv, next);
+        //         }
         /* insert the block into block map */
         block_insert(&rv->block_map, next);
 
@@ -978,6 +979,7 @@ static block_t *block_find_or_translate(riscv_t *rv)
     return next;
 }
 
+typedef void (*func_t)(riscv_t *rv, uintptr_t);
 void rv_step(riscv_t *rv, int32_t cycles)
 {
     assert(rv);
@@ -1030,11 +1032,24 @@ void rv_step(riscv_t *rv, int32_t cycles)
             }
         }
         last_pc = rv->PC;
+        // clock_t begin = clock();
+        // struct jit_state *state = tired1_compile(rv, block);
+        // clock_t end = clock();
+        // double time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
+        // printf("compile time spent = %lf\n", time_spent);
+        // begin = clock();
+        struct jit_state *state = rv->jit_state;
+        uint32_t entry_loc = ubpf_translate_x86_64(rv, block);
+        // printf("entry_loc = %u\n", entry_loc);
+        ((func_t) state->buf)(rv, (uintptr_t) (state->buf + entry_loc));
+        // end = clock(); time_spent = (double) (end - begin) / CLOCKS_PER_SEC;
+        // printf("execution time spent = %lf\n",time_spent);
+        // rv->PC = block->pc_end;
 
         /* execute the block */
-        const rv_insn_t *ir = block->ir_head;
-        if (unlikely(!ir->impl(rv, ir, rv->csr_cycle, rv->PC)))
-            break;
+        // const rv_insn_t *ir = block->ir_head;
+        // if (unlikely(!ir->impl(rv, ir, rv->csr_cycle, rv->PC)))
+        //     break;
         prev = block;
     }
 }

@@ -10,6 +10,7 @@
 #include "mpool.h"
 #include "riscv_private.h"
 #include "state.h"
+#include "ubpf_jit_x86_64.h"
 
 #define BLOCK_IR_MAP_CAPACITY_BITS 10
 
@@ -118,6 +119,8 @@ riscv_t *rv_create(const riscv_io_t *io,
                                 sizeof(block_t));
     rv->block_ir_mp = mpool_create(
         sizeof(rv_insn_t) << BLOCK_IR_MAP_CAPACITY_BITS, sizeof(rv_insn_t));
+
+    rv->jit_state = init_state(65536);
 
     /* initialize the block map */
     block_map_init(&rv->block_map, 10);
