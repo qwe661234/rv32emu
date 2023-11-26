@@ -11,6 +11,10 @@
 #include "riscv_private.h"
 #include "state.h"
 #include "utils.h"
+#if RV32_HAS(JIT)
+#include "cache.h"
+#include "compile.h"
+#endif
 
 #define BLOCK_IR_MAP_CAPACITY_BITS 10
 
@@ -127,9 +131,10 @@ riscv_t *rv_create(const riscv_io_t *io,
     block_map_init(&rv->block_map, 10);
 #else
     rv->block_cache = cache_create(10);
+#ifdef MIR
     rv->code_cache = cache_create(10);
 #endif
-
+#endif
     /* reset */
     rv_reset(rv, 0U, argc, args);
 
@@ -158,7 +163,10 @@ void rv_delete(riscv_t *rv)
 #if !RV32_HAS(JIT)
     block_map_destroy(rv);
 #else
-
+//     cache_free(rv->block_cache, NULL);
+// #ifdef MIR
+//     cache_free(rv->code_cache, NULL);
+// #endif
 #endif
     free(rv);
 }
