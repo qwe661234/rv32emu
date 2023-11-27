@@ -12,6 +12,7 @@
 #include "state.h"
 #include "utils.h"
 #if RV32_HAS(JIT)
+#include "ubpf_jit_x86_64.h"
 #include "cache.h"
 #include "compile.h"
 #endif
@@ -125,6 +126,8 @@ riscv_t *rv_create(const riscv_io_t *io,
                                 sizeof(block_t));
     rv->block_ir_mp = mpool_create(
         sizeof(rv_insn_t) << BLOCK_IR_MAP_CAPACITY_BITS, sizeof(rv_insn_t));
+
+    rv->jit_state = init_state(65536);
 
 #if !RV32_HAS(JIT)
     /* initialize the block map */

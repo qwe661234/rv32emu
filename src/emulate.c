@@ -26,6 +26,7 @@ extern struct target_ops gdbstub_ops;
 #include "state.h"
 #include "utils.h"
 #if RV32_HAS(JIT)
+#include "ubpf_jit_x86_64.h"
 #include "cache.h"
 #include "compile.h"
 #endif
@@ -832,16 +833,14 @@ static block_t *block_find_or_translate(riscv_t *rv)
         next = block_alloc(rv);
         block_translate(rv, next);
 
-        if (!libc_substitute(rv, next)) {
-#if !RV32_HAS(JIT)
-            optimize_constant(rv, next);
-#endif
-#if RV32_HAS(GDBSTUB)
-            if (likely(!rv->debug_mode))
-#endif
-                /* macro operation fusion */
-                match_pattern(rv, next);
-        }
+        //         if (!libc_substitute(rv, next)) {
+        //             optimize_constant(rv, next);
+        // #if RV32_HAS(GDBSTUB)
+        //             if (likely(!rv->debug_mode))
+        // #endif
+        //                 /* macro operation fusion */
+        //                 match_pattern(rv, next);
+        //         }
 #if !RV32_HAS(JIT)
         /* insert the block into block map */
         block_insert(&rv->block_map, next);
@@ -873,6 +872,7 @@ static block_t *block_find_or_translate(riscv_t *rv)
 }
 
 #if RV32_HAS(JIT)
+typedef void (*exec_tired1_block_func_t)(riscv_t *rv, uintptr_t);
 typedef bool (*exec_block_func_t)(riscv_t *rv, uint64_t, uint32_t);
 #endif
 
@@ -942,32 +942,23 @@ void rv_step(riscv_t *rv, int32_t cycles)
         }
         last_pc = rv->PC;
 #if RV32_HAS(JIT)
-        /* execute the block by JIT compiler */
-        exec_block_func_t code = NULL;
-        if (block->hot)
-#ifdef MIR
-            code = (exec_block_func_t) cache_get(rv->code_cache, rv->PC);
-#else
-            code =
-                (exec_block_func_t) code_cache_lookup(rv->block_cache, rv->PC);
-#endif
-        if (!code) {
-            /* check if using frequency of block exceed threshold */
-            if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
-#ifdef MIR
-                code = (exec_block_func_t) block_compile(rv);
-                cache_put(rv->code_cache, rv->PC, code);
-#else
-                code = (exec_block_func_t) block_compile(rv);
-#endif
-            }
-        }
-        if (code) {
-            /* execute machine code */
-            code(rv, rv->csr_cycle, rv->PC);
-            /* block should not be extended if execution mode is jit */
-            prev = NULL;
-            continue;
+        struct jit_state *state = rv->jit_state;
+        if (block->hot) {
+            // printf("tiered 1 %#x\n", rv->PC);
+            // printf("block->offset = %#x\n", block->offset);
+            ((exec_tired1_block_func_t) state->buf)(rv, (uintptr_t) (state->buf + block->offset));
+            // printf("rv->PC = %#x\n");
+            prev = block;
+            break;
+        } /* check if using frequency of block exceed threshold */
+        else if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
+            // printf("tiered 1 translate %#x\n", rv->PC);
+            block->offset = ubpf_translate_x86_64(rv, block);
+            // printf("block->offset = %#x\n", block->offset);
+            ((exec_tired1_block_func_t) state->buf)(rv, (uintptr_t) (state->buf + block->offset));
+            // printf("rv->PC = %#x\n", rv->PC);
+            prev = block;
+            break;
         }
 #endif
         /* execute the block by interpreter */

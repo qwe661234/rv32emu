@@ -4,7 +4,7 @@
  */
 
 #pragma once
-
+#define MIR 1
 #include "feature.h"
 #if defined(__GNUC__) || defined(__clang__)
 #define UNUSED __attribute__((unused))

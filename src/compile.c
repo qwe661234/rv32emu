@@ -531,7 +531,6 @@ static void *import_resolver(const char *name)
         {"sqrtf", sqrtf},
         {"calc_fclass", calc_fclass},
         {"is_nan", is_nan},
-        {"is_snan", is_snan},
 #endif
         {NULL, NULL},
     };
