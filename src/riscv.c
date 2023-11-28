@@ -10,9 +10,11 @@
 #include "mpool.h"
 #include "riscv_private.h"
 #include "state.h"
+#include "utils.h"
 
 #define BLOCK_IR_MAP_CAPACITY_BITS 10
 
+#if !RV32_HAS(JIT)
 /* initialize the block map */
 static void block_map_init(block_map_t *map, const uint8_t bits)
 {
@@ -52,6 +54,7 @@ static void block_map_destroy(riscv_t *rv)
     mpool_destroy(rv->block_mp);
     mpool_destroy(rv->block_ir_mp);
 }
+#endif
 
 riscv_user_t rv_userdata(riscv_t *rv)
 {
@@ -119,8 +122,13 @@ riscv_t *rv_create(const riscv_io_t *io,
     rv->block_ir_mp = mpool_create(
         sizeof(rv_insn_t) << BLOCK_IR_MAP_CAPACITY_BITS, sizeof(rv_insn_t));
 
+#if !RV32_HAS(JIT)
     /* initialize the block map */
     block_map_init(&rv->block_map, 10);
+#else
+    rv->block_cache = cache_create(10);
+    rv->code_cache = cache_create(10);
+#endif
 
     /* reset */
     rv_reset(rv, 0U, argc, args);
@@ -143,10 +151,15 @@ bool rv_enables_to_output_exit_code(riscv_t *rv)
     return rv->output_exit_code;
 }
 
+
 void rv_delete(riscv_t *rv)
 {
     assert(rv);
+#if !RV32_HAS(JIT)
     block_map_destroy(rv);
+#else
+
+#endif
     free(rv);
 }
 
@@ -275,3 +288,133 @@ void rv_reset(riscv_t *rv, riscv_word_t pc, int argc, char **args)
 
     rv->halt = false;
 }
+
+/* get current time in microsecnds and update csr_time register */
+FORCE_INLINE void update_time(riscv_t *rv)
+{
+    struct timeval tv;
+    rv_gettimeofday(&tv);
+
+    uint64_t t = (uint64_t) tv.tv_sec * 1e6 + (uint32_t) tv.tv_usec;
+    rv->csr_time[0] = t & 0xFFFFFFFF;
+    rv->csr_time[1] = t >> 32;
+}
+
+#if RV32_HAS(Zicsr)
+/* get a pointer to a CSR */
+static uint32_t *csr_get_ptr(riscv_t *rv, uint32_t csr)
+{
+    /* csr & 0xFFF prevent sign-extension in decode stage */
+    switch (csr & 0xFFF) {
+    case CSR_MSTATUS: /* Machine Status */
+        return (uint32_t *) (&rv->csr_mstatus);
+    case CSR_MTVEC: /* Machine Trap Handler */
+        return (uint32_t *) (&rv->csr_mtvec);
+    case CSR_MISA: /* Machine ISA and Extensions */
+        return (uint32_t *) (&rv->csr_misa);
+
+    /* Machine Trap Handling */
+    case CSR_MSCRATCH: /* Machine Scratch Register */
+        return (uint32_t *) (&rv->csr_mscratch);
+    case CSR_MEPC: /* Machine Exception Program Counter */
+        return (uint32_t *) (&rv->csr_mepc);
+    case CSR_MCAUSE: /* Machine Exception Cause */
+        return (uint32_t *) (&rv->csr_mcause);
+    case CSR_MTVAL: /* Machine Trap Value */
+        return (uint32_t *) (&rv->csr_mtval);
+    case CSR_MIP: /* Machine Interrupt Pending */
+        return (uint32_t *) (&rv->csr_mip);
+
+    /* Machine Counter/Timers */
+    case CSR_CYCLE: /* Cycle counter for RDCYCLE instruction */
+        return (uint32_t *) &rv->csr_cycle;
+    case CSR_CYCLEH: /* Upper 32 bits of cycle */
+        return &((uint32_t *) &rv->csr_cycle)[1];
+
+    /* TIME/TIMEH - very roughly about 1 ms per tick */
+    case CSR_TIME: /* Timer for RDTIME instruction */
+        update_time(rv);
+        return &rv->csr_time[0];
+    case CSR_TIMEH: /* Upper 32 bits of time */
+        update_time(rv);
+        return &rv->csr_time[1];
+    case CSR_INSTRET: /* Number of Instructions Retired Counter */
+        return (uint32_t *) (&rv->csr_cycle);
+#if RV32_HAS(EXT_F)
+    case CSR_FFLAGS:
+        return (uint32_t *) (&rv->csr_fcsr);
+    case CSR_FCSR:
+        return (uint32_t *) (&rv->csr_fcsr);
+#endif
+    default:
+        return NULL;
+    }
+}
+
+FORCE_INLINE bool csr_is_writable(uint32_t csr)
+{
+    return csr < 0xc00;
+}
+
+/* CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the
+ * CSRs and integer registers. CSRRW reads the old value of the CSR,
+ * zero-extends the value to XLEN bits, and then writes it to register rd.
+ * The initial value in rs1 is written to the CSR.
+ * If rd == x0, then the instruction shall not read the CSR and shall not cause
+ * any of the side effects that might occur on a CSR read.
+ */
+uint32_t csr_csrrw(riscv_t *rv, uint32_t csr, uint32_t val)
+{
+    uint32_t *c = csr_get_ptr(rv, csr);
+    if (!c)
+        return 0;
+
+    uint32_t out = *c;
+#if RV32_HAS(EXT_F)
+    if (csr == CSR_FFLAGS)
+        out &= FFLAG_MASK;
+#endif
+    if (csr_is_writable(csr))
+        *c = val;
+
+    return out;
+}
+
+/* perform csrrs (atomic read and set) */
+uint32_t csr_csrrs(riscv_t *rv, uint32_t csr, uint32_t val)
+{
+    uint32_t *c = csr_get_ptr(rv, csr);
+    if (!c)
+        return 0;
+
+    uint32_t out = *c;
+#if RV32_HAS(EXT_F)
+    if (csr == CSR_FFLAGS)
+        out &= FFLAG_MASK;
+#endif
+    if (csr_is_writable(csr))
+        *c |= val;
+
+    return out;
+}
+
+/* perform csrrc (atomic read and clear)
+ * Read old value of CSR, zero-extend to XLEN bits, write to rd.
+ * Read value from rs1, use as bit mask to clear bits in CSR.
+ */
+uint32_t csr_csrrc(riscv_t *rv, uint32_t csr, uint32_t val)
+{
+    uint32_t *c = csr_get_ptr(rv, csr);
+    if (!c)
+        return 0;
+
+    uint32_t out = *c;
+#if RV32_HAS(EXT_F)
+    if (csr == CSR_FFLAGS)
+        out &= FFLAG_MASK;
+#endif
+    if (csr_is_writable(csr))
+        *c &= ~val;
+    return out;
+}
+#endif
