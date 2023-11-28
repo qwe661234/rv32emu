@@ -113,7 +113,9 @@ struct riscv_internal {
     block_map_t block_map; /**< basic block map */
 #else
     struct cache *block_cache;
+#ifdef MIR
     struct cache *code_cache;
+#endif
 #endif
     struct mpool *block_mp, *block_ir_mp;
     /* print exit code on syscall_exit */
