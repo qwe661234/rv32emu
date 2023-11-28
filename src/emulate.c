@@ -168,6 +168,7 @@ static block_t *block_alloc(riscv_t *rv)
     block->predict = NULL;
 #if RV32_HAS(JIT)
     block->hot = false;
+    block->backward = false;
 #endif
     return block;
 }
@@ -361,44 +362,26 @@ static bool do_fuse4(riscv_t *rv, rv_insn_t *ir, uint64_t cycle, uint32_t PC)
 
 /* memset */
 static bool do_fuse5(riscv_t *rv,
-                     const rv_insn_t *ir,
+                     const rv_insn_t *ir UNUSED,
                      uint64_t cycle,
-                     uint32_t PC)
+                     uint32_t PC UNUSED)
 {
     /* FIXME: specify the correct cycle count for memset routine */
     cycle += 2;
-    memory_t *m = ((state_t *) rv->userdata)->mem;
-    memset((char *) m->mem_base + rv->X[rv_reg_a0], rv->X[rv_reg_a1],
-           rv->X[rv_reg_a2]);
-    PC = rv->X[rv_reg_ra] & ~1U;
-    if (unlikely(RVOP_NO_NEXT(ir))) {
-        rv->csr_cycle = cycle;
-        rv->PC = PC;
-        return true;
-    }
-    const rv_insn_t *next = ir->next;
-    MUST_TAIL return next->impl(rv, next, cycle, PC);
+    rv->io.on_memset(rv);
+    return true;
 }
 
 /* memcpy */
 static bool do_fuse6(riscv_t *rv,
-                     const rv_insn_t *ir,
+                     const rv_insn_t *ir UNUSED,
                      uint64_t cycle,
-                     uint32_t PC)
+                     uint32_t PC UNUSED)
 {
     /* FIXME: specify the correct cycle count for memcpy routine */
     cycle += 2;
-    memory_t *m = ((state_t *) rv->userdata)->mem;
-    memcpy((char *) m->mem_base + rv->X[rv_reg_a0],
-           (char *) m->mem_base + rv->X[rv_reg_a1], rv->X[rv_reg_a2]);
-    PC = rv->X[rv_reg_ra] & ~1U;
-    if (unlikely(RVOP_NO_NEXT(ir))) {
-        rv->csr_cycle = cycle;
-        rv->PC = PC;
-        return true;
-    }
-    const rv_insn_t *next = ir->next;
-    MUST_TAIL return next->impl(rv, next, cycle, PC);
+    rv->io.on_memcpy(rv);
+    return true;
 }
 
 /* multiple shift immediate */
@@ -498,6 +481,8 @@ static void block_translate(riscv_t *rv, block_t *block)
         prev_ir = ir;
         /* stop on branch */
         if (insn_is_branch(ir->opcode)) {
+            if (ir->imm < 0)
+                block->backward = true; 
             if (ir->opcode == rv_insn_jalr
 #if RV32_HAS(EXT_C)
                 || ir->opcode == rv_insn_cjalr || ir->opcode == rv_insn_cjr
@@ -953,7 +938,8 @@ void rv_step(riscv_t *rv, int32_t cycles)
 #endif
         if (!code) {
             /* check if using frequency of block exceed threshold */
-            if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
+            if ((block->backward && cache_freq(rv->block_cache, block->pc_start) >= 1024) || cache_hot(rv->block_cache, block->pc_start)) {
+                block->hot = true;
 #ifdef MIR
                 code = (exec_block_func_t) block_compile(rv);
                 cache_put(rv->code_cache, rv->PC, code);
@@ -992,6 +978,22 @@ void ecall_handler(riscv_t *rv)
     assert(rv);
     rv_except_ecall_M(rv, 0);
     syscall_handler(rv);
+}
+
+void memset_handler(riscv_t *rv)
+{
+    memory_t *m = ((state_t *) rv->userdata)->mem;
+    memset((char *) m->mem_base + rv->X[rv_reg_a0], rv->X[rv_reg_a1],
+           rv->X[rv_reg_a2]);
+    rv->PC = rv->X[rv_reg_ra] & ~1U;
+}
+
+void memcpy_handler(riscv_t *rv)
+{
+    memory_t *m = ((state_t *) rv->userdata)->mem;
+    memcpy((char *) m->mem_base + rv->X[rv_reg_a0],
+           (char *) m->mem_base + rv->X[rv_reg_a1], rv->X[rv_reg_a2]);
+    rv->PC = rv->X[rv_reg_ra] & ~1U;
 }
 
 void dump_registers(riscv_t *rv, char *out_file_path)

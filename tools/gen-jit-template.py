@@ -167,7 +167,12 @@ output = output + "\"" + \
     re.sub("\n", "\"\\\n\"", reg_info) + "\"\\\n"
 output = output + "\"" + \
     re.sub("\n", "\"\\\n\"", re.findall(
-        r'typedef[\S|\s]+?riscv_io_t;', lines)[0]) + "\"\\\n"
+        r'typedef[\S|\s]+?riscv_exception_t;', lines)[0]) + "\"\\\n"
+output = output + "\"" + "typedef struct { uint32_t v; } float32_t;\\\n" + "\"\\\n"
+output = output + "\"" + "typedef float32_t riscv_float_t;\\\n" + "\"\\\n"
+output = output + "\"" + \
+    re.sub("\n", "\"\\\n\"", re.findall(
+        r'typedef riscv_word_t[\S|\s]+?riscv_io_t;', lines)[0]) + "\"\\\n"
 if sys.argv.count("RV32_FEATURE_EXT_F=1"):
     f = open('src/softfloat.h', 'r')
     lines = f.read()

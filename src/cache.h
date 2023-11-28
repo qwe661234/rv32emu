@@ -59,3 +59,5 @@ uint8_t *code_cache_add(struct cache *cache,
                         uint64_t align);
 #endif
 #endif
+
+uint32_t cache_freq(struct cache *cache, uint32_t key);

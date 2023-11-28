@@ -35,14 +35,15 @@ RVOP(jal, {
     RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
     struct rv_insn *taken = ir->branch_taken;
     if (taken) {
-#if !RV32_HAS(JIT)
-        MUST_TAIL return taken->impl(rv, taken, cycle, PC);
-#else
-        if (!cache_get(rv->block_cache, PC)) {                      
-            clear_flag = true;   
-            goto end_insn;                                               
+#if RV32_HAS(JIT)
+        if (!cache_get(rv->block_cache, PC)) {
+            clear_flag = true;
+            goto end_insn;
         }
+        if (cache_hot(rv->block_cache, PC))
+            goto end_insn;
 #endif
+        MUST_TAIL return taken->impl(rv, taken, cycle, PC);
     }
 end_insn:
     rv->csr_cycle = cycle;
@@ -917,14 +918,15 @@ RVOP(cjal, {
     RV_EXC_MISALIGN_HANDLER(PC, insn, true, 0);
     struct rv_insn *taken = ir->branch_taken;
     if (taken) {
-#if !RV32_HAS(JIT)
-        MUST_TAIL return taken->impl(rv, taken, cycle, PC);
-#else
-        if (!cache_get(rv->block_cache, PC)) {                      
-            clear_flag = true;   
-            goto end_insn;                                               
+#if RV32_HAS(JIT)
+        if (!cache_get(rv->block_cache, PC)) {
+            clear_flag = true;
+            goto end_insn;
         }
+        if (cache_hot(rv->block_cache, PC))
+            goto end_insn;
 #endif
+        MUST_TAIL return taken->impl(rv, taken, cycle, PC);
     }
 end_insn:
     rv->csr_cycle = cycle;
@@ -997,14 +999,15 @@ RVOP(cj, {
     RV_EXC_MISALIGN_HANDLER(PC, insn, true, 0);
     struct rv_insn *taken = ir->branch_taken;
     if (taken) {
-#if !RV32_HAS(JIT)
-        MUST_TAIL return taken->impl(rv, taken, cycle, PC);
-#else
-        if (!cache_get(rv->block_cache, PC)) {                      
-            clear_flag = true;   
-            goto end_insn;                                               
+#if RV32_HAS(JIT)
+        if (!cache_get(rv->block_cache, PC)) {
+            clear_flag = true;
+            goto end_insn;
         }
+        if (cache_hot(rv->block_cache, PC))
+            goto end_insn;
 #endif
+        MUST_TAIL return taken->impl(rv, taken, cycle, PC);
     }
 end_insn:
     rv->csr_cycle = cycle;

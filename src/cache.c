@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #ifndef MIR
@@ -18,7 +19,7 @@
 /* THRESHOLD is set to identify hot spots. Once the frequency of use for a block
  * exceeds the THRESHOLD, the JIT compiler flow is triggered.
  */
-#define THRESHOLD 32768
+#define THRESHOLD 4096
 #if RV32_HAS(JIT)
 #ifndef MIR
 #define CODE_CACHE_SIZE (64 * 1024 * 1024)
@@ -575,6 +576,41 @@ void cache_free(cache_t *cache, void (*callback)(void *))
     free(cache);
 }
 
+uint32_t cache_freq(struct cache *cache, uint32_t key)
+{
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+        return 0;
+#if RV32_HAS(ARC)
+    arc_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, arc_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            return entry->frequency;
+    }
+#else
+    lfu_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, lfu_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            return entry->frequency;
+    }
+#endif
+    return 0;
+}
+
 #if RV32_HAS(JIT)
 bool cache_hot(struct cache *cache, uint32_t key)
 {
@@ -614,15 +650,17 @@ bool cache_hot(struct cache *cache, uint32_t key)
 #ifndef MIR
 uint8_t *code_cache_lookup(cache_t *cache, uint32_t key)
 {
-    if (!cache->capacity || hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
         return NULL;
 #if RV32_HAS(ARC)
     arc_entry_t *entry = NULL;
 #ifdef __HAVE_TYPEOF
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
 #else
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list,
-                          arc_entry_t)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, arc_entry_t)
 #endif
     {
         if (entry->key == key)
@@ -631,10 +669,11 @@ uint8_t *code_cache_lookup(cache_t *cache, uint32_t key)
 #else
     lfu_entry_t *entry = NULL;
 #ifdef __HAVE_TYPEOF
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
 #else
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list,
-                          lfu_entry_t)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, lfu_entry_t)
 #endif
     {
         if (entry->key == key)
@@ -658,15 +697,17 @@ uint8_t *code_cache_add(cache_t *cache,
                         uint64_t align)
 {
     cache->offset = align_to(cache->offset, align);
-    if (!cache->capacity || hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
         return NULL;
 #if RV32_HAS(ARC)
     arc_entry_t *entry = NULL;
 #ifdef __HAVE_TYPEOF
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
 #else
-    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)], ht_list,
-                          arc_entry_t)
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, arc_entry_t)
 #endif
     {
         if (entry->key == key)

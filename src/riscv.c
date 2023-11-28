@@ -128,11 +128,11 @@ riscv_t *rv_create(const riscv_io_t *io,
 
 #if !RV32_HAS(JIT)
     /* initialize the block map */
-    block_map_init(&rv->block_map, 10);
+    block_map_init(&rv->block_map, BLOCK_MAP_CAPACITY_BITS);
 #else
-    rv->block_cache = cache_create(10);
+    rv->block_cache = cache_create(BLOCK_MAP_CAPACITY_BITS);
 #ifdef MIR
-    rv->code_cache = cache_create(10);
+    rv->code_cache = cache_create(BLOCK_MAP_CAPACITY_BITS);
 #endif
 #endif
     /* reset */

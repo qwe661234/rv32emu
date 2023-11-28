@@ -62,6 +62,7 @@ typedef struct block {
     struct block *predict;     /**< block prediction */
 
     rv_insn_t *ir_head, *ir_tail; /**< the first and last ir for this block */
+    bool backward;
 #if RV32_HAS(JIT)
     bool hot; /**< Determine the block is hotspot or not */
 #endif
