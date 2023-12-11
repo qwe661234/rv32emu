@@ -28,6 +28,7 @@ extern struct target_ops gdbstub_ops;
 #if RV32_HAS(JIT)
 #include "cache.h"
 #include "compile.h"
+#include "ubpf_jit_x86_64.h"
 #endif
 
 /* Shortcuts for comparing each field of specified RISC-V instruction */
@@ -482,7 +483,7 @@ static void block_translate(riscv_t *rv, block_t *block)
         /* stop on branch */
         if (insn_is_branch(ir->opcode)) {
             if (ir->imm < 0)
-                block->backward = true; 
+                block->backward = true;
             if (ir->opcode == rv_insn_jalr
 #if RV32_HAS(EXT_C)
                 || ir->opcode == rv_insn_cjalr || ir->opcode == rv_insn_cjr
@@ -817,16 +818,14 @@ static block_t *block_find_or_translate(riscv_t *rv)
         next = block_alloc(rv);
         block_translate(rv, next);
 
-        if (!libc_substitute(rv, next)) {
-#if !RV32_HAS(JIT)
-            optimize_constant(rv, next);
-#endif
-#if RV32_HAS(GDBSTUB)
-            if (likely(!rv->debug_mode))
-#endif
-                /* macro operation fusion */
-                match_pattern(rv, next);
-        }
+        //         if (!libc_substitute(rv, next)) {
+        //             optimize_constant(rv, next);
+        // #if RV32_HAS(GDBSTUB)
+        //             if (likely(!rv->debug_mode))
+        // #endif
+        //                 /* macro operation fusion */
+        //                 match_pattern(rv, next);
+        //         }
 #if !RV32_HAS(JIT)
         /* insert the block into block map */
         block_insert(&rv->block_map, next);
@@ -858,6 +857,7 @@ static block_t *block_find_or_translate(riscv_t *rv)
 }
 
 #if RV32_HAS(JIT)
+typedef void (*exec_tired1_block_func_t)(riscv_t *rv, uintptr_t);
 typedef bool (*exec_block_func_t)(riscv_t *rv, uint64_t, uint32_t);
 #endif
 
@@ -927,31 +927,19 @@ void rv_step(riscv_t *rv, int32_t cycles)
         }
         last_pc = rv->PC;
 #if RV32_HAS(JIT)
-        /* execute the block by JIT compiler */
-        exec_block_func_t code = NULL;
-        if (block->hot)
-#ifdef MIR
-            code = (exec_block_func_t) cache_get(rv->code_cache, rv->PC);
-#else
-            code =
-                (exec_block_func_t) code_cache_lookup(rv->block_cache, rv->PC);
-#endif
-        if (!code) {
-            /* check if using frequency of block exceed threshold */
-            if ((block->backward && cache_freq(rv->block_cache, block->pc_start) >= 1024) || cache_hot(rv->block_cache, block->pc_start)) {
-                block->hot = true;
-#ifdef MIR
-                code = (exec_block_func_t) block_compile(rv);
-                cache_put(rv->code_cache, rv->PC, code);
-#else
-                code = (exec_block_func_t) block_compile(rv);
-#endif
-            }
-        }
-        if (code) {
-            /* execute machine code */
-            code(rv, rv->csr_cycle, rv->PC);
-            /* block should not be extended if execution mode is jit */
+        /* execute by tiered 1 JIT compiler */
+        struct jit_state *state = rv->jit_state;
+        if (block->hot) {
+            ((exec_tired1_block_func_t) state->buf)(
+                rv, (uintptr_t) (state->buf + block->offset));
+            prev = NULL;
+            continue;
+        } /* check if using frequency of block exceed threshold */
+        else if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
+            block->hot = true;
+            block->offset = ubpf_translate_x86_64(rv, block);
+            ((exec_tired1_block_func_t) state->buf)(
+                rv, (uintptr_t) (state->buf + block->offset));
             prev = NULL;
             continue;
         }

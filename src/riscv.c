@@ -14,6 +14,7 @@
 #if RV32_HAS(JIT)
 #include "cache.h"
 #include "compile.h"
+#include "ubpf_jit_x86_64.h"
 #endif
 
 #define BLOCK_IR_MAP_CAPACITY_BITS 10
@@ -130,6 +131,7 @@ riscv_t *rv_create(const riscv_io_t *io,
     /* initialize the block map */
     block_map_init(&rv->block_map, BLOCK_MAP_CAPACITY_BITS);
 #else
+    rv->jit_state = init_state(32 * 65536);
     rv->block_cache = cache_create(BLOCK_MAP_CAPACITY_BITS);
 #ifdef MIR
     rv->code_cache = cache_create(BLOCK_MAP_CAPACITY_BITS);

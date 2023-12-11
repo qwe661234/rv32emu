@@ -65,6 +65,7 @@ typedef struct block {
     bool backward;
 #if RV32_HAS(JIT)
     bool hot; /**< Determine the block is hotspot or not */
+    uint32_t offset;
 #endif
 } block_t;
 
@@ -121,7 +122,7 @@ struct riscv_internal {
     struct mpool *block_mp, *block_ir_mp;
     /* print exit code on syscall_exit */
     bool output_exit_code;
-
+    void *jit_state;
 #if RV32_HAS(GDBSTUB)
     /* gdbstub instance */
     gdbstub_t gdbstub;
