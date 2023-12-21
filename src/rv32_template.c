@@ -90,9 +90,9 @@ RVOP(jalr, {
         rv->X[ir->rd] = pc + 4;
     /* check instruction misaligned */
     RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
-#if !RV32_HAS(JIT)
-    LOOKUP_OR_UPDATE_BRANCH_HISTORY_TABLE();
-#endif
+// #if !RV32_HAS(JIT)
+//     LOOKUP_OR_UPDATE_BRANCH_HISTORY_TABLE();
+// #endif
     rv->csr_cycle = cycle;
     rv->PC = PC;
     return true;

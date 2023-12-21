@@ -160,7 +160,7 @@ OBJS := \
 	elf.o \
 	cache.o \
 	mpool.o \
-	ubpf_jit_x86_64.o \
+	ubpf_jit_arm64.o \
 	$(OBJS_EXT) \
 	main.o
 

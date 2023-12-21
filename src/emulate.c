@@ -28,7 +28,7 @@ extern struct target_ops gdbstub_ops;
 #if RV32_HAS(JIT)
 #include "cache.h"
 #include "compile.h"
-#include "ubpf_jit_x86_64.h"
+#include "ubpf_jit_arm64.h"
 #endif
 
 /* Shortcuts for comparing each field of specified RISC-V instruction */
@@ -492,7 +492,7 @@ static void block_translate(riscv_t *rv, block_t *block)
                 ir->branch_table = calloc(1, sizeof(branch_history_table_t));
             break;
         }
-
+        // break;
         ir = mpool_alloc(rv->block_ir_mp);
     }
 
@@ -889,68 +889,131 @@ void rv_step(riscv_t *rv, int32_t cycles)
          * assigned to either the branch_taken or branch_untaken pointer of
          * the previous block.
          */
-        if (prev) {
-            /* update previous block */
-            if (prev->pc_start != last_pc)
-#if !RV32_HAS(JIT)
-                prev = block_find(&rv->block_map, last_pc);
-#else
-                prev = cache_get(rv->block_cache, last_pc);
-#endif
-            if (prev) {
-                rv_insn_t *last_ir = prev->ir_tail;
-#if RV32_HAS(JIT)
-                if (clear_flag) {
-                    if (is_branch_taken)
-                        last_ir->branch_taken = NULL;
-                    else
-                        last_ir->branch_untaken = NULL;
+//         if (prev) {
+//             /* update previous block */
+//             if (prev->pc_start != last_pc)
+// #if !RV32_HAS(JIT)
+//                 prev = block_find(&rv->block_map, last_pc);
+// #else
+//                 prev = cache_get(rv->block_cache, last_pc);
+// #endif
+//             if (prev) {
+//                 rv_insn_t *last_ir = prev->ir_tail;
+// #if RV32_HAS(JIT)
+//                 if (clear_flag) {
+//                     if (is_branch_taken)
+//                         last_ir->branch_taken = NULL;
+//                     else
+//                         last_ir->branch_untaken = NULL;
 
-                    clear_flag = false;
-                }
-#endif
-                /* chain block */
-                if (!insn_is_unconditional_branch(last_ir->opcode)) {
-                    if (is_branch_taken && !last_ir->branch_taken)
-                        last_ir->branch_taken = block->ir_head;
-                    else if (!is_branch_taken && !last_ir->branch_untaken)
-                        last_ir->branch_untaken = block->ir_head;
-                } else if (IF_insn(last_ir, jal)
-#if RV32_HAS(EXT_C)
-                           || IF_insn(last_ir, cj) || IF_insn(last_ir, cjal)
-#endif
-                ) {
-                    if (!last_ir->branch_taken)
-                        last_ir->branch_taken = block->ir_head;
-                }
-            }
-        }
-        last_pc = rv->PC;
+//                     clear_flag = false;
+//                 }
+// #endif
+//                 /* chain block */
+//                 if (!insn_is_unconditional_branch(last_ir->opcode)) {
+//                     if (is_branch_taken && !last_ir->branch_taken)
+//                         last_ir->branch_taken = block->ir_head;
+//                     else if (!is_branch_taken && !last_ir->branch_untaken)
+//                         last_ir->branch_untaken = block->ir_head;
+//                 } else if (IF_insn(last_ir, jal)
+// #if RV32_HAS(EXT_C)
+//                            || IF_insn(last_ir, cj) || IF_insn(last_ir, cjal)
+// #endif
+//                 ) {
+//                     if (!last_ir->branch_taken)
+//                         last_ir->branch_taken = block->ir_head;
+//                 }
+//             }
+//         }
+//         last_pc = rv->PC;
 #if RV32_HAS(JIT)
         /* execute by tiered 1 JIT compiler */
         struct jit_state *state = rv->jit_state;
         if (block->hot) {
+            // printf("rv->PC = %#x\n", rv->PC);
+            // const rv_insn_t *ir = block->ir_head;
+            // printf("rv->X[%d] = %#x\n", ir->rs1, rv->X[ir->rs1]);
+            // printf("rv->X[%d] = %#x\n", ir->rs2, rv->X[ir->rs2]);
             ((exec_tired1_block_func_t) state->buf)(
                 rv, (uintptr_t) (state->buf + block->offset));
             prev = NULL;
+        // assert(rv->X[rv_reg_a0] != 0x13000);
+        // assert(rv->X[rv_reg_s5] != 0xa000);
+            // if (rv->PC == 0x1f128 || rv->PC == 0x1f11c || rv->PC == 0x1f124){
+            //     printf("rv->PC = %#x\n", rv->PC);
+            //     printf("rv->X[a0] = %#x\n", rv->X[rv_reg_a0]);
+            //     printf("rv->X[a5] = %#x\n", rv->X[rv_reg_a5]);
+            //     printf("rv->X[s0] = %#x\n", rv->X[rv_reg_s0]);
+            //     printf("rv->X[s2] = %#x\n", rv->X[rv_reg_s2]);
+            // }
+            //  if (rv->PC == 0x2219c) {
+            // printf("rv->X[%d] = %#x\n", ir->rd, rv->X[ir->rd]);
+            // // printf("rv->X[a0] = %#x\n", rv->X[rv_reg_a0]);
+            // }
+        // if (!insn_is_branch(block->ir_head->opcode)) {
+        //    rv->PC = block->pc_end;
+        // }
             continue;
         } /* check if using frequency of block exceed threshold */
-        else if ((block->hot = cache_hot(rv->block_cache, block->pc_start))) {
-            block->hot = true;
-            block->offset = ubpf_translate_x86_64(rv, block);
-            ((exec_tired1_block_func_t) state->buf)(
-                rv, (uintptr_t) (state->buf + block->offset));
-            prev = NULL;
-            continue;
-        }
+        // else if ((block->hot = cache_hot(rv->block_cache, block->pc_start)))
+        // {
+            // const rv_insn_t *ir = block->ir_head;
+            // printf("rv->PC = %#x\n", rv->PC);
+        // if (rv->PC == 0x2219c) {
+            // printf("rv->X[%d] = %#x\n", ir->rs1, rv->X[ir->rs1]);
+            // printf("rv->X[%d] = %#x\n", ir->rs2, rv->X[ir->rs2]);
+        // }
+        block->hot = true;
+        block->offset = ubpf_translate_arm64(rv, block);
+        ((exec_tired1_block_func_t) state->buf)(
+            rv, (uintptr_t) (state->buf + block->offset));
+        prev = NULL;
+        // assert(rv->X[rv_reg_a0] != 0x13000);
+        // assert(rv->X[rv_reg_s5] != 0xa000);
+        // if (rv->PC == 0x2219c){ 
+            // printf("rv->X[%d] = %#x\n", ir->rd, rv->X[ir->rd]);
+        //     // printf("rv->X[a0] = %#x\n", rv->X[rv_reg_a0]);
+        // }
+        // printf("rv->X[a0] = %#x\n", rv->X[rv_reg_a0]);
+        // printf("rv->X[a1] = %#x\n", rv->X[rv_reg_a1]);
+        // printf("rv->X[a2] = %#x\n", rv->X[rv_reg_a2]);
+        // printf("rv->X[a7] = %#x\n", rv->X[rv_reg_a7]);
+        // printf("rv->X[t1] = %#x\n", rv->X[rv_reg_t1]);
+        // printf("rv->X[t2] = %#x\n", rv->X[rv_reg_t2]);
+        // if (rv->PC == 0x1f128 || rv->PC == 0x1f11c || rv->PC == 0x1f124){
+        //     printf("rv->PC = %#x\n", rv->PC);
+        //     printf("rv->X[a0] = %#x\n", rv->X[rv_reg_a0]);
+        //     printf("rv->X[a5] = %#x\n", rv->X[rv_reg_a5]);
+        //     printf("rv->X[s0] = %#x\n", rv->X[rv_reg_s0]);
+        //     printf("rv->X[s2] = %#x\n", rv->X[rv_reg_s2]);
+        // }
+        // if (!insn_is_branch(block->ir_head->opcode)) {
+        //    rv->PC = block->pc_end;
+        // }
+        // printf("rv->PC = %#x\n", rv->PC);
+        // printf("rv->X[a0] = %#x\n", rv->X[rv_reg_a0]);
+        // printf("rv->X[s0] = %#x\n", rv->X[rv_reg_s0]);
+        // printf("rv->X[s2] = %#x\n", rv->X[rv_reg_s2]);
+        // printf("rv->X[%d] = %#x\n", block->ir_head->rd, rv->X[block->ir_head->rd]);
+        // printf("rv->PC2 = %#x\n", rv->PC);
+        
+        continue;
+        // }
 #endif
         /* execute the block by interpreter */
         const rv_insn_t *ir = block->ir_head;
+        //  printf("rv->PC = %#x\n", rv->PC);
+        //     printf("rv->X[%d] = %#x\n", ir->rs1, rv->X[ir->rs1]);
+        //     printf("rv->X[%d] = %#x\n", ir->rs2, rv->X[ir->rs2]);
         if (unlikely(!ir->impl(rv, ir, rv->csr_cycle, rv->PC))) {
             /* block should not be extended if execption handler invoked */
             prev = NULL;
             break;
         }
+        //  printf("rv->X[%d] = %#x\n", ir->rd, rv->X[ir->rd]);
+        // if (!insn_is_branch(block->ir_head->opcode)) {
+        //    rv->PC = block->pc_end;
+        // }
         prev = block;
     }
 }
@@ -963,6 +1026,8 @@ void ebreak_handler(riscv_t *rv)
 
 void ecall_handler(riscv_t *rv)
 {
+    // printf("rv->X[t1] = %#x\n", rv->X[rv_reg_t1]);
+    // printf("rv->X[t2] = %#x\n", rv->X[rv_reg_t2]);
     assert(rv);
     rv_except_ecall_M(rv, 0);
     syscall_handler(rv);
