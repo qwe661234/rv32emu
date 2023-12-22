@@ -303,7 +303,7 @@ static inline void emit_bytes(struct jit_state *state, void *data, uint32_t len)
 }
 
 
-    
+
 static void emit_instruction(struct jit_state *state, uint32_t instr)
 {
     assert(instr != BAD_OPCODE);
@@ -449,16 +449,15 @@ static inline void emit_load(struct jit_state *state,
 }
 
 static inline void emit_load_sext(struct jit_state *state,
-                             enum operand_size size,
-                             int src,
-                             int dst,
-                             int32_t offset)
+                                  enum operand_size size,
+                                  int src,
+                                  int dst,
+                                  int32_t offset)
 {
     if (size == S8)
         emit_loadstore_immediate(state, LS_LDRSBW, dst, src, offset);
     else if (size == S16)
         emit_loadstore_immediate(state, LS_LDRSHW, dst, src, offset);
-   
 }
 
 static inline void emit_store(struct jit_state *state,
@@ -667,7 +666,7 @@ static inline void emit_alu32(struct jit_state *state, int op, int src, int dst)
     case 0x21: /* AND */
         emit_logical_register(state, false, LOG_AND, dst, dst, src);
         break;
-    case 0xd3: 
+    case 0xd3:
         if (src == 4) /* SLL */
             emit_dataprocessing_twosource(state, false, DP2_LSLV, dst, dst, R8);
         else if (src == 5) /* SRL */
@@ -682,6 +681,18 @@ static inline void emit_alu64(struct jit_state *state, int op, int src, int dst)
 {
     if (op == 0x01)
         emit_addsub_register(state, true, AS_ADD, dst, dst, src);
+}
+
+static inline void emit_alu64_imm8(struct jit_state *state,
+                                   int op,
+                                   int src,
+                                   int dst,
+                                   int8_t imm)
+{
+    if (op == 0xc1) {
+        emit_load_imm(state, R10, imm);
+        emit_dataprocessing_twosource(state, true, DP2_LSRV, dst, dst, R10);
+    }
 }
 
 static inline void emit_alu32_imm8(struct jit_state *state,
@@ -869,7 +880,7 @@ static bool set_has(set_t *set, uint32_t key)
     return false;
 }
 
-#define UPDATE_PC(pc)                                            \
+#define UPDATE_PC(pc)                                           \
     emit_load_imm(state, R6, (pc));                             \
     emit_store(state, S32, R6, platform_parameter_registers[0], \
                offsetof(struct riscv_internal, PC));
@@ -1151,6 +1162,27 @@ static inline void emit_cmp_imm32(struct jit_state *state, int dst, int32_t imm)
     emit_addsub_register(state, false, AS_SUBS, RZ, dst, R10);
 }
 
+static void muldivmod(struct jit_state *state,
+                      uint8_t opcode,
+                      int src,
+                      int dst,
+                      int32_t imm)
+{
+    switch (opcode) {
+    case 0x28:
+        emit_dataprocessing_threesource(state, false, DP3_MADD, dst, dst, src, RZ);
+        break;
+    case 0x2f:
+        emit_dataprocessing_threesource(state, true, DP3_MADD, dst, dst, src, RZ);
+        break;
+    case 0x38:
+        divmod(state, EBPF_OP_DIV_REG, dst, dst, src);
+        break;
+    case 0x98:
+        divmod(state, EBPF_OP_MOD_REG, dst, dst, src);
+        break;
+    }
+}
 static void emit_call(struct jit_state *state, uintptr_t func)
 {
     uint32_t stack_movement = align_to(8, 16);
@@ -1201,25 +1233,25 @@ static void divmod(struct jit_state *state,
 
 static inline void emit_jcc_offset(struct jit_state *state, int code)
 {
-     switch(code) {
-        case 0x84: /* BEQ */
-            code = COND_EQ;
-            break;
-        case 0x85: /* BNE */
-            code = COND_NE;
-            break;
-        case 0x8c: /* BLT */
-            code = COND_LT;
-            break;
-        case 0x8d: /* BGE */
-            code = COND_GE;
-            break;
-        case 0x82: /* BLTU */
-            code = COND_LO;
-            break;
-        case 0x83: /* BGEU */
-            code = COND_HS;
-            break;
+    switch (code) {
+    case 0x84: /* BEQ */
+        code = COND_EQ;
+        break;
+    case 0x85: /* BNE */
+        code = COND_NE;
+        break;
+    case 0x8c: /* BLT */
+        code = COND_LT;
+        break;
+    case 0x8d: /* BGE */
+        code = COND_GE;
+        break;
+    case 0x82: /* BLTU */
+        code = COND_LO;
+        break;
+    case 0x83: /* BGEU */
+        code = COND_HS;
+        break;
     }
     emit_instruction(state, BR_Bcond | (0 << 5) | code);
 }
@@ -1701,6 +1733,332 @@ static void translate(struct jit_state *state,
             emit_call(state, (intptr_t) rv->io.on_ebreak);
             emit_exit(&(*state));
             break;
+#if RV32_HAS(EXT_M)
+        case rv_insn_mul:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            muldivmod(state, 0x28, R7, R6, 0);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_mulh:
+            emit_load_sext(state, S32, platform_parameter_registers[0], R6,
+                           offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load_sext(state, S32, platform_parameter_registers[0], R7,
+                           offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            muldivmod(state, 0x2f, R7, R6, 0);
+            emit_alu64_imm8(state, 0xc1, 5, R6, 32);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_mulhsu:
+            emit_load_sext(state, S32, platform_parameter_registers[0], R6,
+                           offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            muldivmod(state, 0x2f, R7, R6, 0);
+            emit_alu64_imm8(state, 0xc1, 5, R6, 32);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_mulhu:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            muldivmod(state, 0x2f, R7, R6, 0);
+            emit_alu64_imm8(state, 0xc1, 5, R6, 32);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_div:
+            /* not handle overflow */
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            muldivmod(state, 0x38, R7, R6, 0);
+            emit_cmp_imm32(state, R7, 0);
+            jump_loc = state->offset;
+            emit_jcc_offset(state, 0x85);
+            emit_load_imm(state, R6, -1);
+            emit_jump_target_offset(state, jump_loc, state->offset);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_divu:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            muldivmod(state, 0x38, R7, R6, 0);
+            emit_cmp_imm32(state, R7, 0);
+            jump_loc = state->offset;
+            emit_jcc_offset(state, 0x85);
+            emit_load_imm(state, R6, ~0U);
+            emit_jump_target_offset(state, jump_loc, state->offset);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_rem:
+            /* not handle overflow */
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            muldivmod(state, 0x98, R7, R6, 0);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_remu:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            muldivmod(state, 0x98, R7, R6, 0);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+#endif
+        case rv_insn_caddi4spn:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * rv_reg_sp);
+            emit_alu32_imm32(state, 0x81, 0, R6, (uint16_t) ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_clw:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load_imm(state, R7,
+                          (intptr_t) (m->mem_base + (uint32_t) ir->imm));
+            emit_alu64(state, 0x01, R7, R6);
+            emit_load(state, S32, R6, R7, 0);
+            emit_store(state, S32, R7, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_csw:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load_imm(state, R7,
+                          (intptr_t) (m->mem_base + (uint32_t) ir->imm));
+            emit_alu64(state, 0x01, R7, R6);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            emit_store(state, S32, R7, R6, 0);
+            break;
+        case rv_insn_cnop:
+            break;
+        case rv_insn_caddi:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            emit_alu32_imm32(state, 0x81, 0, R6, (int16_t) ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_cjal:
+            emit_load_imm(state, R6, ir->pc + 2);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * rv_reg_ra);
+            emit_load_imm(state, R6, ir->pc + ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            // printf("state->offset = %#x\n", state->offset);
+            emit_jmp(state, ir->pc + ir->imm);
+            emit_exit(&(*state));
+            break;
+        case rv_insn_cli:
+            emit_load_imm(state, R6, ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_caddi16sp:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            emit_alu32_imm32(state, 0x81, 0, R6, ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_clui:
+            emit_load_imm(state, R6, ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_csrli:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_alu32_imm8(state, 0xc1, 5, R6, ir->shamt);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            break;
+        case rv_insn_csrai:
+            /* not good */
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_alu32_imm8(state, 0xc1, 7, R6, ir->shamt);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            break;
+        case rv_insn_candi:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_alu32_imm32(state, 0x81, 4, R6, ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            break;
+        case rv_insn_csub:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            emit_alu32(state, 0x29, R7, R6);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_cxor:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            emit_alu32(state, 0x31, R7, R6);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_cor:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            emit_alu32(state, 0x09, R7, R6);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_cand:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            emit_alu32(state, 0x21, R7, R6);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_cj:
+            emit_load_imm(state, R6, ir->pc + ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            // printf("state->offset = %#x\n", state->offset);
+            emit_jmp(state, ir->pc + ir->imm);
+            emit_exit(&(*state));
+            break;
+        case rv_insn_cbeqz:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_cmp_imm32(state, R6, 0);
+            jump_loc = state->offset;
+            emit_jcc_offset(state, 0x84);
+            if (ir->branch_untaken)
+                emit_jmp(state, ir->pc + 2);
+            emit_load_imm(state, R6, ir->pc + 2);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            emit_exit(&(*state));
+            emit_jump_target_offset(state, jump_loc, state->offset);
+            if (ir->branch_taken)
+                emit_jmp(state, ir->pc + ir->imm);
+            emit_load_imm(state, R6, ir->pc + ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            emit_exit(&(*state));
+            break;
+        case rv_insn_cbnez:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_cmp_imm32(state, R6, 0);
+            jump_loc = state->offset;
+            emit_jcc_offset(state, 0x85);
+            if (ir->branch_untaken)
+                emit_jmp(state, ir->pc + 2);
+            emit_load_imm(state, R6, ir->pc + 2);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            emit_exit(&(*state));
+            emit_jump_target_offset(state, jump_loc, state->offset);
+            if (ir->branch_taken)
+                emit_jmp(state, ir->pc + ir->imm);
+            emit_load_imm(state, R6, ir->pc + ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            emit_exit(&(*state));
+            break;
+        case rv_insn_cslli:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            emit_alu32_imm8(state, 0xc1, 4, R6, (uint8_t) ir->imm);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_clwsp:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * rv_reg_sp);
+            emit_load_imm(state, R7, (intptr_t) (m->mem_base + ir->imm));
+            emit_alu64(state, 0x01, R7, R6);
+            emit_load(state, S32, R6, R7, 0);
+            emit_store(state, S32, R7, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_cjr:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            emit_exit(&(*state));
+            break;
+        case rv_insn_cmv:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_cebreak:
+            emit_load_imm(state, R6, ir->pc);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            emit_load_imm(state, R6, 1);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, compressed));
+            emit_call(state, (intptr_t) rv->io.on_ebreak);
+            emit_exit(&(*state));
+            break;
+        case rv_insn_cjalr:
+            emit_load_imm(state, R6, ir->pc + 2);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * rv_reg_ra);
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, PC));
+            emit_exit(&(*state));
+            break;
+        case rv_insn_cadd:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs1);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            emit_alu32(state, 0x01, R7, R6);
+            emit_store(state, S32, R6, platform_parameter_registers[0],
+                       offsetof(struct riscv_internal, X) + 4 * ir->rd);
+            break;
+        case rv_insn_cswsp:
+            emit_load(state, S32, platform_parameter_registers[0], R6,
+                      offsetof(struct riscv_internal, X) + 4 * rv_reg_sp);
+            emit_load_imm(state, R7, (intptr_t) (m->mem_base + ir->imm));
+            emit_alu64(state, 0x01, R7, R6);
+            emit_load(state, S32, platform_parameter_registers[0], R7,
+                      offsetof(struct riscv_internal, X) + 4 * ir->rs2);
+            emit_store(state, S32, R7, R6, 0);
+            break;
         default:
             printf("opcode = %s\n", opcode_table[ir->opcode]);
             assert(NULL);
@@ -1800,7 +2158,7 @@ static void prepare_translate(struct jit_state *state)
                                      callee_saved_registers[i + 1], SP,
                                      (i + 2) * 8);
     }
-    
+
     emit_unconditionalbranch_register(state, BR_BR, R1);
     /* Epilogue */
     state->exit_loc = state->offset;
