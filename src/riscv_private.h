@@ -12,6 +12,7 @@
 #endif
 #include "decode.h"
 #include "riscv.h"
+#include "utils.h"
 #if RV32_HAS(JIT)
 #include "cache.h"
 #endif
@@ -67,8 +68,16 @@ typedef struct block {
     uint32_t offset;
     bool
         translatable; /**< Determine the block has RV32AF insturctions or not */
+    struct list_head list;
 #endif
 } block_t;
+
+#if RV32_HAS(JIT)
+typedef struct chaining_entry {
+    block_t *block;
+    struct list_head list;
+} chaining_entry_t;
+#endif
 
 typedef struct {
     uint32_t block_capacity; /**< max number of entries in the block map */

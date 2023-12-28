@@ -301,6 +301,7 @@ static block_t *block_alloc(riscv_t *rv)
     block->translatable = true;
     block->hot = false;
     block->backward = false;
+    INIT_LIST_HEAD(&block->list);
 #endif
     return block;
 }
@@ -976,6 +977,49 @@ static block_t *block_find_or_translate(riscv_t *rv)
         /* insert the block into block cache */
         block_t *delete_target = cache_put(rv->block_cache, rv->PC, &(*next));
         if (delete_target) {
+            if (prev == delete_target)
+                prev = NULL;
+            chaining_entry_t *entry, *safe;
+            /* correctly remove delete block from its chained block */
+            rv_insn_t *taken = delete_target->ir_tail->branch_taken,
+                      *untaken = delete_target->ir_tail->branch_untaken;
+            if (taken && taken->pc != delete_target->pc_start) {
+                block_t *target = cache_get(rv->block_cache, taken->pc);
+                bool flag = false;
+                list_for_each_entry_safe (entry, safe, &target->list, list) {
+                    if (entry->block == delete_target) {
+                        list_del_init(&entry->list);
+                        free(entry);
+                        flag = true;
+                    }
+                }
+                assert(flag);
+            }
+            if (untaken && untaken->pc != delete_target->pc_start) {
+                block_t *target = cache_get(rv->block_cache, untaken->pc);
+                assert(target);
+                bool flag = false;
+                list_for_each_entry_safe (entry, safe, &target->list, list) {
+                    if (entry->block == delete_target) {
+                        list_del_init(&entry->list);
+                        free(entry);
+                        flag = true;
+                    }
+                }
+                assert(flag);
+            }
+            /* correctly remove delete block from the block chained to it */
+            list_for_each_entry_safe (entry, safe, &delete_target->list, list) {
+                if (entry->block == delete_target)
+                    continue;
+                rv_insn_t *target = entry->block->ir_tail;
+                if (target->branch_taken == delete_target->ir_head)
+                    target->branch_taken = NULL;
+                else if (target->branch_untaken == delete_target->ir_head)
+                    target->branch_untaken = NULL;
+                free(entry);
+            }
+            /* free delete block */
             uint32_t idx;
             rv_insn_t *ir, *next;
             for (idx = 0, ir = delete_target->ir_head;
@@ -1006,19 +1050,6 @@ void rv_step(riscv_t *rv, int32_t cycles)
     /* loop until hitting the cycle target */
     while (rv->csr_cycle < cycles_target && !rv->halt) {
         block_t *block;
-        /* lookup the next block in block map or translate a new block,
-         * and move onto the next block.
-         */
-        block = block_find_or_translate(rv);
-
-        /* by now, a block should be available */
-        assert(block);
-
-        /* After emulating the previous block, it is determined whether the
-         * branch is taken or not. The IR array of the current block is then
-         * assigned to either the branch_taken or branch_untaken pointer of
-         * the previous block.
-         */
         if (prev) {
             /* update previous block */
             if (prev->pc_start != last_pc)
@@ -1027,20 +1058,54 @@ void rv_step(riscv_t *rv, int32_t cycles)
 #else
                 prev = cache_get(rv->block_cache, last_pc);
 #endif
-            if (prev) {
-                rv_insn_t *last_ir = prev->ir_tail;
-                /* chain block */
-                if (!insn_is_unconditional_branch(last_ir->opcode)) {
-                    if (is_branch_taken)
-                        last_ir->branch_taken = block->ir_head;
-                    else if (!is_branch_taken)
-                        last_ir->branch_untaken = block->ir_head;
-                } else if (IF_insn(last_ir, jal)
-#if RV32_HAS(EXT_C)
-                           || IF_insn(last_ir, cj) || IF_insn(last_ir, cjal)
-#endif
-                ) {
+        }
+        /* lookup the next block in block map or translate a new block,
+         * and move onto the next block.
+         */
+        block = block_find_or_translate(rv);
+        /* by now, a block should be available */
+        assert(block);
+
+        /* After emulating the previous block, it is determined whether the
+         * branch is taken or not. The IR array of the current block is then
+         * assigned to either the branch_taken or branch_untaken pointer of
+         * the previous block.
+         */
+
+        if (prev) {
+            rv_insn_t *last_ir = prev->ir_tail;
+            /* chain block */
+            if (!insn_is_unconditional_branch(last_ir->opcode)) {
+                if (is_branch_taken && !last_ir->branch_taken) {
                     last_ir->branch_taken = block->ir_head;
+#if RV32_HAS(JIT)
+                    chaining_entry_t *new_entry =
+                        malloc(sizeof(chaining_entry_t));
+                    new_entry->block = prev;
+                    list_add(&new_entry->list, &block->list);
+#endif
+                } else if (!is_branch_taken && !last_ir->branch_untaken) {
+                    last_ir->branch_untaken = block->ir_head;
+#if RV32_HAS(JIT)
+                    chaining_entry_t *new_entry =
+                        malloc(sizeof(chaining_entry_t));
+                    new_entry->block = prev;
+                    list_add(&new_entry->list, &block->list);
+#endif
+                }
+            } else if (IF_insn(last_ir, jal)
+#if RV32_HAS(EXT_C)
+                       || IF_insn(last_ir, cj) || IF_insn(last_ir, cjal)
+#endif
+            ) {
+                if (!last_ir->branch_taken) {
+                    last_ir->branch_taken = block->ir_head;
+#if RV32_HAS(JIT)
+                    chaining_entry_t *new_entry =
+                        malloc(sizeof(chaining_entry_t));
+                    new_entry->block = prev;
+                    list_add(&new_entry->list, &block->list);
+#endif
                 }
             }
         }
