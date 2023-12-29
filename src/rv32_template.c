@@ -136,6 +136,7 @@ RVOP(
         struct rv_insn *taken = ir->branch_taken;
         if (taken) {
 #if RV32_HAS(JIT)
+            cache_get(rv->block_cache, ir->branch_taken->pc, true);
             if (cache_hot(rv->block_cache, PC))
                 goto end_insn;
 #endif
@@ -201,6 +202,8 @@ RVOP(
         RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
 #if !RV32_HAS(JIT)
         LOOKUP_OR_UPDATE_BRANCH_HISTORY_TABLE();
+#else
+        cache_get(rv->block_cache, PC, true);
 #endif
         rv->csr_cycle = cycle;
         rv->PC = PC;
@@ -232,6 +235,7 @@ RVOP(
             goto nextop;                                           \
         IIF(RV32_HAS(JIT))                                         \
         ({                                                         \
+            cache_get(rv->block_cache, untaken->pc, true);         \
             if (cache_hot(rv->block_cache, PC + 4))                \
                 goto nextop;                                       \
         }, );                                                      \
@@ -247,6 +251,7 @@ RVOP(
     if (taken) {                                                   \
         IIF(RV32_HAS(JIT))                                         \
         ({                                                         \
+            cache_get(rv->block_cache, taken->pc, true);           \
             if (cache_hot(rv->block_cache, PC))                    \
                 goto end_insn;                                     \
         }, );                                                      \
@@ -1790,6 +1795,7 @@ RVOP(
         struct rv_insn *taken = ir->branch_taken;
         if (taken) {
 #if RV32_HAS(JIT)
+            cache_get(rv->block_cache, taken->pc, true);
             if (cache_hot(rv->block_cache, PC))
                 goto end_insn;
 #endif
@@ -1951,6 +1957,7 @@ RVOP(
         struct rv_insn *taken = ir->branch_taken;
         if (taken) {
 #if RV32_HAS(JIT)
+            cache_get(rv->block_cache, taken->pc, true);
             if (cache_hot(rv->block_cache, PC))
                 goto end_insn;
 #endif
@@ -1983,6 +1990,7 @@ RVOP(
             if (!untaken)
                 goto nextop;
 #if RV32_HAS(JIT)
+            cache_get(rv->block_cache, untaken->pc, true);
             if (cache_hot(rv->block_cache, PC + 2))
                 goto nextop;
 #endif
@@ -1995,6 +2003,7 @@ RVOP(
         struct rv_insn *taken = ir->branch_taken;
         if (taken) {
 #if RV32_HAS(JIT)
+            cache_get(rv->block_cache, taken->pc, true);
             if (cache_hot(rv->block_cache, PC))
                 goto end_insn;
 #endif
@@ -2036,6 +2045,7 @@ RVOP(
             if (!untaken)
                 goto nextop;
 #if RV32_HAS(JIT)
+            cache_get(rv->block_cache, untaken->pc, true);
             if (cache_hot(rv->block_cache, PC + 2))
                 goto nextop;
 #endif
@@ -2048,6 +2058,7 @@ RVOP(
         struct rv_insn *taken = ir->branch_taken;
         if (taken) {
 #if RV32_HAS(JIT)
+            cache_get(rv->block_cache, taken->pc, true);
             if (cache_hot(rv->block_cache, PC))
                 goto end_insn;
 #endif
@@ -2116,6 +2127,8 @@ RVOP(
         PC = rv->X[ir->rs1];
 #if !RV32_HAS(JIT)
         LOOKUP_OR_UPDATE_BRANCH_HISTORY_TABLE();
+#else
+        cache_get(rv->block_cache, PC, true);
 #endif
         rv->csr_cycle = cycle;
         rv->PC = PC;
@@ -2166,6 +2179,8 @@ RVOP(
         RV_EXC_MISALIGN_HANDLER(PC, insn, true, 0);
 #if !RV32_HAS(JIT)
         LOOKUP_OR_UPDATE_BRANCH_HISTORY_TABLE();
+#else
+        cache_get(rv->block_cache, PC, true);
 #endif
         rv->csr_cycle = cycle;
         rv->PC = PC;

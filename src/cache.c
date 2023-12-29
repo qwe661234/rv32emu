@@ -171,7 +171,7 @@ cache_t *cache_create(int size_bits)
     return cache;
 }
 
-void *cache_get(cache_t *cache, uint32_t key)
+void *cache_get(cache_t *cache, uint32_t key, bool update)
 {
     if (!cache->capacity ||
         hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
@@ -197,7 +197,7 @@ void *cache_get(cache_t *cache, uint32_t key)
      * code. The generated C code is then compiled into machine code by the
      * target compiler.
      */
-    if (entry->frequency < THRESHOLD) {
+    if (update && entry->frequency < THRESHOLD) {
         list_del_init(&entry->list);
         list_add(&entry->list, cache->lists[entry->frequency++]);
     }

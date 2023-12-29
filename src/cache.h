@@ -20,9 +20,10 @@ struct cache *cache_create(int size_bits);
  * cache_get - retrieve the specified entry from the cache
  * @cache: a pointer points to target cache
  * @key: the key of the specified entry
+ * @update: update frequency or not
  * @return: the specified entry or NULL
  */
-void *cache_get(struct cache *cache, uint32_t key);
+void *cache_get(struct cache *cache, uint32_t key, bool update);
 
 /**
  * cache_put - insert a new entry into the cache
