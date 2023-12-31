@@ -1,0 +1,13 @@
+PC     | invoke time | backward | ir_cnt | loop
+0x10110| 999999      | 1        | 85     | 0     
+0x10330| 8000015     | 1        | 131    | 0     
+0x104e4| 495906      | 0        | 351    | 0     
+0x10a48| 995906      | 0        | 76     | 0     
+0x10aac| 499999      | 1        | 15     | 0     
+hotspot && invoke time >= 4096 = 5
+backward = 3
+loop = 0
+ir_cnt <= 50 = 1
+50 < ir_cnt <= 100 = 2
+100 < ir_cnt <= 200 = 1
+ir_cnt > 200 = 1

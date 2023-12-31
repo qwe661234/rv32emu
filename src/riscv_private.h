@@ -68,6 +68,9 @@ typedef struct block {
     uint32_t offset;
     bool
         translatable; /**< Determine the block has RV32AF insturctions or not */
+    uint64_t invoke;
+    uint32_t ir_cnt;
+    bool loop;
     struct list_head list;
 #endif
 } block_t;

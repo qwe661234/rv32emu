@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,7 +39,7 @@ struct hlist_node {
 typedef struct {
     void *value;
     uint32_t key;
-    uint32_t frequency;
+    uint64_t frequency;
     struct list_head list;
     struct hlist_node ht_list;
 } lfu_entry_t;
@@ -201,7 +202,9 @@ void *cache_get(cache_t *cache, uint32_t key, bool update)
         list_del_init(&entry->list);
         list_add(&entry->list, cache->lists[entry->frequency++]);
     }
-
+    if (entry->frequency >= THRESHOLD) {
+        entry->frequency++;
+    }
     /* return NULL if cache miss */
     return entry->value;
 }
@@ -247,7 +250,7 @@ void cache_free(cache_t *cache)
     free(cache);
 }
 
-uint32_t cache_freq(struct cache *cache, uint32_t key)
+uint64_t cache_freq(struct cache *cache, uint32_t key)
 {
     if (!cache->capacity ||
         hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
@@ -282,9 +285,21 @@ bool cache_hot(struct cache *cache, uint32_t key)
                           ht_list, lfu_entry_t)
 #endif
     {
-        if (entry->key == key && entry->frequency == THRESHOLD)
+        if (entry->key == key && entry->frequency >= THRESHOLD)
             return true;
     }
     return false;
 }
 #endif
+
+
+void cache_profile(struct cache *cache, fun func)
+{
+    for (int i = 0; i < THRESHOLD; i++) {
+        lfu_entry_t *entry, *safe;
+        list_for_each_entry_safe (entry, safe, cache->lists[i], list) {
+            func(entry->value);
+            printf("frequency = %lu\n", entry->frequency);
+        }
+    }
+}

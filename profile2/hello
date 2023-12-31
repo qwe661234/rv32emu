@@ -1,0 +1,9 @@
+PC     | noc Frequency | PC     | Frequency | entry_point
+0      | 17            | 0      | 1         | 0       
+0x10   | 5             | 0x10   | 1         | 1       
+0x14   | 5             | 0x14   | 2         | 2       
+0x28   | 5             | 0x28   | 5         | 0       
+0x30   | 1             | 0x30   | 1         | 0       
+0xc    | 1             | 0xc    | 1         | 1       
+PC     | noc Frequency | PC     | Frequency | backward | invoke time | ir_cnt | loop | entry
+0x28   | 5             | 0x28   | 5         | 1        | 4           | 5      | 0      | 0     

@@ -51,4 +51,7 @@ void cache_free(struct cache *cache);
 bool cache_hot(struct cache *cache, uint32_t key);
 #endif
 
-uint32_t cache_freq(struct cache *cache, uint32_t key);
+uint64_t cache_freq(struct cache *cache, uint32_t key);
+
+typedef void (*fun)(void *);
+void cache_profile(struct cache *cache, fun func);

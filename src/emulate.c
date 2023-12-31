@@ -299,9 +299,12 @@ static block_t *block_alloc(riscv_t *rv)
     block->n_insn = 0;
 #if RV32_HAS(JIT)
     block->translatable = true;
+    block->loop = false;
     block->hot = false;
     block->backward = false;
     INIT_LIST_HEAD(&block->list);
+    block->invoke = 0;
+    block->ir_cnt = 0;
 #endif
     return block;
 }
@@ -977,6 +980,7 @@ static block_t *block_find_or_translate(riscv_t *rv)
         /* insert the block into block cache */
         block_t *delete_target = cache_put(rv->block_cache, rv->PC, &(*next));
         if (delete_target) {
+            assert(NULL);
             if (prev == delete_target)
                 prev = NULL;
             chaining_entry_t *entry, *safe;
@@ -1114,6 +1118,7 @@ void rv_step(riscv_t *rv, int32_t cycles)
         /* execute by tier-1 JIT compiler */
         struct jit_state *state = rv->jit_state;
         if (block->hot) {
+            block->invoke++;
             ((exec_block_func_t) state->buf)(
                 rv, (uintptr_t) (state->buf + block->offset));
             prev = NULL;
@@ -1121,8 +1126,9 @@ void rv_step(riscv_t *rv, int32_t cycles)
         } /* check if using frequency of block exceed threshold */
         else if (block->translatable &&
                  ((block->backward &&
-                   cache_freq(rv->block_cache, block->pc_start) >= 1024) ||
+                   cache_freq(rv->block_cache, block->pc_start) >= 2) ||
                   cache_hot(rv->block_cache, block->pc_start))) {
+            block->invoke++;
             block->hot = true;
             block->offset = jit_translate(rv, block);
             ((exec_block_func_t) state->buf)(

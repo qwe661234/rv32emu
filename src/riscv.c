@@ -15,7 +15,7 @@
 #if RV32_HAS(JIT)
 #include "cache.h"
 #include "jit.h"
-#define CODE_CACHE_SIZE (1024 * 1024)
+#define CODE_CACHE_SIZE (4 * 1024 * 1024)
 #endif
 
 #define BLOCK_IR_MAP_CAPACITY_BITS 10
@@ -158,6 +158,23 @@ bool rv_enables_to_output_exit_code(riscv_t *rv)
     return rv->output_exit_code;
 }
 
+void profile(block_t *block)
+{
+    printf("PC = %#x\n", block->pc_start);
+    if (block->hot) {
+        printf("backward = %d\n", block->backward);
+        printf("invoke time = %lu\n", block->invoke);
+        printf("ir_cnt = %u\n", block->ir_cnt);
+        printf("loop = %u\n", block->loop);
+    }
+    uint32_t count = 0;
+    chaining_entry_t *entry, *safe;
+    list_for_each_entry_safe (entry, safe, &block->list, list) {
+        count++;
+    }
+    printf("entry = %u\n", count);
+}
+
 void rv_delete(riscv_t *rv)
 {
     assert(rv);
@@ -165,6 +182,7 @@ void rv_delete(riscv_t *rv)
     block_map_destroy(rv);
 #else
     jit_state_exit(rv->jit_state);
+    cache_profile(rv->block_cache, (fun) profile);
     cache_free(rv->block_cache);
 #endif
     free(rv);

@@ -1,0 +1,28 @@
+Hello World!
+Hello World!
+Hello World!
+Hello World!
+Hello World!
+inferior exit code 0
+PC = 0x30
+entry = 0
+frequency = 1
+PC = 0x10
+entry = 1
+frequency = 1
+PC = 0xc
+entry = 1
+frequency = 1
+PC = 0
+entry = 0
+frequency = 1
+PC = 0x14
+entry = 2
+frequency = 2
+PC = 0x28
+backward = 1
+invoke time = 4
+ir_cnt = 5
+loop = 0
+entry = 0
+frequency = 5

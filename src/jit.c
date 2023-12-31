@@ -1483,26 +1483,30 @@ static void resolve_jumps(struct jit_state *state)
 #endif
     }
 }
-
+uint32_t ir_cnt = 0;
 static void translate_chained_block(struct jit_state *state,
                                     riscv_t *rv,
                                     block_t *block,
                                     set_t *set)
 {
-    if (set_has(set, block->pc_start))
+    if (set_has(set, block->pc_start)) {
+        block->loop = true;
         return;
-
+    }
+    ir_cnt += block->n_insn;
     set_add(set, block->pc_start);
     offset_map_insert(state, block->pc_start);
     translate(state, rv, block);
     rv_insn_t *ir = block->ir_tail;
-    if (ir->branch_untaken && !set_has(set, ir->branch_untaken->pc)) {
-        block_t *block1 = cache_get(rv->block_cache, ir->branch_untaken->pc, false);
+    if (ir->branch_untaken) {
+        block_t *block1 =
+            cache_get(rv->block_cache, ir->branch_untaken->pc, false);
         if (block1->translatable)
             translate_chained_block(state, rv, block1, set);
     }
-    if (ir->branch_taken && !set_has(set, ir->branch_taken->pc)) {
-        block_t *block1 = cache_get(rv->block_cache, ir->branch_taken->pc, false);
+    if (ir->branch_taken) {
+        block_t *block1 =
+            cache_get(rv->block_cache, ir->branch_taken->pc, false);
         if (block1->translatable)
             translate_chained_block(state, rv, block1, set);
     }
@@ -1518,8 +1522,9 @@ uint32_t jit_translate(riscv_t *rv, block_t *block)
     uint32_t entry_loc = state->offset;
     set_t set;
     set_reset(&set);
+    ir_cnt = 0;
     translate_chained_block(&(*state), rv, block, &set);
-
+    block->ir_cnt = ir_cnt;
     if (state->offset == state->size) {
         printf("Target buffer too small\n");
         goto out;
