@@ -301,6 +301,7 @@ static block_t *block_alloc(riscv_t *rv)
     block->translatable = true;
     block->hot = false;
     block->backward = false;
+    block->loop = false;
     INIT_LIST_HEAD(&block->list);
 #endif
     return block;
@@ -382,6 +383,11 @@ static bool is_branch_taken = false;
 
 /* record the program counter of the previous block */
 static uint32_t last_pc = 0;
+
+#if RV32_HAS(JIT)
+static set_t pc_set;
+bool loop = false;
+#endif
 
 /* Interpreter-based execution path */
 #define RVOP(inst, code, asm)                                         \
@@ -996,7 +1002,8 @@ static block_t *block_find_or_translate(riscv_t *rv)
                 assert(flag);
             }
             if (untaken && untaken->pc != delete_target->pc_start) {
-                block_t *target = cache_get(rv->block_cache, untaken->pc, false);
+                block_t *target =
+                    cache_get(rv->block_cache, untaken->pc, false);
                 assert(target);
                 bool flag = false;
                 list_for_each_entry_safe (entry, safe, &target->list, list) {
@@ -1037,6 +1044,38 @@ static block_t *block_find_or_translate(riscv_t *rv)
 }
 
 #if RV32_HAS(JIT)
+void detect_loop(riscv_t *rv, rv_insn_t *ir, set_t *set)
+{
+    if (set_has(set, ir->pc)) {
+        loop = true;
+        return;
+    }
+
+    set_add(set, ir->pc);
+    while (ir->next)
+        ir = ir->next;
+    if (ir->branch_untaken)
+        detect_loop(rv, ir->branch_untaken, set);
+    if (ir->branch_taken)
+        detect_loop(rv, ir->branch_taken, set);
+}
+
+static bool runtime_profiler(riscv_t *rv, block_t *block)
+{
+    /* Based on our observation, a high percentage of true hotspots involve high
+     * using frequency, loops or backward jumps. Therefore, we believe our
+     * profiler can use three indices to detect hotspots */
+    uint32_t freq = cache_freq(rv->block_cache, block->pc_start);
+    /* to profile the block after chaining, the block should be executed first
+     */
+    if (freq >= 2 && (block->backward || block->loop))
+        return true;
+    /* using frequency exceeds predetermined threshold */
+    if (freq == THRESHOLD)
+        return true;
+    return false;
+}
+
 typedef void (*exec_block_func_t)(riscv_t *rv, uintptr_t);
 #endif
 
@@ -1119,10 +1158,7 @@ void rv_step(riscv_t *rv, int32_t cycles)
             prev = NULL;
             continue;
         } /* check if using frequency of block exceed threshold */
-        else if (block->translatable &&
-                 ((block->backward &&
-                   cache_freq(rv->block_cache, block->pc_start) >= 1024) ||
-                  cache_hot(rv->block_cache, block->pc_start))) {
+        else if (block->translatable && runtime_profiler(rv, block)) {
             block->hot = true;
             block->offset = jit_translate(rv, block);
             ((exec_block_func_t) state->buf)(
@@ -1130,6 +1166,8 @@ void rv_step(riscv_t *rv, int32_t cycles)
             prev = NULL;
             continue;
         }
+        set_reset(&pc_set);
+        loop = false;
 #endif
         /* execute the block by interpreter */
         const rv_insn_t *ir = block->ir_head;
@@ -1138,6 +1176,10 @@ void rv_step(riscv_t *rv, int32_t cycles)
             prev = NULL;
             break;
         }
+#if RV32_HAS(JIT)
+        if (loop && !block->loop)
+            block->loop = true;
+#endif
         prev = block;
     }
 }

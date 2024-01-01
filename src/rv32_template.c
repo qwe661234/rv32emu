@@ -137,7 +137,9 @@ RVOP(
         if (taken) {
 #if RV32_HAS(JIT)
             cache_get(rv->block_cache, ir->branch_taken->pc, true);
-            if (cache_hot(rv->block_cache, PC))
+            if (!set_add(&pc_set, ir->branch_taken->pc))
+                loop = true;
+            if (cache_hot(rv->block_cache, ir->branch_taken->pc))
                 goto end_insn;
 #endif
             last_pc = PC;
@@ -226,41 +228,45 @@ RVOP(
     (type) x cond (type) y
 /* clang-format on */
 
-#define BRANCH_FUNC(type, cond)                                    \
-    const uint32_t pc = PC;                                        \
-    if (BRANCH_COND(type, rv->X[ir->rs1], rv->X[ir->rs2], cond)) { \
-        is_branch_taken = false;                                   \
-        struct rv_insn *untaken = ir->branch_untaken;              \
-        if (!untaken)                                              \
-            goto nextop;                                           \
-        IIF(RV32_HAS(JIT))                                         \
-        ({                                                         \
-            cache_get(rv->block_cache, untaken->pc, true);         \
-            if (cache_hot(rv->block_cache, PC + 4))                \
-                goto nextop;                                       \
-        }, );                                                      \
-        PC += 4;                                                   \
-        last_pc = PC;                                              \
-        MUST_TAIL return untaken->impl(rv, untaken, cycle, PC);    \
-    }                                                              \
-    is_branch_taken = true;                                        \
-    PC += ir->imm;                                                 \
-    /* check instruction misaligned */                             \
-    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);                   \
-    struct rv_insn *taken = ir->branch_taken;                      \
-    if (taken) {                                                   \
-        IIF(RV32_HAS(JIT))                                         \
-        ({                                                         \
-            cache_get(rv->block_cache, taken->pc, true);           \
-            if (cache_hot(rv->block_cache, PC))                    \
-                goto end_insn;                                     \
-        }, );                                                      \
-        last_pc = PC;                                              \
-        MUST_TAIL return taken->impl(rv, taken, cycle, PC);        \
-    }                                                              \
-    end_insn:                                                      \
-    rv->csr_cycle = cycle;                                         \
-    rv->PC = PC;                                                   \
+#define BRANCH_FUNC(type, cond)                                     \
+    const uint32_t pc = PC;                                         \
+    if (BRANCH_COND(type, rv->X[ir->rs1], rv->X[ir->rs2], cond)) {  \
+        is_branch_taken = false;                                    \
+        struct rv_insn *untaken = ir->branch_untaken;               \
+        if (!untaken)                                               \
+            goto nextop;                                            \
+        IIF(RV32_HAS(JIT))                                          \
+        ({                                                          \
+            cache_get(rv->block_cache, untaken->pc, true);          \
+            if (!set_add(&pc_set, ir->branch_untaken->pc))          \
+                loop = true;                                        \
+            if (cache_hot(rv->block_cache, ir->branch_untaken->pc)) \
+                goto nextop;                                        \
+        }, );                                                       \
+        PC += 4;                                                    \
+        last_pc = PC;                                               \
+        MUST_TAIL return untaken->impl(rv, untaken, cycle, PC);     \
+    }                                                               \
+    is_branch_taken = true;                                         \
+    PC += ir->imm;                                                  \
+    /* check instruction misaligned */                              \
+    RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);                    \
+    struct rv_insn *taken = ir->branch_taken;                       \
+    if (taken) {                                                    \
+        IIF(RV32_HAS(JIT))                                          \
+        ({                                                          \
+            cache_get(rv->block_cache, taken->pc, true);            \
+            if (!set_add(&pc_set, ir->branch_taken->pc))            \
+                loop = true;                                        \
+            if (cache_hot(rv->block_cache, ir->branch_taken->pc))   \
+                goto end_insn;                                      \
+        }, );                                                       \
+        last_pc = PC;                                               \
+        MUST_TAIL return taken->impl(rv, taken, cycle, PC);         \
+    }                                                               \
+    end_insn:                                                       \
+    rv->csr_cycle = cycle;                                          \
+    rv->PC = PC;                                                    \
     return true;
 
 /* In RV32I and RV64I, if the branch is taken, set pc = pc + offset, where
@@ -1796,7 +1802,9 @@ RVOP(
         if (taken) {
 #if RV32_HAS(JIT)
             cache_get(rv->block_cache, taken->pc, true);
-            if (cache_hot(rv->block_cache, PC))
+            if (!set_add(&pc_set, ir->branch_taken->pc))
+                loop = true;
+            if (cache_hot(rv->block_cache, ir->branch_taken->pc))
                 goto end_insn;
 #endif
             last_pc = PC;
@@ -1958,7 +1966,9 @@ RVOP(
         if (taken) {
 #if RV32_HAS(JIT)
             cache_get(rv->block_cache, taken->pc, true);
-            if (cache_hot(rv->block_cache, PC))
+            if (!set_add(&pc_set, ir->branch_taken->pc))
+                loop = true;
+            if (cache_hot(rv->block_cache, ir->branch_taken->pc))
                 goto end_insn;
 #endif
             last_pc = PC;
@@ -1991,7 +2001,9 @@ RVOP(
                 goto nextop;
 #if RV32_HAS(JIT)
             cache_get(rv->block_cache, untaken->pc, true);
-            if (cache_hot(rv->block_cache, PC + 2))
+            if (!set_add(&pc_set, ir->branch_untaken->pc))
+                loop = true;
+            if (cache_hot(rv->block_cache, ir->branch_untaken->pc))
                 goto nextop;
 #endif
             PC += 2;
@@ -2004,7 +2016,9 @@ RVOP(
         if (taken) {
 #if RV32_HAS(JIT)
             cache_get(rv->block_cache, taken->pc, true);
-            if (cache_hot(rv->block_cache, PC))
+            if (!set_add(&pc_set, ir->branch_taken->pc))
+                loop = true;
+            if (cache_hot(rv->block_cache, ir->branch_taken->pc))
                 goto end_insn;
 #endif
             last_pc = PC;
@@ -2046,7 +2060,9 @@ RVOP(
                 goto nextop;
 #if RV32_HAS(JIT)
             cache_get(rv->block_cache, untaken->pc, true);
-            if (cache_hot(rv->block_cache, PC + 2))
+            if (!set_add(&pc_set, ir->branch_untaken->pc))
+                loop = true;
+            if (cache_hot(rv->block_cache, ir->branch_untaken->pc))
                 goto nextop;
 #endif
             PC += 2;
@@ -2059,7 +2075,9 @@ RVOP(
         if (taken) {
 #if RV32_HAS(JIT)
             cache_get(rv->block_cache, taken->pc, true);
-            if (cache_hot(rv->block_cache, PC))
+            if (!set_add(&pc_set, ir->branch_taken->pc))
+                loop = true;
+            if (cache_hot(rv->block_cache, ir->branch_taken->pc))
                 goto end_insn;
 #endif
             last_pc = PC;
