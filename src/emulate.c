@@ -301,6 +301,8 @@ static block_t *block_alloc(riscv_t *rv)
 #if RV32_HAS(JIT)
     block->translatable = true;
     block->hot = false;
+    block->hot2 = false;
+    block->invoke = 0;
     block->backward = false;
     block->loop = false;
     INIT_LIST_HEAD(&block->list);
@@ -925,6 +927,7 @@ typedef struct {
         code;                                                 \
     }
 
+#if !RV32_HAS(JIT)
 #include "rv32_constopt.c"
 static const void *constopt_table[] = {
 #define _(inst, can_branch, insn_len, translatable, reg_mask) \
@@ -945,6 +948,7 @@ static void optimize_constant(riscv_t *rv UNUSED, block_t *block)
     for (i = 0, ir = block->ir_head; i < block->n_insn; i++, ir = ir->next)
         ((constopt_func_t) constopt_table[ir->opcode])(ir, &info);
 }
+#endif
 
 static block_t *prev = NULL;
 static block_t *block_find_or_translate(riscv_t *rv)
@@ -1072,15 +1076,15 @@ static bool runtime_profiler(riscv_t *rv, block_t *block)
     uint32_t freq = cache_freq(rv->block_cache, block->pc_start);
     /* to profile the block after chaining, the block should be executed first
      */
-    // if (freq >= 2 && (block->backward || block->loop))
-    //     return true;
+    if (freq >= 2 && block->loop)
+        return true;
     /* using frequency exceeds predetermined threshold */
     if (freq == THRESHOLD)
         return true;
     return false;
 }
 
-// typedef void (*exec_block_func_t)(riscv_t *rv, uintptr_t);
+typedef void (*exec_block_func_t)(riscv_t *rv, uintptr_t);
 typedef bool (*exec_block_func2_t)(riscv_t *rv, uint64_t, uint32_t);
 #endif
 
@@ -1156,30 +1160,36 @@ void rv_step(riscv_t *rv, int32_t cycles)
         last_pc = rv->PC;
 #if RV32_HAS(JIT)
         exec_block_func2_t code = NULL;
-        /* execute by tier-1 JIT compiler */
-        // struct jit_state *state = rv->jit_state;
-        if (block->hot) {
-            // ((exec_block_func_t) state->buf)(
-            //     rv, (uintptr_t) (state->buf + block->offset));
-            // printf("%#x\n", rv->PC);
-            // printf("PC1 = %#x\n", rv->PC);
+        if (block->hot2) {
             code =
                 (exec_block_func2_t) code_cache_lookup(rv->block_cache, rv->PC);
             code(rv, rv->csr_cycle, rv->PC);
-            // printf("PC = %#x\n", rv->PC);
+            prev = NULL;
+            continue;
+        }
+        /* check if invoking time of T1C exceed threshold */
+        if (block->invoke >= THRESHOLD) {
+            block->hot2 = true;
+            code = (exec_block_func2_t) block_compile(rv);
+            code(rv, rv->csr_cycle, rv->PC);
+            prev = NULL;
+            continue;
+        }
+        /* execute by tier-1 JIT compiler */
+        struct jit_state *state = rv->jit_state;
+        if (block->hot) {
+            block->invoke++;
+            ((exec_block_func_t) state->buf)(
+                rv, (uintptr_t) (state->buf + block->offset));
             prev = NULL;
             continue;
         } /* check if using frequency of block exceed threshold */
         else if (block->translatable && runtime_profiler(rv, block)) {
             block->hot = true;
-            // block->offset = jit_translate(rv, block);
-            // ((exec_block_func_t) state->buf)(
-            //     rv, (uintptr_t) (state->buf + block->offset));
-            // printf("%#x\n", rv->PC);
-            code = (exec_block_func2_t) block_compile(rv);
-            // printf("PC1 = %#x\n", rv->PC);
-            code(rv, rv->csr_cycle, rv->PC);
-            // printf("PC = %#x\n", rv->PC);
+            block->invoke++;
+            block->offset = jit_translate(rv, block);
+            ((exec_block_func_t) state->buf)(
+                rv, (uintptr_t) (state->buf + block->offset));
             prev = NULL;
             continue;
         }
