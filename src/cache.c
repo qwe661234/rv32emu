@@ -8,10 +8,15 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #include "cache.h"
 #include "mpool.h"
 #include "utils.h"
+
+#define CODE_CACHE_SIZE (4 * 1024 * 1024)
+#define sys_icache_invalidate(addr, size) \
+    __builtin___clear_cache((char *) (addr), (char *) (addr) + (size));
 
 static uint32_t cache_size, cache_size_bits;
 static struct mpool *cache_mp;
@@ -31,6 +36,9 @@ typedef struct {
     void *value;
     uint32_t key;
     uint32_t frequency;
+#if RV32_HAS(JIT)
+    uint64_t offset;
+#endif
     struct list_head list;
     struct hlist_node ht_list;
 } lfu_entry_t;
@@ -44,6 +52,10 @@ typedef struct cache {
     uint32_t list_size;
     hashtable_t *map;
     uint32_t capacity;
+#if RV32_HAS(JIT)
+    uint8_t *jitcode;
+    uint64_t offset;
+#endif
 } cache_t;
 
 #define INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
@@ -160,6 +172,12 @@ cache_t *cache_create(int size_bits)
     cache_mp =
         mpool_create(cache_size * sizeof(lfu_entry_t), sizeof(lfu_entry_t));
     cache->capacity = cache_size;
+#if RV32_HAS(JIT)
+    cache->jitcode = (uint8_t *) mmap(NULL, CODE_CACHE_SIZE,
+                                      PROT_READ | PROT_WRITE | PROT_EXEC,
+                                      MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    cache->offset = 0;
+#endif
     return cache;
 }
 
@@ -278,5 +296,54 @@ bool cache_hot(struct cache *cache, uint32_t key)
             return true;
     }
     return false;
+}
+
+uint8_t *code_cache_lookup(cache_t *cache, uint32_t key)
+{
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+        return NULL;
+    lfu_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, lfu_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            return cache->jitcode + entry->offset;
+    }
+    return NULL;
+}
+
+uint8_t *code_cache_add(cache_t *cache,
+                        uint64_t key,
+                        uint8_t *code,
+                        size_t sz,
+                        uint64_t align)
+{
+    cache->offset = align_up(cache->offset, align);
+    if (!cache->capacity ||
+        hlist_empty(&cache->map->ht_list_head[cache_hash(key)]))
+        return NULL;
+    lfu_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list)
+#else
+    hlist_for_each_entry (entry, &cache->map->ht_list_head[cache_hash(key)],
+                          ht_list, lfu_entry_t)
+#endif
+    {
+        if (entry->key == key)
+            break;
+    }
+    memcpy(cache->jitcode + cache->offset, code, sz);
+    entry->offset = cache->offset;
+    cache->offset += sz;
+    sys_icache_invalidate(cache->jitcode + entry->offset, sz);
+    return cache->jitcode + entry->offset;
 }
 #endif

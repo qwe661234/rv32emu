@@ -55,6 +55,14 @@ void cache_free(struct cache *cache);
  * @key: the key of the specified entry
  */
 bool cache_hot(struct cache *cache, uint32_t key);
+
+uint8_t *code_cache_lookup(struct cache *cache, uint32_t key);
+
+uint8_t *code_cache_add(struct cache *cache,
+                        uint64_t key,
+                        uint8_t *code,
+                        size_t sz,
+                        uint64_t align);
 #endif
 
 uint32_t cache_freq(struct cache *cache, uint32_t key);
