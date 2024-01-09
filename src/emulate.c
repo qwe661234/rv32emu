@@ -23,6 +23,7 @@ extern struct target_ops gdbstub_ops;
 #include "mpool.h"
 #include "riscv.h"
 #include "riscv_private.h"
+#include "t2jit.h"
 #include "utils.h"
 
 #if RV32_HAS(JIT)
@@ -1100,6 +1101,9 @@ void ebreak_handler(riscv_t *rv)
 
 void ecall_handler(riscv_t *rv)
 {
+    funcPtr_t func = t2();
+    func(rv);
+    printf("%#x\n", rv->X[30]);
     assert(rv);
     rv_except_ecall_M(rv, 0);
     syscall_handler(rv);
