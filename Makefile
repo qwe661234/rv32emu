@@ -121,7 +121,7 @@ endif
 ENABLE_JIT ?= 0
 $(call set-feature, JIT)
 ifeq ($(call has, JIT), 1)
-OBJS_EXT += jit.o 
+OBJS_EXT += jit.o t2jit.o
 CFLAGS += -g `llvm-config --cflags`
 LDFLAGS += `llvm-config --libs core executionengine mcjit interpreter analysis native --system-libs`
 ifneq ($(processor),$(filter $(processor),x86_64 aarch64 arm64))

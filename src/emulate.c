@@ -965,14 +965,14 @@ static block_t *block_find_or_translate(riscv_t *rv)
         next = block_alloc(rv);
         block_translate(rv, next);
 
-        if (!libc_substitute(rv, next)) {
-            optimize_constant(rv, next);
-#if RV32_HAS(GDBSTUB)
-            if (likely(!rv->debug_mode))
-#endif
-                /* macro operation fusion */
-                match_pattern(rv, next);
-        }
+//         if (!libc_substitute(rv, next)) {
+//             optimize_constant(rv, next);
+// #if RV32_HAS(GDBSTUB)
+//             if (likely(!rv->debug_mode))
+// #endif
+//                 /* macro operation fusion */
+//                 match_pattern(rv, next);
+//         }
 #if !RV32_HAS(JIT)
         /* insert the block into block map */
         block_insert(&rv->block_map, next);
@@ -1062,25 +1062,35 @@ void rv_step(riscv_t *rv, int32_t cycles)
         }
         last_pc = rv->PC;
 #if RV32_HAS(JIT)
-        /* execute by tier-1 JIT compiler */
-        struct jit_state *state = rv->jit_state;
-        if (block->hot) {
-            ((exec_block_func_t) state->buf)(
-                rv, (uintptr_t) (state->buf + block->offset));
-            prev = NULL;
-            continue;
-        } /* check if using frequency of block exceed threshold */
-        else if (block->translatable &&
-                 ((block->backward &&
-                   cache_freq(rv->block_cache, block->pc_start) >= 1024) ||
-                  cache_hot(rv->block_cache, block->pc_start))) {
+        // /* execute by tier-1 JIT compiler */
+        // struct jit_state *state = rv->jit_state;
+        // if (block->hot) {
+        //     ((exec_block_func_t) state->buf)(
+        //         rv, (uintptr_t) (state->buf + block->offset));
+        //     prev = NULL;
+        //     continue;
+        // } /* check if using frequency of block exceed threshold */
+        // else if (block->translatable &&
+        //          ((block->backward &&
+        //            cache_freq(rv->block_cache, block->pc_start) >= 1024) ||
+        //           cache_hot(rv->block_cache, block->pc_start))) {
+        //     block->hot = true;
+        //     block->offset = jit_translate(rv, block);
+        //     ((exec_block_func_t) state->buf)(
+        //         rv, (uintptr_t) (state->buf + block->offset));
+        //     prev = NULL;
+        //     continue;
+        // }
+        // printf("rv->PC = %#x\n", rv->PC);
+        if (!block->hot) {
             block->hot = true;
-            block->offset = jit_translate(rv, block);
-            ((exec_block_func_t) state->buf)(
-                rv, (uintptr_t) (state->buf + block->offset));
-            prev = NULL;
-            continue;
+            block->func =
+                t2(block->ir_head, ((state_t *) rv->userdata)->mem->mem_base);
         }
+        block->func(rv);
+        // printf("rv->PC = %#x\n", rv->PC);
+        prev = NULL;
+        break;
 #endif
         /* execute the block by interpreter */
         const rv_insn_t *ir = block->ir_head;
@@ -1101,9 +1111,10 @@ void ebreak_handler(riscv_t *rv)
 
 void ecall_handler(riscv_t *rv)
 {
-    funcPtr_t func = t2();
-    func(rv);
-    printf("%#x\n", rv->X[30]);
+    // printf("%#x\n", rv->X[rv_reg_t0]);
+    // printf("%#x\n", rv->io.mem_read_w(0xff));
+    // printf("%#x\n", rv->X[rv_reg_t1]);
+    // printf("%#x\n", rv->X[rv_reg_t2]);
     assert(rv);
     rv_except_ecall_M(rv, 0);
     syscall_handler(rv);

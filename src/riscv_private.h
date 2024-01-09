@@ -54,7 +54,7 @@ enum {
     CSR_MIMPID = 0xF13,    /* Implementation ID */
     CSR_MHARTID = 0xF14,   /* Hardware thread ID */
 };
-
+typedef intptr_t (*funcPtr_t)(riscv_t *);
 /* translated basic block */
 typedef struct block {
     uint32_t n_insn;           /**< number of instructions encompased */
@@ -68,6 +68,7 @@ typedef struct block {
     uint32_t offset;
     bool
         translatable; /**< Determine the block has RV32AF insturctions or not */
+    funcPtr_t func;
 #endif
 } block_t;
 
