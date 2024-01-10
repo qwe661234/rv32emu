@@ -23,12 +23,12 @@ extern struct target_ops gdbstub_ops;
 #include "mpool.h"
 #include "riscv.h"
 #include "riscv_private.h"
-#include "t2jit.h"
 #include "utils.h"
 
 #if RV32_HAS(JIT)
 #include "cache.h"
 #include "jit.h"
+#include "t2jit.h"
 #endif
 
 /* Shortcuts for comparing each field of specified RISC-V instruction */
@@ -1081,16 +1081,23 @@ void rv_step(riscv_t *rv, int32_t cycles)
         //     prev = NULL;
         //     continue;
         // }
-        // printf("rv->PC = %#x\n", rv->PC);
-        if (!block->hot) {
+
+        if (block->hot) {
+            block->func(rv);
+            prev = NULL;
+            continue;
+        } /* check if using frequency of block exceed threshold */
+        else if (block->translatable &&
+                 ((block->backward &&
+                   cache_freq(rv->block_cache, block->pc_start) >= 1024) ||
+                  cache_hot(rv->block_cache, block->pc_start))) {
             block->hot = true;
             block->func =
                 t2(block->ir_head, ((state_t *) rv->userdata)->mem->mem_base);
+            block->func(rv);
+            prev = NULL;
+            continue;
         }
-        block->func(rv);
-        // printf("rv->PC = %#x\n", rv->PC);
-        prev = NULL;
-        break;
 #endif
         /* execute the block by interpreter */
         const rv_insn_t *ir = block->ir_head;
@@ -1111,10 +1118,6 @@ void ebreak_handler(riscv_t *rv)
 
 void ecall_handler(riscv_t *rv)
 {
-    // printf("%#x\n", rv->X[rv_reg_t0]);
-    // printf("%#x\n", rv->io.mem_read_w(0xff));
-    // printf("%#x\n", rv->X[rv_reg_t1]);
-    // printf("%#x\n", rv->X[rv_reg_t2]);
     assert(rv);
     rv_except_ecall_M(rv, 0);
     syscall_handler(rv);

@@ -56,3 +56,35 @@ static inline uintptr_t align_up(uintptr_t sz, size_t alignment)
         return ((sz + mask) & ~mask);
     return (((sz + mask) / alignment) * alignment);
 }
+
+#define SET_SIZE_BITS 10
+#define SET_SIZE (1 << SET_SIZE_BITS)
+#define SET_SLOTS_SIZE 32
+HASH_FUNC_IMPL(set_hash, SET_SIZE_BITS, 1 << SET_SIZE_BITS);
+
+/* The set consists of SET_SIZE buckets, with each bucket containing
+ * SET_SLOTS_SIZE slots.
+ */
+typedef struct {
+    uint32_t table[SET_SIZE][SET_SLOTS_SIZE];
+} set_t;
+
+/**
+ * set_reset - clear a set
+ * @set: a pointer points to target set
+ */
+void set_reset(set_t *set);
+
+/**
+ * set_add - insert a new element into the set
+ * @set: a pointer points to target set
+ * @key: the key of the inserted entry
+ */
+bool set_add(set_t *set, uint32_t key);
+
+/**
+ * set_has - check whether the element exist in the set or not
+ * @set: a pointer points to target set
+ * @key: the key of the inserted entry
+ */
+bool set_has(set_t *set, uint32_t key);

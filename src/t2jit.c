@@ -4,14 +4,24 @@
 #include <llvm-c/Core.h>
 #include <llvm-c/ExecutionEngine.h>
 #include <llvm-c/Target.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "riscv.h"
 #include "riscv_private.h"
+#include "utils.h"
 
+struct LLVM_block_map_entry {
+    uint32_t pc;
+    LLVMBasicBlockRef block;
+};
+
+struct LLVM_block_map {
+    uint32_t count;
+    struct LLVM_block_map_entry map[1024];
+};
 
 typedef intptr_t (*funcPtr_t)(riscv_t *);
 
@@ -55,6 +65,8 @@ void auipc(LLVMBuilderRef *builder,
 void jal(LLVMBuilderRef *builder,
          LLVMTypeRef *param_types UNUSED,
          LLVMValueRef start,
+         LLVMBuilderRef *taken_builder,
+         LLVMBuilderRef *untaken_builder,
          rv_insn_t *ir)
 {
     if (ir->rd) {
@@ -72,10 +84,14 @@ void jal(LLVMBuilderRef *builder,
     LLVMValueRef addr_PC =
         LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
                               PC_offset, 1, "addr_PC");
-    LLVMBuildStore(*builder,
-                   LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                   addr_PC);
-    LLVMBuildRetVoid(*builder);
+    if (ir->branch_taken) {
+        *taken_builder = *builder;
+    } else {
+        LLVMBuildStore(*builder,
+                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
+                       addr_PC);
+        LLVMBuildRetVoid(*builder);
+    }
 }
 
 void jalr(LLVMBuilderRef *builder,
@@ -116,6 +132,8 @@ void jalr(LLVMBuilderRef *builder,
 void beq(LLVMBuilderRef *builder,
          LLVMTypeRef *param_types UNUSED,
          LLVMValueRef start,
+         LLVMBuilderRef *taken_builder,
+         LLVMBuilderRef *untaken_builder,
          rv_insn_t *ir)
 {
     LLVMValueRef PC_offset[1] = {LLVMConstInt(
@@ -142,23 +160,33 @@ void beq(LLVMBuilderRef *builder,
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    LLVMBuildStore(builder2,
-                   LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder2);
+    if (ir->branch_taken) {
+        *taken_builder = builder2;
+    } else {
+        LLVMBuildStore(builder2,
+                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
+                       addr_PC);
+        LLVMBuildRetVoid(builder2);
+    }
     // // else
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    LLVMBuildStore(builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder3);
+    if (ir->branch_untaken) {
+        *untaken_builder = builder3;
+    } else {
+        LLVMBuildStore(
+            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
+        LLVMBuildRetVoid(builder3);
+    }
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 }
 
 void bne(LLVMBuilderRef *builder,
          LLVMTypeRef *param_types UNUSED,
          LLVMValueRef start,
+         LLVMBuilderRef *taken_builder,
+         LLVMBuilderRef *untaken_builder,
          rv_insn_t *ir)
 {
     LLVMValueRef PC_offset[1] = {LLVMConstInt(
@@ -185,23 +213,33 @@ void bne(LLVMBuilderRef *builder,
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    LLVMBuildStore(builder2,
-                   LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder2);
+    if (ir->branch_taken) {
+        *taken_builder = builder2;
+    } else {
+        LLVMBuildStore(builder2,
+                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
+                       addr_PC);
+        LLVMBuildRetVoid(builder2);
+    }
     // // else
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    LLVMBuildStore(builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder3);
+    if (ir->branch_untaken) {
+        *untaken_builder = builder3;
+    } else {
+        LLVMBuildStore(
+            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
+        LLVMBuildRetVoid(builder3);
+    }
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 }
 
 void blt(LLVMBuilderRef *builder,
          LLVMTypeRef *param_types UNUSED,
          LLVMValueRef start,
+         LLVMBuilderRef *taken_builder,
+         LLVMBuilderRef *untaken_builder,
          rv_insn_t *ir)
 {
     LLVMValueRef PC_offset[1] = {LLVMConstInt(
@@ -228,23 +266,33 @@ void blt(LLVMBuilderRef *builder,
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    LLVMBuildStore(builder2,
-                   LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder2);
+    if (ir->branch_taken) {
+        *taken_builder = builder2;
+    } else {
+        LLVMBuildStore(builder2,
+                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
+                       addr_PC);
+        LLVMBuildRetVoid(builder2);
+    }
     // // else
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    LLVMBuildStore(builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder3);
+    if (ir->branch_untaken) {
+        *untaken_builder = builder3;
+    } else {
+        LLVMBuildStore(
+            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
+        LLVMBuildRetVoid(builder3);
+    }
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 }
 
 void bge(LLVMBuilderRef *builder,
          LLVMTypeRef *param_types UNUSED,
          LLVMValueRef start,
+         LLVMBuilderRef *taken_builder,
+         LLVMBuilderRef *untaken_builder,
          rv_insn_t *ir)
 {
     LLVMValueRef PC_offset[1] = {LLVMConstInt(
@@ -271,23 +319,33 @@ void bge(LLVMBuilderRef *builder,
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    LLVMBuildStore(builder2,
-                   LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder2);
+    if (ir->branch_taken) {
+        *taken_builder = builder2;
+    } else {
+        LLVMBuildStore(builder2,
+                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
+                       addr_PC);
+        LLVMBuildRetVoid(builder2);
+    }
     // // else
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    LLVMBuildStore(builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder3);
+    if (ir->branch_untaken) {
+        *untaken_builder = builder3;
+    } else {
+        LLVMBuildStore(
+            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
+        LLVMBuildRetVoid(builder3);
+    }
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 }
 
 void bltu(LLVMBuilderRef *builder,
           LLVMTypeRef *param_types UNUSED,
           LLVMValueRef start,
+          LLVMBuilderRef *taken_builder,
+          LLVMBuilderRef *untaken_builder,
           rv_insn_t *ir)
 {
     LLVMValueRef PC_offset[1] = {LLVMConstInt(
@@ -314,23 +372,33 @@ void bltu(LLVMBuilderRef *builder,
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    LLVMBuildStore(builder2,
-                   LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder2);
+    if (ir->branch_taken) {
+        *taken_builder = builder2;
+    } else {
+        LLVMBuildStore(builder2,
+                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
+                       addr_PC);
+        LLVMBuildRetVoid(builder2);
+    }
     // // else
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    LLVMBuildStore(builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder3);
+    if (ir->branch_untaken) {
+        *untaken_builder = builder3;
+    } else {
+        LLVMBuildStore(
+            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
+        LLVMBuildRetVoid(builder3);
+    }
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 }
 
 void bgeu(LLVMBuilderRef *builder,
           LLVMTypeRef *param_types UNUSED,
           LLVMValueRef start,
+          LLVMBuilderRef *taken_builder,
+          LLVMBuilderRef *untaken_builder,
           rv_insn_t *ir)
 {
     LLVMValueRef PC_offset[1] = {LLVMConstInt(
@@ -357,17 +425,25 @@ void bgeu(LLVMBuilderRef *builder,
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    LLVMBuildStore(builder2,
-                   LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder2);
+    if (ir->branch_taken) {
+        *taken_builder = builder2;
+    } else {
+        LLVMBuildStore(builder2,
+                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
+                       addr_PC);
+        LLVMBuildRetVoid(builder2);
+    }
     // // else
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    LLVMBuildStore(builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true),
-                   addr_PC);
-    LLVMBuildRetVoid(builder3);
+    if (ir->branch_untaken) {
+        *untaken_builder = builder3;
+    } else {
+        LLVMBuildStore(
+            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
+        LLVMBuildRetVoid(builder3);
+    }
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 }
 
@@ -1235,12 +1311,504 @@ void ebreak(LLVMBuilderRef *builder,
     LLVMBuildRetVoid(*builder);
 }
 
+void mul(LLVMBuilderRef *builder,
+         LLVMTypeRef *param_types UNUSED,
+         LLVMValueRef start,
+         LLVMBasicBlockRef *entry,
+         uint64_t mem_base,
+         rv_insn_t *ir)
+{
+    LLVMValueRef rs1_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs1, true)};
+    LLVMValueRef addr_rs1 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs1_offset, 1, "addr_rs1");
+    LLVMValueRef rs2_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs2, true)};
+    LLVMValueRef addr_rs2 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs2_offset, 1, "addr_rs2");
+    LLVMValueRef rd_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rd, true)};
+    LLVMValueRef addr_rd =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rd_offset, 1, "addr_rd");
+    LLVMValueRef val_rs1 = LLVMBuildSExt(
+        *builder,
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs1, "val_rs1"),
+        LLVMInt64Type(), "sextrs1to64");
+    LLVMValueRef val_rs2 = LLVMBuildSExt(
+        *builder,
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs2, "val_rs2"),
+        LLVMInt64Type(), "sextrs2to64");
+    LLVMValueRef tmp =
+        LLVMBuildAnd(*builder, LLVMBuildMul(*builder, val_rs1, val_rs2, "mul"),
+                     LLVMConstInt(LLVMInt64Type(), 0xFFFFFFFF, false), "and");
+    LLVMValueRef res =
+        LLVMBuildTrunc(*builder, tmp, LLVMInt32Type(), "sextresto32");
+    LLVMBuildStore(*builder, res, addr_rd);
+}
+
+void mulh(LLVMBuilderRef *builder,
+          LLVMTypeRef *param_types UNUSED,
+          LLVMValueRef start,
+          LLVMBasicBlockRef *entry,
+          uint64_t mem_base,
+          rv_insn_t *ir)
+{
+    LLVMValueRef rs1_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs1, true)};
+    LLVMValueRef addr_rs1 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs1_offset, 1, "addr_rs1");
+    LLVMValueRef rs2_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs2, true)};
+    LLVMValueRef addr_rs2 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs2_offset, 1, "addr_rs2");
+    LLVMValueRef rd_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rd, true)};
+    LLVMValueRef addr_rd =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rd_offset, 1, "addr_rd");
+    LLVMValueRef val_rs1 = LLVMBuildSExt(
+        *builder,
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs1, "val_rs1"),
+        LLVMInt64Type(), "sextrs1to64");
+    LLVMValueRef val_rs2 = LLVMBuildSExt(
+        *builder,
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs2, "val_rs2"),
+        LLVMInt64Type(), "sextrs2to64");
+    LLVMValueRef tmp =
+        LLVMBuildLShr(*builder, LLVMBuildMul(*builder, val_rs1, val_rs2, "mul"),
+                      LLVMConstInt(LLVMInt64Type(), 32, false), "sll");
+    LLVMValueRef res =
+        LLVMBuildTrunc(*builder, tmp, LLVMInt32Type(), "sextresto32");
+    LLVMBuildStore(*builder, res, addr_rd);
+}
+
+void mulhsu(LLVMBuilderRef *builder,
+            LLVMTypeRef *param_types UNUSED,
+            LLVMValueRef start,
+            LLVMBasicBlockRef *entry,
+            uint64_t mem_base,
+            rv_insn_t *ir)
+{
+    LLVMValueRef rs1_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs1, true)};
+    LLVMValueRef addr_rs1 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs1_offset, 1, "addr_rs1");
+    LLVMValueRef rs2_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs2, true)};
+    LLVMValueRef addr_rs2 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs2_offset, 1, "addr_rs2");
+    LLVMValueRef rd_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rd, true)};
+    LLVMValueRef addr_rd =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rd_offset, 1, "addr_rd");
+    LLVMValueRef val_rs1 = LLVMBuildSExt(
+        *builder,
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs1, "val_rs1"),
+        LLVMInt64Type(), "sextrs1to64");
+    LLVMValueRef val_rs2 = LLVMBuildZExt(
+        *builder,
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs2, "val_rs2"),
+        LLVMInt64Type(), "zextrs2to64");
+    LLVMValueRef tmp =
+        LLVMBuildLShr(*builder, LLVMBuildMul(*builder, val_rs1, val_rs2, "mul"),
+                      LLVMConstInt(LLVMInt64Type(), 32, false), "sll");
+    LLVMValueRef res =
+        LLVMBuildTrunc(*builder, tmp, LLVMInt32Type(), "sextresto32");
+    LLVMBuildStore(*builder, res, addr_rd);
+}
+
+void mulhu(LLVMBuilderRef *builder,
+           LLVMTypeRef *param_types UNUSED,
+           LLVMValueRef start,
+           LLVMBasicBlockRef *entry,
+           uint64_t mem_base,
+           rv_insn_t *ir)
+{
+    LLVMValueRef rs1_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs1, true)};
+    LLVMValueRef addr_rs1 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs1_offset, 1, "addr_rs1");
+    LLVMValueRef rs2_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs2, true)};
+    LLVMValueRef addr_rs2 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs2_offset, 1, "addr_rs2");
+    LLVMValueRef rd_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rd, true)};
+    LLVMValueRef addr_rd =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rd_offset, 1, "addr_rd");
+    LLVMValueRef val_rs1 = LLVMBuildZExt(
+        *builder,
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs1, "val_rs1"),
+        LLVMInt64Type(), "zextrs1to64");
+    LLVMValueRef val_rs2 = LLVMBuildZExt(
+        *builder,
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs2, "val_rs2"),
+        LLVMInt64Type(), "zextrs2to64");
+    LLVMValueRef tmp =
+        LLVMBuildLShr(*builder, LLVMBuildMul(*builder, val_rs1, val_rs2, "mul"),
+                      LLVMConstInt(LLVMInt64Type(), 32, false), "sll");
+    LLVMValueRef res =
+        LLVMBuildTrunc(*builder, tmp, LLVMInt32Type(), "sextresto32");
+    LLVMBuildStore(*builder, res, addr_rd);
+}
+
+void divaaa(LLVMBuilderRef *builder,
+            LLVMTypeRef *param_types UNUSED,
+            LLVMValueRef start,
+            LLVMBasicBlockRef *entry,
+            uint64_t mem_base,
+            rv_insn_t *ir)
+{
+    LLVMValueRef rs1_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs1, true)};
+    LLVMValueRef addr_rs1 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs1_offset, 1, "addr_rs1");
+    LLVMValueRef rs2_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs2, true)};
+    LLVMValueRef addr_rs2 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs2_offset, 1, "addr_rs2");
+    LLVMValueRef rd_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rd, true)};
+    LLVMValueRef addr_rd =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rd_offset, 1, "addr_rd");
+    LLVMValueRef val_rs1 =
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs1, "val_rs1");
+    LLVMValueRef val_rs2 =
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs2, "val_rs2");
+    LLVMValueRef res = LLVMBuildSDiv(*builder, val_rs1, val_rs2, "sdiv");
+    LLVMBuildStore(*builder, res, addr_rd);
+}
+
+void divu(LLVMBuilderRef *builder,
+          LLVMTypeRef *param_types UNUSED,
+          LLVMValueRef start,
+          LLVMBasicBlockRef *entry,
+          uint64_t mem_base,
+          rv_insn_t *ir)
+{
+    LLVMValueRef rs1_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs1, true)};
+    LLVMValueRef addr_rs1 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs1_offset, 1, "addr_rs1");
+    LLVMValueRef rs2_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs2, true)};
+    LLVMValueRef addr_rs2 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs2_offset, 1, "addr_rs2");
+    LLVMValueRef rd_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rd, true)};
+    LLVMValueRef addr_rd =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rd_offset, 1, "addr_rd");
+    LLVMValueRef val_rs1 =
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs1, "val_rs1");
+    LLVMValueRef val_rs2 =
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs2, "val_rs2");
+    LLVMValueRef res = LLVMBuildUDiv(*builder, val_rs1, val_rs2, "udiv");
+    LLVMBuildStore(*builder, res, addr_rd);
+}
+
+void rem(LLVMBuilderRef *builder,
+         LLVMTypeRef *param_types UNUSED,
+         LLVMValueRef start,
+         LLVMBasicBlockRef *entry,
+         uint64_t mem_base,
+         rv_insn_t *ir)
+{
+    LLVMValueRef rs1_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs1, true)};
+    LLVMValueRef addr_rs1 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs1_offset, 1, "addr_rs1");
+    LLVMValueRef rs2_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs2, true)};
+    LLVMValueRef addr_rs2 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs2_offset, 1, "addr_rs2");
+    LLVMValueRef rd_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rd, true)};
+    LLVMValueRef addr_rd =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rd_offset, 1, "addr_rd");
+    LLVMValueRef val_rs1 =
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs1, "val_rs1");
+    LLVMValueRef val_rs2 =
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs2, "val_rs2");
+    LLVMValueRef res = LLVMBuildSRem(*builder, val_rs1, val_rs2, "srem");
+    LLVMBuildStore(*builder, res, addr_rd);
+}
+
+void remu(LLVMBuilderRef *builder,
+          LLVMTypeRef *param_types UNUSED,
+          LLVMValueRef start,
+          LLVMBasicBlockRef *entry,
+          uint64_t mem_base,
+          rv_insn_t *ir)
+{
+    LLVMValueRef rs1_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs1, true)};
+    LLVMValueRef addr_rs1 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs1_offset, 1, "addr_rs1");
+    LLVMValueRef rs2_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rs2, true)};
+    LLVMValueRef addr_rs2 =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rs2_offset, 1, "addr_rs2");
+    LLVMValueRef rd_offset[1] = {LLVMConstInt(
+        LLVMInt32Type(), offsetof(riscv_t, X) / sizeof(int) + ir->rd, true)};
+    LLVMValueRef addr_rd =
+        LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
+                              rd_offset, 1, "addr_rd");
+    LLVMValueRef val_rs1 =
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs1, "val_rs1");
+    LLVMValueRef val_rs2 =
+        LLVMBuildLoad2(*builder, LLVMInt32Type(), addr_rs2, "val_rs2");
+    LLVMValueRef res = LLVMBuildURem(*builder, val_rs1, val_rs2, "urem");
+    LLVMBuildStore(*builder, res, addr_rd);
+}
+
 static const char *name_table[] = {
 #define _(inst, can_branch, insn_len, translatable, reg_mask) \
     [rv_insn_##inst] = #inst,
     RV_INSN_LIST
 #undef _
 };
+
+static void trace_ebb(LLVMBuilderRef *builder,
+                      LLVMTypeRef *param_types UNUSED,
+                      LLVMValueRef start,
+                      LLVMBasicBlockRef *entry,
+                      uint64_t mem_base,
+                      rv_insn_t *ir,
+                      set_t *set,
+                      struct LLVM_block_map *map)
+{
+    if (set_has(set, ir->pc))
+        return;
+    set_add(set, ir->pc);
+    struct LLVM_block_map_entry map_entry;
+    map_entry.block = *entry;
+    map_entry.pc = ir->pc;
+    map->map[map->count++] = map_entry;
+    LLVMBuilderRef tk, utk;
+    while (1) {
+        // printf("%s\n", name_table[ir->opcode]);
+        switch (ir->opcode) {
+        case rv_insn_nop:
+            nop(builder, param_types, start, ir);
+            break;
+        case rv_insn_lui:
+            lui(builder, param_types, start, ir);
+            break;
+        case rv_insn_auipc:
+            auipc(builder, param_types, start, ir);
+            break;
+        case rv_insn_jal:
+            jal(builder, param_types, start, &tk, &utk, ir);
+            break;
+        case rv_insn_jalr:
+            jalr(builder, param_types, start, ir);
+            break;
+        case rv_insn_beq:
+            beq(builder, param_types, start, &tk, &utk, ir);
+            break;
+        case rv_insn_bne:
+            bne(builder, param_types, start, &tk, &utk, ir);
+            break;
+        case rv_insn_blt:
+            blt(builder, param_types, start, &tk, &utk, ir);
+            break;
+        case rv_insn_bge:
+            bge(builder, param_types, start, &tk, &utk, ir);
+            break;
+        case rv_insn_bltu:
+            bltu(builder, param_types, start, &tk, &utk, ir);
+            break;
+        case rv_insn_bgeu:
+            bgeu(builder, param_types, start, &tk, &utk, ir);
+            break;
+        case rv_insn_lb:
+            lb(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_lh:
+            lh(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_lw:
+            lw(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_lbu:
+            lbu(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_lhu:
+            lhu(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_sb:
+            sb(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_sh:
+            sh(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_sw:
+            sw(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_addi:
+            addi(builder, param_types, start, ir);
+            break;
+        case rv_insn_slti:
+            slti(builder, param_types, start, entry, ir);
+            break;
+        case rv_insn_sltiu:
+            sltiu(builder, param_types, start, entry, ir);
+            break;
+        case rv_insn_xori:
+            xori(builder, param_types, start, ir);
+            break;
+        case rv_insn_ori:
+            ori(builder, param_types, start, ir);
+            break;
+        case rv_insn_andi:
+            andi(builder, param_types, start, ir);
+            break;
+        case rv_insn_slli:
+            slli(builder, param_types, start, ir);
+            break;
+        case rv_insn_srli:
+            srli(builder, param_types, start, ir);
+            break;
+        case rv_insn_srai:
+            srai(builder, param_types, start, ir);
+            break;
+        case rv_insn_add:
+            add(builder, param_types, start, ir);
+            break;
+        case rv_insn_sub:
+            sub(builder, param_types, start, ir);
+            break;
+        case rv_insn_sll:
+            sll(builder, param_types, start, ir);
+            break;
+        case rv_insn_slt:
+            slt(builder, param_types, start, entry, ir);
+            break;
+        case rv_insn_sltu:
+            sltu(builder, param_types, start, entry, ir);
+            break;
+        case rv_insn_xor:
+            xor(builder, param_types, start, ir);
+            break;
+        case rv_insn_srl:
+            srl(builder, param_types, start, ir);
+            break;
+        case rv_insn_sra:
+            sra(builder, param_types, start, ir);
+            break;
+        case rv_insn_or:
+            or (builder, param_types, start, ir);
+            break;
+        case rv_insn_and:
+            and(builder, param_types, start, ir);
+            break;
+        case rv_insn_ecall:
+            ecall(builder, param_types, start, ir);
+            break;
+        case rv_insn_ebreak:
+            ebreak(builder, param_types, start, ir);
+            break;
+        case rv_insn_mul:
+            mul(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_mulh:
+            mulh(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_mulhsu:
+            mulhsu(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_mulhu:
+            mulhu(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_div:
+            divaaa(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_divu:
+            divu(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_rem:
+            rem(builder, param_types, start, entry, mem_base, ir);
+            break;
+        case rv_insn_remu:
+            remu(builder, param_types, start, entry, mem_base, ir);
+            break;
+        default:
+            assert(NULL);
+        }
+        if (!ir->next)
+            break;
+        ir = ir->next;
+    }
+    if (ir->branch_untaken) {
+        // printf("trace untaken\n");
+        if (set_has(set, ir->branch_untaken->pc)) {
+            for (uint32_t i = 0; i < map->count; i++) {
+                if (map->map[i].pc == ir->branch_untaken->pc) {
+                    LLVMBuildBr(utk, map->map[i].block);
+                    break;
+                }
+            }
+        } else {
+            LLVMBasicBlockRef untaken_entry =
+                LLVMAppendBasicBlock(start, "untaken_entry");
+            LLVMBuilderRef untaken_builder = LLVMCreateBuilder();
+            LLVMPositionBuilderAtEnd(untaken_builder, untaken_entry);
+            LLVMBuildBr(utk, untaken_entry);
+            trace_ebb(&untaken_builder, param_types, start, &untaken_entry,
+                      mem_base, ir->branch_untaken, set, map);
+        }
+
+    } else {
+        // printf("delete untaken\n");
+    }
+    if (ir->branch_taken) {
+        // printf("trace taken\n");
+        if (set_has(set, ir->branch_taken->pc)) {
+            // printf("ir->pc = %#x\n", ir->branch_taken->pc);
+            // printf("trace taken A\n");
+            for (uint32_t i = 0; i < map->count; i++) {
+                if (map->map[i].pc == ir->branch_taken->pc) {
+                    LLVMBuildBr(tk, map->map[i].block);
+                    break;
+                }
+            }
+        } else {
+            // printf("trace taken B\n");
+            LLVMBasicBlockRef taken_entry =
+                LLVMAppendBasicBlock(start, "taken_entry");
+            LLVMBuilderRef taken_builder = LLVMCreateBuilder();
+            LLVMPositionBuilderAtEnd(taken_builder, taken_entry);
+            LLVMBuildBr(tk, taken_entry);
+            trace_ebb(&taken_builder, param_types, start, &taken_entry,
+                      mem_base, ir->branch_taken, set, map);
+        }
+
+    } else {
+        // printf("delete taken\n");
+    }
+}
 
 funcPtr_t t2(rv_insn_t *ir, uint64_t mem_base)
 {
@@ -1260,139 +1828,18 @@ funcPtr_t t2(rv_insn_t *ir, uint64_t mem_base)
     LLVMTypeRef param_types[] = {LLVMPointerType(struct_rv, 0)};
     LLVMValueRef start = LLVMAddFunction(
         module, "start", LLVMFunctionType(LLVMVoidType(), param_types, 1, 0));
+    LLVMBasicBlockRef first_block = LLVMAppendBasicBlock(start, "first_block");
+    LLVMBuilderRef first_builder = LLVMCreateBuilder();
+    LLVMPositionBuilderAtEnd(first_builder, first_block);
     LLVMBasicBlockRef entry = LLVMAppendBasicBlock(start, "entry");
     LLVMBuilderRef builder = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder, entry);
-    while (1) {
-        // printf("%s\n", name_table[ir->opcode]);
-        switch (ir->opcode) {
-        case rv_insn_nop:
-            nop(&builder, param_types, start, ir);
-            break;
-        case rv_insn_lui:
-            lui(&builder, param_types, start, ir);
-            break;
-        case rv_insn_auipc:
-            auipc(&builder, param_types, start, ir);
-            break;
-        case rv_insn_jal:
-            jal(&builder, param_types, start, ir);
-            break;
-        case rv_insn_jalr:
-            jalr(&builder, param_types, start, ir);
-            break;
-        case rv_insn_beq:
-            beq(&builder, param_types, start, ir);
-            break;
-        case rv_insn_bne:
-            bne(&builder, param_types, start, ir);
-            break;
-        case rv_insn_blt:
-            blt(&builder, param_types, start, ir);
-            break;
-        case rv_insn_bge:
-            bge(&builder, param_types, start, ir);
-            break;
-        case rv_insn_bltu:
-            bltu(&builder, param_types, start, ir);
-            break;
-        case rv_insn_bgeu:
-            bgeu(&builder, param_types, start, ir);
-            break;
-        case rv_insn_lb:
-            lb(&builder, param_types, start, &entry, mem_base, ir);
-            break;
-        case rv_insn_lh:
-            lh(&builder, param_types, start, &entry, mem_base, ir);
-            break;
-        case rv_insn_lw:
-            lw(&builder, param_types, start, &entry, mem_base, ir);
-            break;
-        case rv_insn_lbu:
-            lbu(&builder, param_types, start, &entry, mem_base, ir);
-            break;
-        case rv_insn_lhu:
-            lhu(&builder, param_types, start, &entry, mem_base, ir);
-            break;
-        case rv_insn_sb:
-            sb(&builder, param_types, start, &entry, mem_base, ir);
-            break;
-        case rv_insn_sh:
-            sh(&builder, param_types, start, &entry, mem_base, ir);
-            break;
-        case rv_insn_sw:
-            sw(&builder, param_types, start, &entry, mem_base, ir);
-            break;
-        case rv_insn_addi:
-            addi(&builder, param_types, start, ir);
-            break;
-        case rv_insn_slti:
-            slti(&builder, param_types, start, &entry, ir);
-            break;
-        case rv_insn_sltiu:
-            sltiu(&builder, param_types, start, &entry, ir);
-            break;
-        case rv_insn_xori:
-            xori(&builder, param_types, start, ir);
-            break;
-        case rv_insn_ori:
-            ori(&builder, param_types, start, ir);
-            break;
-        case rv_insn_andi:
-            andi(&builder, param_types, start, ir);
-            break;
-        case rv_insn_slli:
-            slli(&builder, param_types, start, ir);
-            break;
-        case rv_insn_srli:
-            srli(&builder, param_types, start, ir);
-            break;
-        case rv_insn_srai:
-            srai(&builder, param_types, start, ir);
-            break;
-        case rv_insn_add:
-            add(&builder, param_types, start, ir);
-            break;
-        case rv_insn_sub:
-            sub(&builder, param_types, start, ir);
-            break;
-        case rv_insn_sll:
-            sll(&builder, param_types, start, ir);
-            break;
-        case rv_insn_slt:
-            slt(&builder, param_types, start, &entry, ir);
-            break;
-        case rv_insn_sltu:
-            sltu(&builder, param_types, start, &entry, ir);
-            break;
-        case rv_insn_xor:
-            xor(&builder, param_types, start, ir);
-            break;
-        case rv_insn_srl:
-            srl(&builder, param_types, start, ir);
-            break;
-        case rv_insn_sra:
-            sra(&builder, param_types, start, ir);
-            break;
-        case rv_insn_or:
-            or (&builder, param_types, start, ir);
-            break;
-        case rv_insn_and:
-            and(&builder, param_types, start, ir);
-            break;
-        case rv_insn_ecall:
-            ecall(&builder, param_types, start, ir);
-            break;
-        case rv_insn_ebreak:
-            ebreak(&builder, param_types, start, ir);
-            break;
-        default:
-            assert(NULL);
-        }
-        if (!ir->next)
-            break;
-        ir = ir->next;
-    }
+    LLVMBuildBr(first_builder, entry);
+    set_t set;
+    set_reset(&set);
+    struct LLVM_block_map map;
+    map.count = 0;
+    trace_ebb(&builder, param_types, start, &entry, mem_base, ir, &set, &map);
 
     if (LLVMPrintModuleToFile(module, "start.ll", NULL)) {
         fprintf(stderr, "error writing bitcode to file, skipping\n");
@@ -1415,18 +1862,16 @@ funcPtr_t t2(rv_insn_t *ir, uint64_t mem_base)
         abort();
     }
 
-    if (error) {
-        fprintf(stderr, "error: %s\n", error);
-        LLVMDisposeMessage(error);
-        exit(EXIT_FAILURE);
-    }
+    // if (error) {
+    //     fprintf(stderr, "error: %s\n", error);
+    //     LLVMDisposeMessage(error);
+    //     exit(EXIT_FAILURE);
+    // }
 
     funcPtr_t funcPtr = (funcPtr_t) LLVMGetPointerToGlobal(engine, start);
 
-    if (LLVMPrintModuleToFile(module, "start.ll", NULL)) {
-        fprintf(stderr, "error writing bitcode to file, skipping\n");
-    }
-    // LLVMDisposeBuilder(builder);
-    // LLVMDisposeExecutionEngine(engine);
+    // if (LLVMPrintModuleToFile(module, "start.ll", NULL)) {
+    //     fprintf(stderr, "error writing bitcode to file, skipping\n");
+    // }
     return funcPtr;
 }
