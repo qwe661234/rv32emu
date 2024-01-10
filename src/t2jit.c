@@ -1841,14 +1841,14 @@ funcPtr_t t2(rv_insn_t *ir, uint64_t mem_base)
     map.count = 0;
     trace_ebb(&builder, param_types, start, &entry, mem_base, ir, &set, &map);
 
-    if (LLVMPrintModuleToFile(module, "start.ll", NULL)) {
-        fprintf(stderr, "error writing bitcode to file, skipping\n");
-    }
+    // if (LLVMPrintModuleToFile(module, "start.ll", NULL)) {
+    //     fprintf(stderr, "error writing bitcode to file, skipping\n");
+    // }
 
     /* DEBUG */
     char *error = NULL;
-    LLVMVerifyModule(module, LLVMAbortProcessAction, &error);
-    LLVMDisposeMessage(error);
+    // LLVMVerifyModule(module, LLVMAbortProcessAction, &error);
+    // LLVMDisposeMessage(error);
     /* DEBUG */
 
     LLVMExecutionEngineRef engine;
@@ -1857,7 +1857,7 @@ funcPtr_t t2(rv_insn_t *ir, uint64_t mem_base)
     LLVMInitializeNativeTarget();
     LLVMInitializeNativeAsmPrinter();
     LLVMInitializeNativeAsmParser();
-    if (LLVMCreateExecutionEngineForModule(&engine, module, &error) != 0) {
+    if (LLVMCreateJITCompilerForModule(&engine, module, 2, &error) != 0) {
         fprintf(stderr, "failed to create execution engine\n");
         abort();
     }
