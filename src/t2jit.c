@@ -4,6 +4,8 @@
 #include <llvm-c/Core.h>
 #include <llvm-c/ExecutionEngine.h>
 #include <llvm-c/Target.h>
+#include <llvm-c/Transforms/PassBuilder.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -2821,8 +2823,25 @@ funcPtr_t t2(rv_insn_t *ir, uint64_t mem_base)
     LLVMLinkInMCJIT();
     LLVMInitializeNativeTarget();
     LLVMInitializeNativeAsmPrinter();
-    LLVMInitializeNativeAsmParser();
-    if (LLVMCreateJITCompilerForModule(&engine, module, 2, &error) != 0) {
+    // Create the JIT instance.
+    LLVMTargetRef target;
+    char *triple = LLVMGetDefaultTargetTriple();
+    char *em = "";
+    if (LLVMGetTargetFromTriple(triple, &target, &em) != 0) {
+        fprintf(stderr, "failed to create Target\n");
+    }
+    // LLVMTargetMachineRef tm = LLVMCreateTargetMachine(
+    //     target, triple, LLVMGetHostCPUName(), LLVMGetHostCPUFeatures(),
+    //     LLVMCodeGenLevelNone, LLVMRelocDefault, LLVMCodeModelJITDefault);
+    // LLVMPassBuilderOptionsRef pb_option = LLVMCreatePassBuilderOptions();
+    // LLVMRunPasses(module,
+    //               "dce,early-cse<memssa>,instcombine,correlated-propagation,"
+    //               "loop-simplifycfg,memcpyopt",
+    //               tm, pb_option);
+    if (LLVMPrintModuleToFile(module, "sum.ll", NULL)) {
+        fprintf(stderr, "error writing bitcode to file, skipping\n");
+    }
+    if (LLVMCreateExecutionEngineForModule(&engine, module, &error) != 0) {
         fprintf(stderr, "failed to create execution engine\n");
         abort();
     }
