@@ -28,6 +28,7 @@ extern struct target_ops gdbstub_ops;
 #if RV32_HAS(JIT)
 #include "cache.h"
 #include "jit.h"
+#include "t2jit.h"
 #endif
 
 /* Shortcuts for comparing each field of specified RISC-V instruction */
@@ -304,8 +305,10 @@ static block_t *block_alloc(riscv_t *rv)
 #if RV32_HAS(JIT)
     block->translatable = true;
     block->hot = false;
+    block->hot2 = false;
     block->backward = false;
     block->has_loops = false;
+    block->n_invoke = 0;
     INIT_LIST_HEAD(&block->list);
 #endif
     return block;
@@ -1133,9 +1136,24 @@ void rv_step(riscv_t *rv, int32_t cycles)
         }
         last_pc = rv->PC;
 #if RV32_HAS(JIT)
+        /* execute by tier-2 JIT compiler */
+        if (block->hot2) {
+            block->func(rv);
+            prev = NULL;
+            continue;
+        } /* check if invoking times of t1 generated code exceed threshold */
+        else if (block->n_invoke >= 4096) {
+            block->hot2 = true;
+            block->func = t2(block->ir_head,
+                             (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base);
+            block->func(rv);
+            prev = NULL;
+            continue;
+        }
         /* execute by tier-1 JIT compiler */
         struct jit_state *state = rv->jit_state;
         if (block->hot) {
+            block->n_invoke++;
             ((exec_block_func_t) state->buf)(
                 rv, (uintptr_t) (state->buf + block->offset));
             prev = NULL;
@@ -1143,6 +1161,7 @@ void rv_step(riscv_t *rv, int32_t cycles)
         } /* check if using frequency of block exceed threshold */
         else if (block->translatable && runtime_profiler(rv, block)) {
             block->hot = true;
+            block->n_invoke++;
             block->offset = jit_translate(rv, block);
             ((exec_block_func_t) state->buf)(
                 rv, (uintptr_t) (state->buf + block->offset));

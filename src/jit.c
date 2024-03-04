@@ -1346,7 +1346,7 @@ void parse_branch_history_table(struct jit_state *state, rv_insn_t *ir)
         if (bt->times[max_idx] < bt->times[i])
             max_idx = i;
     }
-    if (bt->PC[max_idx]) {
+    if (bt->PC[max_idx] && bt->times[max_idx] >= 512) {
         emit_load_imm(state, register_map[0], bt->PC[max_idx]);
         emit_cmp32(state, temp_reg, register_map[0]);
         uint32_t jump_loc = state->offset;
@@ -1561,7 +1561,8 @@ static void translate_chained_block(struct jit_state *state,
             if (bt->times[max_idx] < bt->times[i])
                 max_idx = i;
         }
-        if (bt->PC[max_idx] && !set_has(set, bt->PC[max_idx])) {
+        if (bt->PC[max_idx] && bt->times[max_idx] >= 512 &&
+            !set_has(set, bt->PC[max_idx])) {
             block_t *block1 =
                 cache_get(rv->block_cache, bt->PC[max_idx], false);
             if (block1 && block1->translatable)
