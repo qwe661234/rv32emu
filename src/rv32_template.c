@@ -226,8 +226,8 @@ RVOP(
         for (int i = 0; i < HISTORY_SIZE; i++) {                              \
             if (ir->branch_table->PC[i] == PC) {                              \
                 ir->branch_table->times[i]++;                                 \
-                MUST_TAIL return block->ir_head->impl(rv, block->ir_head,     \
-                                                      cycle, PC);             \
+                if (cache_hot(rv->block_cache, PC))                           \
+                    goto end_insn;                                            \
             }                                                                 \
         }                                                                     \
         /* update branch history table */                                     \
@@ -243,6 +243,8 @@ RVOP(
         }                                                                     \
         ir->branch_table->times[min_idx] = 1;                                 \
         ir->branch_table->PC[min_idx] = PC;                                   \
+        if (cache_hot(rv->block_cache, PC))                                   \
+            goto end_insn;                                                    \
         MUST_TAIL return block->ir_head->impl(rv, block->ir_head, cycle, PC); \
     }
 #endif
@@ -267,6 +269,7 @@ RVOP(
         RV_EXC_MISALIGN_HANDLER(pc, insn, false, 0);
 #endif
         LOOKUP_OR_UPDATE_BRANCH_HISTORY_TABLE();
+    end_insn:
         rv->csr_cycle = cycle;
         rv->PC = PC;
         return true;
@@ -2286,6 +2289,7 @@ RVOP(
     {
         PC = rv->X[ir->rs1];
         LOOKUP_OR_UPDATE_BRANCH_HISTORY_TABLE();
+    end_insn:
         rv->csr_cycle = cycle;
         rv->PC = PC;
         return true;
@@ -2338,6 +2342,7 @@ RVOP(
         rv->X[rv_reg_ra] = PC + 2;
         PC = jump_to;
         LOOKUP_OR_UPDATE_BRANCH_HISTORY_TABLE();
+    end_insn:
         rv->csr_cycle = cycle;
         rv->PC = PC;
         return true;
