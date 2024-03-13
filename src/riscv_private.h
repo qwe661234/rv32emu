@@ -58,6 +58,10 @@ enum {
     CSR_MHARTID = 0xF14,   /* Hardware thread ID */
 };
 
+#if RV32_HAS(JIT)
+typedef intptr_t (*funcPtr_t)(riscv_t *);
+#endif
+
 /* translated basic block */
 typedef struct block {
     uint32_t n_insn;           /**< number of instructions encompased */
@@ -68,10 +72,13 @@ typedef struct block {
     bool backward; /**< Determine the block has backward jump or not */
     bool hot;      /**< Determine the block is hotspot or not */
     uint32_t offset;
+    bool hot2;
+    uint32_t n_invoke;
     bool
         translatable; /**< Determine the block has RV32AF insturctions or not */
     bool has_loops;   /**< Determine the block has loop or not */
     struct list_head list;
+    funcPtr_t func;
 #endif
 } block_t;
 
