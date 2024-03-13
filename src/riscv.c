@@ -498,7 +498,7 @@ static void profile(block_t *block, uint32_t freq, FILE *output_file)
     fprintf(output_file, "%#-9x|", block->pc_start);
     fprintf(output_file, "%#-8x|", block->pc_end);
     fprintf(output_file, " %-10u|", freq);
-    fprintf(output_file, " %-5s |", block->hot ? "true" : "false");
+    fprintf(output_file, " %-5d |", block->tiered);
     fprintf(output_file, " %-8s |", block->backward ? "true" : "false");
     fprintf(output_file, " %-6s |", block->has_loops ? "true" : "false");
     rv_insn_t *taken = block->ir_tail->branch_taken,

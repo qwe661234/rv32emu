@@ -3010,6 +3010,7 @@ static void trace_ebb(LLVMBuilderRef *builder,
     if (!insn_is_unconditional_branch(ir->opcode)) {
         if (ir->branch_untaken) {
             block_t *block = cache_get(rv->block_cache, ir->branch_untaken->pc, false);
+            block->tiered = 2;
             if (set_has(set, ir->branch_untaken->pc)) {
                 for (uint32_t i = 0; i < map->count; i++) {
                     if (map->map[i].pc == ir->branch_untaken->pc) {
@@ -3028,7 +3029,8 @@ static void trace_ebb(LLVMBuilderRef *builder,
             }
         }
         if (ir->branch_taken) {
-            block_t *block = cache_get(rv->block_cache, ir->branch_untaken->pc, false);
+            block_t *block = cache_get(rv->block_cache, ir->branch_taken->pc, false);
+            block->tiered = 2;
             if (set_has(set, ir->branch_taken->pc)) {
                 for (uint32_t i = 0; i < map->count; i++) {
                     if (map->map[i].pc == ir->branch_taken->pc) {
@@ -3079,6 +3081,7 @@ funcPtr_t t2(riscv_t *rv, uint64_t mem_base)
     struct LLVM_block_map map;
     map.count = 0;
     block_t *block = cache_get(rv->block_cache, rv->PC, false);
+    block->tiered = 2;
     trace_ebb(&builder, param_types, start, &entry, mem_base, block->ir_head,
               rv, &set, &map);
 

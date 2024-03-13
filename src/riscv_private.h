@@ -79,6 +79,7 @@ typedef struct block {
     bool has_loops;   /**< Determine the block has loop or not */
     struct list_head list;
     funcPtr_t func;
+    uint32_t tiered;
 #endif
 } block_t;
 

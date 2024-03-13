@@ -1539,7 +1539,7 @@ static void translate_chained_block(struct jit_state *state,
 {
     if (set_has(&state->set, block->pc_start))
         return;
-
+    block->tiered = 1;
     set_add(&state->set, block->pc_start);
     offset_map_insert(state, block->pc_start);
     translate(state, rv, block);

@@ -309,6 +309,7 @@ static block_t *block_alloc(riscv_t *rv)
     block->backward = false;
     block->has_loops = false;
     block->n_invoke = 0;
+    block->tiered = 0;
     INIT_LIST_HEAD(&block->list);
 #endif
     return block;
