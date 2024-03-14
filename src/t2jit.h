@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "decode.h"
+#include "riscv_private.h"
 
 typedef intptr_t (*funcPtr_t)(riscv_t *);
 
-funcPtr_t t2(riscv_t *rv, uint64_t mem_base);
+void t2(riscv_t *rv, block_t *block, uint64_t mem_base);

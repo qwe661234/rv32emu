@@ -13,7 +13,7 @@
 
 #include "decode.h"
 #include "riscv.h"
-#include "riscv_private.h"
+#include "t2jit.h"
 #include "utils.h"
 
 struct LLVM_block_map_entry {
@@ -3009,7 +3009,8 @@ static void trace_ebb(LLVMBuilderRef *builder,
     }
     if (!insn_is_unconditional_branch(ir->opcode)) {
         if (ir->branch_untaken) {
-            block_t *block = cache_get(rv->block_cache, ir->branch_untaken->pc, false);
+            block_t *block =
+                cache_get(rv->block_cache, ir->branch_untaken->pc, false);
             block->tiered = 2;
             if (set_has(set, ir->branch_untaken->pc)) {
                 for (uint32_t i = 0; i < map->count; i++) {
@@ -3029,7 +3030,8 @@ static void trace_ebb(LLVMBuilderRef *builder,
             }
         }
         if (ir->branch_taken) {
-            block_t *block = cache_get(rv->block_cache, ir->branch_taken->pc, false);
+            block_t *block =
+                cache_get(rv->block_cache, ir->branch_taken->pc, false);
             block->tiered = 2;
             if (set_has(set, ir->branch_taken->pc)) {
                 for (uint32_t i = 0; i < map->count; i++) {
@@ -3051,7 +3053,7 @@ static void trace_ebb(LLVMBuilderRef *builder,
     }
 }
 
-funcPtr_t t2(riscv_t *rv, uint64_t mem_base)
+void t2(riscv_t *rv, block_t *block, uint64_t mem_base)
 {
     LLVMModuleRef module = LLVMModuleCreateWithName("my_module");
     LLVMTypeRef io_members[] = {
@@ -3080,7 +3082,6 @@ funcPtr_t t2(riscv_t *rv, uint64_t mem_base)
     set_reset(&set);
     struct LLVM_block_map map;
     map.count = 0;
-    block_t *block = cache_get(rv->block_cache, rv->PC, false);
     block->tiered = 2;
     trace_ebb(&builder, param_types, start, &entry, mem_base, block->ir_head,
               rv, &set, &map);
@@ -3114,6 +3115,6 @@ funcPtr_t t2(riscv_t *rv, uint64_t mem_base)
     //     LLVMDisposeMessage(error);
     //     exit(EXIT_FAILURE);
     // }
-    funcPtr_t funcPtr = (funcPtr_t) LLVMGetPointerToGlobal(engine, start);
-    return funcPtr;
+    block->func = (funcPtr_t) LLVMGetPointerToGlobal(engine, start);
+    block->hot2 = true;
 }

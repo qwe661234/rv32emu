@@ -26,6 +26,7 @@ extern struct target_ops gdbstub_ops;
 #include "utils.h"
 
 #if RV32_HAS(JIT)
+#include <pthread.h>
 #include "cache.h"
 #include "jit.h"
 #include "t2jit.h"
@@ -306,6 +307,7 @@ static block_t *block_alloc(riscv_t *rv)
     block->translatable = true;
     block->hot = false;
     block->hot2 = false;
+    block->compiled = false;
     block->backward = false;
     block->has_loops = false;
     block->n_invoke = 0;
@@ -1078,6 +1080,21 @@ static bool runtime_profiler(riscv_t *rv, block_t *block)
 typedef void (*exec_block_func_t)(riscv_t *rv, uintptr_t);
 #endif
 
+typedef struct {
+    riscv_t *rv;
+    block_t *block;
+    uint64_t mem_base;
+} thread_arg_t;
+pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+void *test(void *para)
+{
+    thread_arg_t *arg = (thread_arg_t *) para;
+    pthread_mutex_lock(&mutex1);
+    t2(arg->rv, arg->block, arg->mem_base);
+    pthread_mutex_unlock(&mutex1);
+    return NULL;
+}
+
 void rv_step(riscv_t *rv, int32_t cycles)
 {
     assert(rv);
@@ -1150,13 +1167,20 @@ void rv_step(riscv_t *rv, int32_t cycles)
             prev = NULL;
             continue;
         } /* check if invoking times of t1 generated code exceed threshold */
-        else if (block->n_invoke >= 4096) {
-            block->hot2 = true;
-            block->func = t2(rv,
-                             (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base);
-            block->func(rv);
-            prev = NULL;
-            continue;
+        else if (!block->compiled && block->n_invoke >= 4096) {
+            block->compiled = true;
+            thread_arg_t arg = {
+                .rv = rv,
+                .block = block,
+                .mem_base = (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base,
+            };
+            pthread_t t;
+            pthread_create(&t, NULL, test, &arg);
+            // printf("%d\n", block->hot2);
+            // pthread_join(t, NULL);
+            // block->func(rv);
+            // prev = NULL;
+            // continue;
         }
         /* execute by tier-1 JIT compiler */
         struct jit_state *state = rv->jit_state;

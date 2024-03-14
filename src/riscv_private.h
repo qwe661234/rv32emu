@@ -73,6 +73,7 @@ typedef struct block {
     bool hot;      /**< Determine the block is hotspot or not */
     uint32_t offset;
     bool hot2;
+    bool compiled;
     uint32_t n_invoke;
     bool
         translatable; /**< Determine the block has RV32AF insturctions or not */
