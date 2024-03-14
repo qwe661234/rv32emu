@@ -1,0 +1,18 @@
+./build/rv32emu -p ../rv8-bench/NUMERICSORT
+./build/rv32emu -p ../rv8-bench/qsort.elf
+./build/rv32emu -p ../rv8-bench/miniz.elf
+./build/rv32emu -p ../rv8-bench/primes.elf
+./build/rv32emu -p ../rv8-bench/sha.elf
+./build/rv32emu -p ../rv8-bench/FPEMULATION
+./build/rv32emu -p ../rv8-bench/BITFIELD
+./build/rv32emu -p ./build/stream.elf
+./build/rv32emu -p ../rv8-bench/STRINGSORT
+./decoder.py NUMERICSORT
+./decoder.py qsort.elf
+./decoder.py miniz.elf
+./decoder.py primes.elf
+./decoder.py sha.elf
+./decoder.py FPEMULATION
+./decoder.py BITFIELD
+./decoder.py stream.elf
+./decoder.py STRINGSORT
