@@ -1080,20 +1080,6 @@ static bool runtime_profiler(riscv_t *rv, block_t *block)
 typedef void (*exec_block_func_t)(riscv_t *rv, uintptr_t);
 #endif
 
-typedef struct {
-    riscv_t *rv;
-    block_t *block;
-    uint64_t mem_base;
-} thread_arg_t;
-pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
-void *test(void *para)
-{
-    thread_arg_t *arg = (thread_arg_t *) para;
-    pthread_mutex_lock(&mutex1);
-    t2(arg->rv, arg->block, arg->mem_base);
-    pthread_mutex_unlock(&mutex1);
-    return NULL;
-}
 
 void rv_step(riscv_t *rv, int32_t cycles)
 {
@@ -1101,7 +1087,6 @@ void rv_step(riscv_t *rv, int32_t cycles)
 
     /* find or translate a block for starting PC */
     const uint64_t cycles_target = rv->csr_cycle + cycles;
-
     /* loop until hitting the cycle target */
     while (rv->csr_cycle < cycles_target && !rv->halt) {
         if (prev && prev->pc_start != last_pc) {
@@ -1169,18 +1154,12 @@ void rv_step(riscv_t *rv, int32_t cycles)
         } /* check if invoking times of t1 generated code exceed threshold */
         else if (!block->compiled && block->n_invoke >= 4096) {
             block->compiled = true;
-            thread_arg_t arg = {
-                .rv = rv,
-                .block = block,
-                .mem_base = (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base,
-            };
-            pthread_t t;
-            pthread_create(&t, NULL, test, &arg);
-            // printf("%d\n", block->hot2);
-            // pthread_join(t, NULL);
-            // block->func(rv);
-            // prev = NULL;
-            // continue;
+            queue_entry_t *entry = malloc(sizeof(queue_entry_t));
+            pthread_mutex_lock(&rv->queue_lock);
+            entry->block = block;
+            list_add(&entry->list, &rv->queue);
+            // printf("%d\n", list_empty(&rv->queue));
+            pthread_mutex_unlock(&rv->queue_lock);
         }
         /* execute by tier-1 JIT compiler */
         struct jit_state *state = rv->jit_state;

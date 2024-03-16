@@ -4,6 +4,7 @@
  */
 
 #include <assert.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,11 +27,12 @@
 #if RV32_HAS(JIT)
 #include "cache.h"
 #include "jit.h"
+#include "t2jit.h"
 #define CODE_CACHE_SIZE (4 * 1024 * 1024)
 #endif
 
 #define BLOCK_IR_MAP_CAPACITY_BITS 10
-
+static pthread_t bg_th;
 #if !RV32_HAS(JIT)
 /* initialize the block map */
 static void block_map_init(block_map_t *map, const uint8_t bits)
@@ -180,6 +182,27 @@ IO_HANDLER_IMPL(byte, write_b, W)
 #undef R
 #undef W
 
+void *test(void *arg)
+{
+    riscv_t *rv = (riscv_t *) arg;
+    while (!rv->exit) {
+        pthread_mutex_lock(&rv->queue_lock);
+        if (!list_empty(&rv->queue)) {
+            // printf("%d\n", list_empty(&rv->queue));
+            queue_entry_t *entry =
+                list_last_entry(&rv->queue, queue_entry_t, list);
+            list_del_init(&entry->list);
+            pthread_mutex_unlock(&rv->queue_lock);
+            block_t *block = entry->block;
+            free(entry);
+            assert(block);
+            t2(rv, block, (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base);
+        } else
+            pthread_mutex_unlock(&rv->queue_lock);
+    }
+    return NULL;
+}
+
 riscv_t *rv_create(riscv_user_t rv_attr)
 {
     assert(rv_attr);
@@ -265,8 +288,11 @@ riscv_t *rv_create(riscv_user_t rv_attr)
     rv->jit_state = jit_state_init(CODE_CACHE_SIZE);
     rv->block_cache = cache_create(BLOCK_MAP_CAPACITY_BITS);
     assert(rv->block_cache);
+    rv->exit = false;
+    pthread_mutex_init(&rv->queue_lock, NULL);
+    INIT_LIST_HEAD(&rv->queue);
+    pthread_create(&bg_th, NULL, test, rv);
 #endif
-
     return rv;
 }
 
@@ -345,6 +371,7 @@ void rv_delete(riscv_t *rv)
     memory_delete(attr->mem);
     block_map_destroy(rv);
 #else
+    rv->exit = true;
     mpool_destroy(rv->chain_entry_mp);
     jit_state_exit(rv->jit_state);
     cache_free(rv->block_cache);

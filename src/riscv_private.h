@@ -14,6 +14,8 @@
 #include "riscv.h"
 #include "utils.h"
 #if RV32_HAS(JIT)
+#include <pthread.h>
+
 #include "cache.h"
 #endif
 
@@ -136,8 +138,11 @@ struct riscv_internal {
 #if !RV32_HAS(JIT)
     block_map_t block_map; /**< basic block map */
 #else
+    bool exit;
     struct cache *block_cache;
     struct mpool *chain_entry_mp;
+    struct list_head queue;
+    pthread_mutex_t queue_lock;
 #endif
     struct mpool *block_mp, *block_ir_mp;
 
@@ -157,6 +162,11 @@ struct riscv_internal {
     bool is_interrupted;
 #endif
 };
+
+typedef struct {
+    block_t *block;
+    struct list_head list;
+} queue_entry_t;
 
 /* sign extend a 16 bit value */
 FORCE_INLINE uint32_t sign_extend_h(const uint32_t x)

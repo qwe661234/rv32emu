@@ -1,0 +1,9 @@
+perf stat --repeat 5 ./build/rv32emu ../rv8-bench/NUMERICSORT
+perf stat --repeat 5 ./build/rv32emu ../rv8-bench/qsort.elf
+perf stat --repeat 5 ./build/rv32emu ../rv8-bench/miniz.elf
+perf stat --repeat 5 ./build/rv32emu ../rv8-bench/primes.elf
+perf stat --repeat 5 ./build/rv32emu ../rv8-bench/sha.elf
+perf stat --repeat 5 ./build/rv32emu ../rv8-bench/FPEMULATION
+perf stat --repeat 5 ./build/rv32emu ../rv8-bench/BITFIELD
+perf stat --repeat 5 ./build/rv32emu ./build/stream.elf
+perf stat --repeat 5 ./build/rv32emu ../rv8-bench/STRINGSORT
