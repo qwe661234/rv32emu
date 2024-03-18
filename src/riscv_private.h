@@ -14,6 +14,8 @@
 #include "riscv.h"
 #include "utils.h"
 #if RV32_HAS(JIT)
+#include <pthread.h>
+
 #include "cache.h"
 #endif
 
@@ -71,6 +73,7 @@ typedef struct block {
     bool
         translatable; /**< Determine the block has RV32AF insturctions or not */
     bool has_loops;   /**< Determine the block has loop or not */
+    bool compiled;
     uint32_t offset;
     uint32_t n_invoke;
     void *func;
@@ -83,6 +86,11 @@ typedef struct {
     block_t *block;
     struct list_head list;
 } chain_entry_t;
+
+typedef struct {
+    block_t *block;
+    struct list_head list;
+} queue_entry_t;
 #endif
 
 typedef struct {
@@ -130,8 +138,11 @@ struct riscv_internal {
 #if !RV32_HAS(JIT)
     block_map_t block_map; /**< basic block map */
 #else
+    bool exit;
     struct cache *block_cache;
     struct mpool *chain_entry_mp;
+    struct list_head queue;
+    pthread_mutex_t queue_lock;
 #endif
     struct mpool *block_mp, *block_ir_mp;
 

@@ -202,6 +202,6 @@ void t2(block_t *block, uint64_t mem_base)
         abort();
     }
 
-    block->hot2 = true;
     block->func = (funcPtr_t) LLVMGetPointerToGlobal(engine, start);
+    block->hot2 = true;
 }
