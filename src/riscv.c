@@ -187,6 +187,10 @@ IO_HANDLER_IMPL(byte, write_b, W)
 static pthread_t t2c_thread;
 void *t2c_routine(void *arg)
 {
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(3, &cpuset); /* set background thread to cpu3 */
+    pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
     riscv_t *rv = (riscv_t *) arg;
     while (!rv->exit) {
         if (!list_empty(&rv->queue)) {
@@ -284,6 +288,10 @@ riscv_t *rv_create(riscv_user_t rv_attr)
     /* initialize the block map */
     block_map_init(&rv->block_map, BLOCK_MAP_CAPACITY_BITS);
 #else
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(1, &cpuset); /* set background thread to cpu3 */
+    pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
     rv->chain_entry_mp =
         mpool_create(sizeof(chain_entry_t) << BLOCK_IR_MAP_CAPACITY_BITS,
                      sizeof(chain_entry_t));
