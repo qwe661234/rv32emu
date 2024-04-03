@@ -310,6 +310,7 @@ static block_t *block_alloc(riscv_t *rv)
     block->translatable = true;
     block->hot = false;
     block->hot2 = false;
+    block->compiled = false;
     block->backward = false;
     block->has_loops = false;
     block->n_invoke = 0;
@@ -1157,11 +1158,13 @@ void rv_step(void *arg)
             prev = NULL;
             continue;
         } /* check if invoking times of t1 generated code exceed threshold */
-        else if (block->n_invoke >= 4096) {
-            t2(block, (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base);
-            ((funcPtr_t) block->func)(rv);
-            prev = NULL;
-            continue;
+        else if (!block->compiled && block->n_invoke >= 4096) {
+            block->compiled = true;
+            queue_entry_t *entry = malloc(sizeof(queue_entry_t));
+            entry->block = block;
+            pthread_mutex_lock(&rv->queue_lock);
+            list_add(&entry->list, &rv->queue);
+            pthread_mutex_unlock(&rv->queue_lock);
         }
         /* execute by tier-1 JIT compiler */
         struct jit_state *state = rv->jit_state;
