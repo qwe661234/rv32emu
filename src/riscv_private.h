@@ -67,10 +67,13 @@ typedef struct block {
 #if RV32_HAS(JIT)
     bool backward; /**< Determine the block has backward jump or not */
     bool hot;      /**< Determine the block is hotspot or not */
-    uint32_t offset;
+    bool hot2;
     bool
         translatable; /**< Determine the block has RV32AF insturctions or not */
     bool has_loops;   /**< Determine the block has loop or not */
+    uint32_t offset;
+    uint32_t n_invoke;
+    void *func;
     struct list_head list;
 #endif
 } block_t;
