@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:32:42 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/idea.elf' (20 runs):
+
+          163,5511      L1-icache-misses                                                        ( +-  0.27% )
+            1,5726      iTLB-misses                                                             ( +-  9.59% )
+               829      page-faults                                                             ( +-  0.04% )
+
+           4.59627 +- 0.00694 seconds time elapsed  ( +-  0.15% )
+

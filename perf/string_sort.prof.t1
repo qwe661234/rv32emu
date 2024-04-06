@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:25:05 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/string_sort.elf' (20 runs):
+
+          274,4172      L1-icache-misses                                                        ( +-  1.10% )
+            2,3700      iTLB-misses                                                             ( +-  4.85% )
+               829      page-faults                                                             ( +-  0.04% )
+
+           11.7366 +- 0.0106 seconds time elapsed  ( +-  0.09% )
+

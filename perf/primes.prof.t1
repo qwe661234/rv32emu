@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:14:53 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/primes.elf' (20 runs):
+
+           54,3411      L1-icache-misses                                                        ( +-  0.81% )
+              3568      iTLB-misses                                                             ( +- 37.45% )
+              2833      page-faults                                                             ( +-  0.01% )
+
+           1.07572 +- 0.00241 seconds time elapsed  ( +-  0.22% )
+

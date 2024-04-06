@@ -1,0 +1,11 @@
+# started on Sat Apr  6 14:50:14 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/dhrystone.elf' (20 runs):
+
+           42,4676      L1-icache-misses                                                        ( +-  0.47% )
+              2830      iTLB-misses                                                             ( +-  0.47% )
+              3151      page-faults                                                             ( +-  0.01% )
+
+          0.256653 +- 0.000517 seconds time elapsed  ( +-  0.20% )
+

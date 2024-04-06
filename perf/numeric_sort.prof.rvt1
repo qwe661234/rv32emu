@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:48:43 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/numeric_sort.elf' (20 runs):
+
+           24,5935      L1-icache-misses                                                        ( +-  0.67% )
+               887      iTLB-misses                                                             ( +-  3.95% )
+               435      page-faults                                                             ( +-  0.06% )
+
+           0.80630 +- 0.00126 seconds time elapsed  ( +-  0.16% )
+

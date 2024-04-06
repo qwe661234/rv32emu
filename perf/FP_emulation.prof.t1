@@ -1,0 +1,11 @@
+# started on Fri Apr  5 20:39:22 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/FP_emulation.elf' (20 runs):
+
+          268,9467      L1-icache-misses                                                        ( +-  0.31% )
+              4787      iTLB-misses                                                             ( +-  3.36% )
+               857      page-faults                                                             ( +-  0.04% )
+
+           2.02615 +- 0.00207 seconds time elapsed  ( +-  0.10% )
+

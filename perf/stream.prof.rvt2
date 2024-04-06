@@ -1,0 +1,11 @@
+# started on Thu Apr  4 16:49:07 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/stream.elf' (20 runs):
+
+       1,0512,6338      L1-icache-misses                                                        ( +-  0.24% )
+           41,6019      iTLB-misses                                                             ( +-  0.34% )
+            7,1049      page-faults                                                             ( +-  0.04% )
+
+            6.8559 +- 0.0204 seconds time elapsed  ( +-  0.30% )
+

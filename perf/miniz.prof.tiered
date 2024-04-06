@@ -1,0 +1,11 @@
+# started on Sat Apr  6 14:49:22 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/miniz.elf' (20 runs):
+
+       1,0027,1340      L1-icache-misses                                                        ( +-  0.04% )
+           18,0795      iTLB-misses                                                             ( +-  0.22% )
+            1,2829      page-faults                                                             ( +-  0.08% )
+
+           0.78058 +- 0.00169 seconds time elapsed  ( +-  0.22% )
+

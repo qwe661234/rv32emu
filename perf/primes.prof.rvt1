@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:50:04 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/primes.elf' (20 runs):
+
+           19,3977      L1-icache-misses                                                        ( +-  1.32% )
+               504      iTLB-misses                                                             ( +-  4.46% )
+              2308      page-faults                                                             ( +-  0.01% )
+
+           1.47544 +- 0.00193 seconds time elapsed  ( +-  0.13% )
+

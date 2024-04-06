@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:14:31 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/miniz.elf' (20 runs):
+
+          143,4248      L1-icache-misses                                                        ( +-  0.29% )
+            1,6822      iTLB-misses                                                             ( +-  1.91% )
+              5757      page-faults                                                             ( +-  0.01% )
+
+           1.12965 +- 0.00170 seconds time elapsed  ( +-  0.15% )
+

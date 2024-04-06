@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:15:15 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/sha.elf' (20 runs):
+
+           56,5365      L1-icache-misses                                                        ( +-  0.77% )
+              2301      iTLB-misses                                                             ( +-  3.09% )
+               808      page-faults                                                             ( +-  0.04% )
+
+           0.99050 +- 0.00175 seconds time elapsed  ( +-  0.18% )
+

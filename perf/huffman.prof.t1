@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:34:14 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/huffman.elf' (20 runs):
+
+          415,9241      L1-icache-misses                                                        ( +-  0.85% )
+           29,8136      iTLB-misses                                                             ( +-  7.19% )
+               834      page-faults                                                             ( +-  0.04% )
+
+            18.253 +- 0.171 seconds time elapsed  ( +-  0.94% )
+

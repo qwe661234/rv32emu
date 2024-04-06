@@ -1,0 +1,11 @@
+# started on Thu Apr  4 00:02:51 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/assignment.elf' (20 runs):
+
+          162,8679      L1-icache-misses                                                        ( +-  0.70% )
+              2181      iTLB-misses                                                             ( +-  7.88% )
+               443      page-faults                                                             ( +-  0.05% )
+
+          11.95642 +- 0.00566 seconds time elapsed  ( +-  0.05% )
+

@@ -1,0 +1,11 @@
+# started on Thu Apr  4 18:22:15 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/dhrystone.elf' (20 runs):
+
+           50,0630      L1-icache-misses                                                        ( +-  0.36% )
+           92,0414      iTLB-misses                                                             ( +- 99.78% )
+               804      page-faults                                                             ( +-  0.04% )
+
+           0.50202 +- 0.00859 seconds time elapsed  ( +-  1.71% )
+

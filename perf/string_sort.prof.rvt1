@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:59:43 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/string_sort.elf' (20 runs):
+
+          144,7642      L1-icache-misses                                                        ( +-  1.42% )
+              1507      iTLB-misses                                                             ( +-  4.29% )
+               435      page-faults                                                             ( +-  0.07% )
+
+           9.35478 +- 0.00329 seconds time elapsed  ( +-  0.04% )
+

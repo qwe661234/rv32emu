@@ -1,0 +1,11 @@
+# started on Thu Apr  4 17:05:55 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/qsort.elf' (20 runs):
+
+          510,9784      L1-icache-misses                                                        ( +-  0.06% )
+            2,3938      iTLB-misses                                                             ( +-  0.37% )
+            5,3775      page-faults                                                             ( +-  0.00% )
+
+           1.60013 +- 0.00194 seconds time elapsed  ( +-  0.12% )
+

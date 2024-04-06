@@ -1,0 +1,11 @@
+# started on Thu Apr  4 00:06:50 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/idea.elf' (20 runs):
+
+           67,1864      L1-icache-misses                                                        ( +-  0.93% )
+              1366      iTLB-misses                                                             ( +-  2.93% )
+               433      page-faults                                                             ( +-  0.07% )
+
+           7.13495 +- 0.00869 seconds time elapsed  ( +-  0.12% )
+

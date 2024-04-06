@@ -1,0 +1,11 @@
+# started on Sat Apr  6 14:59:36 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/huffman.elf' (20 runs):
+
+         4561,7144      L1-icache-misses                                                        ( +-  0.09% )
+           11,1883      iTLB-misses                                                             ( +-  0.48% )
+              8122      page-faults                                                             ( +-  0.00% )
+
+            9.9934 +- 0.0195 seconds time elapsed  ( +-  0.20% )
+

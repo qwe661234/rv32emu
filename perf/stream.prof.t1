@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:20:57 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/stream.elf' (20 runs):
+
+          248,9495      L1-icache-misses                                                        ( +-  0.82% )
+           62,6244      iTLB-misses                                                             ( +- 65.40% )
+            5,9409      page-faults                                                             ( +-  0.00% )
+
+           12.4125 +- 0.0175 seconds time elapsed  ( +-  0.14% )
+

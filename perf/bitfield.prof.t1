@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:20:24 2024
+
+
+ Performance counter stats for '../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/bitfield.elf' (20 runs):
+
+          148,3468      L1-icache-misses                                                        ( +-  0.20% )
+              2965      iTLB-misses                                                             ( +-  4.76% )
+               987      page-faults                                                             ( +-  0.03% )
+
+           1.65857 +- 0.00110 seconds time elapsed  ( +-  0.07% )
+

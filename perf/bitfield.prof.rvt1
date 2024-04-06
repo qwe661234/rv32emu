@@ -1,0 +1,11 @@
+# started on Wed Apr  3 23:55:47 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/bitfield.elf' (20 runs):
+
+           33,3543      L1-icache-misses                                                        ( +-  0.70% )
+              1490      iTLB-misses                                                             ( +- 25.31% )
+               461      page-faults                                                             ( +-  0.05% )
+
+           1.59870 +- 0.00155 seconds time elapsed  ( +-  0.10% )
+
