@@ -206,7 +206,7 @@ void *t2c_routine(void *arg)
             block_t *block = entry->block;
             // free(entry);
             assert(block);
-            t2(block, (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base);
+            t2(rv, block, (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base);
         }
     }
     return NULL;

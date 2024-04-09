@@ -1,0 +1,11 @@
+# started on Tue Apr  9 17:39:55 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/FP_emulation.elf' (20 runs):
+
+       3,1170,1585      L1-icache-misses                                                        ( +-  0.02% )
+           49,7755      iTLB-misses                                                             ( +-  2.34% )
+            1,8503      page-faults                                                             ( +-  0.10% )
+
+          2.099624 +- 0.000868 seconds time elapsed  ( +-  0.04% )
+

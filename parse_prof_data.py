@@ -2,7 +2,7 @@
 
 output = ""
 
-emus = ["t1", "rvt1", "rvt2", "rvtiered", "tiered"]
+emus = ["t1", "rvt1", "rvt2", "rvtiered", "tiered", "long_rvtiered"]
 tests = ["dhrystone", "qsort", "miniz", "primes", "sha","numeric_sort", "FP_emulation",
          "bitfield", "stream", "string_sort", "assignment", "idea", "huffman"]
 for emu in emus:

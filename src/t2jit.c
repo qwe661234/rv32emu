@@ -4,6 +4,8 @@
 #include <llvm-c/ExecutionEngine.h>
 #include <llvm-c/Target.h>
 #include <llvm-c/Transforms/PassBuilder.h>
+
+#include <assert.h>
 #include <stdlib.h>
 
 #include "riscv_private.h"
@@ -66,6 +68,19 @@ FORCE_INLINE bool insn_is_unconditional_branch(uint8_t opcode)
     return false;
 }
 
+FORCE_INLINE bool insn_is_branch(uint8_t opcode)
+{
+    switch (opcode) {
+#define _(inst, can_branch, insn_len, translatable, reg_mask) \
+    IIF(can_branch)                                           \
+    (case rv_insn_##inst:, )
+        RV_INSN_LIST
+#undef _
+        return true;
+    }
+    return false;
+}
+
 typedef void (*t2_codegen_block_func_t)(LLVMBuilderRef *builder UNUSED,
                                         LLVMTypeRef *param_types UNUSED,
                                         LLVMValueRef start UNUSED,
@@ -75,37 +90,68 @@ typedef void (*t2_codegen_block_func_t)(LLVMBuilderRef *builder UNUSED,
                                         uint64_t mem_base UNUSED,
                                         rv_insn_t *ir UNUSED);
 
-static void trace_ebb(LLVMBuilderRef *builder,
-                      LLVMTypeRef *param_types UNUSED,
-                      LLVMValueRef start,
-                      LLVMBasicBlockRef *entry,
-                      uint64_t mem_base,
-                      rv_insn_t *ir,
-                      set_t *set,
-                      struct LLVM_block_map *map)
+static const uint8_t insn_len_table[] = {
+/* RV32 instructions */
+#define _(inst, can_branch, insn_len, translatable, reg_mask) \
+    [rv_insn_##inst] = insn_len,
+    RV_INSN_LIST
+#undef _
+};
+
+static void trace_range(riscv_t *rv,
+                        LLVMBuilderRef *builder,
+                        LLVMTypeRef *param_types,
+                        LLVMValueRef start,
+                        LLVMBasicBlockRef *entry,
+                        uint64_t mem_base,
+                        rv_insn_t *ir,
+                        uint32_t pc,
+                        set_t *set,
+                        struct LLVM_block_map *map)
 {
-    if (set_has(set, ir->pc))
+    if (set_has(set, pc))
         return;
-    set_add(set, ir->pc);
+    set_add(set, pc);
     struct LLVM_block_map_entry map_entry;
     map_entry.block = *entry;
-    map_entry.pc = ir->pc;
+    map_entry.pc = pc;
     map->map[map->count++] = map_entry;
     LLVMBuilderRef tk, utk;
 
-    while (1) {
-        ((t2_codegen_block_func_t) dispatch_table[ir->opcode])(
-            builder, param_types, start, entry, &tk, &utk, mem_base, ir);
-        if (!ir->next)
-            break;
-        ir = ir->next;
-    }
+    if (!ir) {
+        ir = malloc(sizeof(rv_insn_t));
+        while (1) {
+            memset(ir, 0, sizeof(rv_insn_t));
 
+            const uint32_t insn = rv->io.mem_ifetch(pc);
+
+            if (!rv_decode(ir, insn))
+                assert(NULL);
+            ir->pc = pc;
+            ((t2_codegen_block_func_t) dispatch_table[ir->opcode])(
+                builder, param_types, start, entry, &tk, &utk, mem_base, ir);
+
+            if (insn_is_branch(ir->opcode))
+                break;
+            pc += insn_len_table[ir->opcode];
+        }
+    } else {
+        while (1) {
+            ((t2_codegen_block_func_t) dispatch_table[ir->opcode])(
+                builder, param_types, start, entry, &tk, &utk, mem_base, ir);
+            if (!ir->next)
+                break;
+            ir = ir->next;
+        }
+        pc = ir->pc;
+    }
     if (!insn_is_unconditional_branch(ir->opcode)) {
-        if (ir->branch_untaken) {
-            if (set_has(set, ir->branch_untaken->pc)) {
+        if (ir->opcode != rv_insn_jal && ir->opcode != rv_insn_cjal &&
+            ir->opcode != rv_insn_cj) {
+            uint32_t utk_pc = pc + insn_len_table[ir->opcode];
+            if (set_has(set, utk_pc)) {
                 for (uint32_t i = 0; i < map->count; i++) {
-                    if (map->map[i].pc == ir->branch_untaken->pc) {
+                    if (map->map[i].pc == utk_pc) {
                         LLVMBuildBr(utk, map->map[i].block);
                         break;
                     }
@@ -118,33 +164,33 @@ static void trace_ebb(LLVMBuilderRef *builder,
                 LLVMBuilderRef untaken_builder = LLVMCreateBuilder();
                 LLVMPositionBuilderAtEnd(untaken_builder, untaken_entry);
                 LLVMBuildBr(utk, untaken_entry);
-                trace_ebb(&untaken_builder, param_types, start, &untaken_entry,
-                          mem_base, ir->branch_untaken, set, map);
+                trace_range(rv, &untaken_builder, param_types, start,
+                            &untaken_entry, mem_base, ir->branch_untaken,
+                            utk_pc, set, map);
             }
         }
-        if (ir->branch_taken) {
-            if (set_has(set, ir->branch_taken->pc)) {
-                for (uint32_t i = 0; i < map->count; i++) {
-                    if (map->map[i].pc == ir->branch_taken->pc) {
-                        LLVMBuildBr(tk, map->map[i].block);
-                        break;
-                    }
+        uint32_t tk_pc = pc + ir->imm;
+        if (set_has(set, tk_pc)) {
+            for (uint32_t i = 0; i < map->count; i++) {
+                if (map->map[i].pc == tk_pc) {
+                    LLVMBuildBr(tk, map->map[i].block);
+                    break;
                 }
-            } else {
-                LLVMBasicBlockRef taken_entry = LLVMAppendBasicBlock(start,
-                                                                     "taken_"
-                                                                     "entry");
-                LLVMBuilderRef taken_builder = LLVMCreateBuilder();
-                LLVMPositionBuilderAtEnd(taken_builder, taken_entry);
-                LLVMBuildBr(tk, taken_entry);
-                trace_ebb(&taken_builder, param_types, start, &taken_entry,
-                          mem_base, ir->branch_taken, set, map);
             }
+        } else {
+            LLVMBasicBlockRef taken_entry = LLVMAppendBasicBlock(start,
+                                                                 "taken_"
+                                                                 "entry");
+            LLVMBuilderRef taken_builder = LLVMCreateBuilder();
+            LLVMPositionBuilderAtEnd(taken_builder, taken_entry);
+            LLVMBuildBr(tk, taken_entry);
+            trace_range(rv, &taken_builder, param_types, start, &taken_entry,
+                        mem_base, ir->branch_taken, tk_pc, set, map);
         }
     }
 }
 
-void t2(block_t *block, uint64_t mem_base)
+void t2(riscv_t *rv, block_t *block, uint64_t mem_base)
 {
     LLVMModuleRef module = LLVMModuleCreateWithName("my_module");
     LLVMTypeRef io_members[] = {
@@ -173,8 +219,8 @@ void t2(block_t *block, uint64_t mem_base)
     set_reset(&set);
     struct LLVM_block_map map;
     map.count = 0;
-    trace_ebb(&builder, param_types, start, &entry, mem_base, block->ir_head,
-              &set, &map);
+    trace_range(rv, &builder, param_types, start, &entry, mem_base, block->ir_head,
+                block->pc_start, &set, &map);
     char *error = NULL, *triple = LLVMGetDefaultTargetTriple();
     LLVMExecutionEngineRef engine;
     LLVMTargetRef target;

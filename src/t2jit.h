@@ -9,4 +9,4 @@
 
 typedef intptr_t (*funcPtr_t)(riscv_t *);
 
-void t2(block_t *block, uint64_t mem_base);
+void t2(riscv_t *rv, block_t *block, uint64_t mem_base);

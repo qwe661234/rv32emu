@@ -1,8 +1,8 @@
-# declare -a arr=( "numeric_sort" "qsort" "miniz" "primes" "sha" "dhrystone" "FP_emulation" "bitfield" "stream" "string_sort" "assignment" "idea" "huffman")
-declare -a arr=("FP_emulation")
+declare -a arr=( "numeric_sort" "qsort" "miniz" "primes" "sha" "dhrystone" "FP_emulation" "bitfield" "stream" "string_sort" "assignment" "idea" "huffman")
+# declare -a arr=("FP_emulation")
 ## now loop through the above array
 for i in "${arr[@]}"
 do
-   perf stat --repeat 20 -e L1-icache-misses,iTLB-misses,page-faults -o "./perf/$i.prof.rvtiered" ./build/rv32emu "../rv8-bench/test_bench/$i.elf"
+   perf stat --repeat 20 -e L1-icache-misses,iTLB-misses,page-faults -o "./perf/$i.prof.long_rvtiered" ./build/rv32emu "../rv8-bench/test_bench/$i.elf"
    # or do whatever with individual element of the array
 done

@@ -1,0 +1,11 @@
+# started on Tue Apr  9 17:39:33 2024
+
+
+ Performance counter stats for './build/rv32emu ../rv8-bench/test_bench/sha.elf' (20 runs):
+
+       1,5185,3945      L1-icache-misses                                                        ( +-  0.03% )
+           16,3648      iTLB-misses                                                             ( +-  0.27% )
+              9105      page-faults                                                             ( +-  0.28% )
+
+           0.83073 +- 0.00428 seconds time elapsed  ( +-  0.52% )
+

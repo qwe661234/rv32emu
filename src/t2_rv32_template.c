@@ -38,14 +38,8 @@ RVT2OP(jal, {
     LLVMValueRef addr_PC =
         LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
                               PC_offset, 1, "addr_PC");
-    if (ir->branch_taken) {
-        *taken_builder = *builder;
-    } else {
-        LLVMBuildStore(*builder,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(*builder);
-    }
+
+    *taken_builder = *builder;
 })
 
 RVT2OP(jalr, {
@@ -104,24 +98,15 @@ RVT2OP(beq, {
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    if (ir->branch_taken) {
-        *taken_builder = builder2;
-    } else {
-        LLVMBuildStore(builder2,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(builder2);
-    }
+
+    *taken_builder = builder2;
+
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    if (ir->branch_untaken) {
-        *untaken_builder = builder3;
-    } else {
-        LLVMBuildStore(
-            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
-        LLVMBuildRetVoid(builder3);
-    }
+
+    *untaken_builder = builder3;
+
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 })
 
@@ -150,25 +135,16 @@ RVT2OP(bne, {
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    if (ir->branch_taken) {
-        *taken_builder = builder2;
-    } else {
-        LLVMBuildStore(builder2,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(builder2);
-    }
+
+    *taken_builder = builder2;
+
 
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    if (ir->branch_untaken) {
-        *untaken_builder = builder3;
-    } else {
-        LLVMBuildStore(
-            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
-        LLVMBuildRetVoid(builder3);
-    }
+
+    *untaken_builder = builder3;
+
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 })
 
@@ -197,25 +173,16 @@ RVT2OP(blt, {
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    if (ir->branch_taken) {
-        *taken_builder = builder2;
-    } else {
-        LLVMBuildStore(builder2,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(builder2);
-    }
+
+    *taken_builder = builder2;
+
 
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    if (ir->branch_untaken) {
-        *untaken_builder = builder3;
-    } else {
-        LLVMBuildStore(
-            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
-        LLVMBuildRetVoid(builder3);
-    }
+
+    *untaken_builder = builder3;
+
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 })
 
@@ -244,25 +211,16 @@ RVT2OP(bge, {
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    if (ir->branch_taken) {
-        *taken_builder = builder2;
-    } else {
-        LLVMBuildStore(builder2,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(builder2);
-    }
+
+    *taken_builder = builder2;
+
     // // else
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    if (ir->branch_untaken) {
-        *untaken_builder = builder3;
-    } else {
-        LLVMBuildStore(
-            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
-        LLVMBuildRetVoid(builder3);
-    }
+
+    *untaken_builder = builder3;
+
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 })
 
@@ -291,25 +249,16 @@ RVT2OP(bltu, {
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    if (ir->branch_taken) {
-        *taken_builder = builder2;
-    } else {
-        LLVMBuildStore(builder2,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(builder2);
-    }
+
+    *taken_builder = builder2;
+
 
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    if (ir->branch_untaken) {
-        *untaken_builder = builder3;
-    } else {
-        LLVMBuildStore(
-            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
-        LLVMBuildRetVoid(builder3);
-    }
+
+    *untaken_builder = builder3;
+
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 })
 
@@ -338,25 +287,16 @@ RVT2OP(bgeu, {
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    if (ir->branch_taken) {
-        *taken_builder = builder2;
-    } else {
-        LLVMBuildStore(builder2,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(builder2);
-    }
+
+    *taken_builder = builder2;
+
 
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    if (ir->branch_untaken) {
-        *untaken_builder = builder3;
-    } else {
-        LLVMBuildStore(
-            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 4, true), addr_PC);
-        LLVMBuildRetVoid(builder3);
-    }
+
+    *untaken_builder = builder3;
+
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 })
 
@@ -1515,14 +1455,8 @@ RVT2OP(cjal, {
     LLVMValueRef addr_PC =
         LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
                               PC_offset, 1, "addr_PC");
-    if (ir->branch_taken) {
-        *taken_builder = *builder;
-    } else {
-        LLVMBuildStore(*builder,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(*builder);
-    }
+
+    *taken_builder = *builder;
 })
 
 RVT2OP(cli, {
@@ -1701,14 +1635,8 @@ RVT2OP(cj, {
     LLVMValueRef addr_PC =
         LLVMBuildInBoundsGEP2(*builder, LLVMInt32Type(), LLVMGetParam(start, 0),
                               PC_offset, 1, "addr_PC");
-    if (ir->branch_taken) {
-        *taken_builder = *builder;
-    } else {
-        LLVMBuildStore(*builder,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(*builder);
-    }
+
+    *taken_builder = *builder;
 })
 
 RVT2OP(cbeqz, {
@@ -1730,25 +1658,15 @@ RVT2OP(cbeqz, {
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    if (ir->branch_taken) {
-        *taken_builder = builder2;
-    } else {
-        LLVMBuildStore(builder2,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(builder2);
-    }
+
+    *taken_builder = builder2;
+
 
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    if (ir->branch_untaken) {
-        *untaken_builder = builder3;
-    } else {
-        LLVMBuildStore(
-            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 2, true), addr_PC);
-        LLVMBuildRetVoid(builder3);
-    }
+
+    *untaken_builder = builder3;
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 })
 
@@ -1771,25 +1689,16 @@ RVT2OP(cbnez, {
     LLVMBasicBlockRef taken = LLVMAppendBasicBlock(start, "taken");
     LLVMBuilderRef builder2 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder2, taken);
-    if (ir->branch_taken) {
-        *taken_builder = builder2;
-    } else {
-        LLVMBuildStore(builder2,
-                       LLVMConstInt(LLVMInt32Type(), ir->pc + ir->imm, true),
-                       addr_PC);
-        LLVMBuildRetVoid(builder2);
-    }
+
+    *taken_builder = builder2;
+
 
     LLVMBasicBlockRef untaken = LLVMAppendBasicBlock(start, "untaken");
     LLVMBuilderRef builder3 = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(builder3, untaken);
-    if (ir->branch_untaken) {
-        *untaken_builder = builder3;
-    } else {
-        LLVMBuildStore(
-            builder3, LLVMConstInt(LLVMInt32Type(), ir->pc + 2, true), addr_PC);
-        LLVMBuildRetVoid(builder3);
-    }
+
+    *untaken_builder = builder3;
+    
     LLVMBuildCondBr(*builder, cond, taken, untaken);
 })
 
@@ -1961,13 +1870,17 @@ RVT2OP(cswsp, {
 #endif
 
 #if RV32_HAS(EXT_C) && RV32_HAS(EXT_F)
-RVT2OP(cflwsp, { __UNREACHABLE; })
+RVT2OP(cflwsp, {
+    __UNREACHABLE; })
 
-RVT2OP(cfswsp, { __UNREACHABLE; })
+RVT2OP(cfswsp, {
+    __UNREACHABLE; })
 
-RVT2OP(cflw, { __UNREACHABLE; })
+RVT2OP(cflw, {
+    __UNREACHABLE; })
 
-RVT2OP(cfsw, { __UNREACHABLE; })
+RVT2OP(cfsw, {
+    __UNREACHABLE; })
 #endif
 
 RVT2OP(fuse1, {
