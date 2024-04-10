@@ -1,0 +1,679 @@
+desc: --massif-out-file=./valgrind/idea.t1.out
+cmd: ./build/rv32emu ../rv8-bench/test_bench/idea.elf
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=8344181
+mem_heap_B=318700
+mem_heap_extra_B=33428
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=14560772
+mem_heap_B=319532
+mem_heap_extra_B=33532
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=20398216
+mem_heap_B=320532
+mem_heap_extra_B=33628
+mem_stacks_B=0
+heap_tree=detailed
+n7: 320532 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 5052 in 15 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=4
+#-----------
+time=29651158
+mem_heap_B=322372
+mem_heap_extra_B=33708
+mem_stacks_B=0
+heap_tree=detailed
+n8: 322372 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 3840 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 3840 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 3052 in 16 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=5
+#-----------
+time=37198098
+mem_heap_B=323292
+mem_heap_extra_B=33820
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=42655973
+mem_heap_B=323604
+mem_heap_extra_B=33892
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=50976678
+mem_heap_B=324900
+mem_heap_extra_B=34028
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=58187953
+mem_heap_B=325516
+mem_heap_extra_B=34108
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=66207599
+mem_heap_B=325532
+mem_heap_extra_B=34116
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=70565268
+mem_heap_B=326180
+mem_heap_extra_B=34212
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=315797663
+mem_heap_B=326308
+mem_heap_extra_B=34220
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=316063859
+mem_heap_B=326500
+mem_heap_extra_B=34260
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=550939249
+mem_heap_B=326628
+mem_heap_extra_B=34268
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=552924399
+mem_heap_B=326932
+mem_heap_extra_B=34308
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=23718081480
+mem_heap_B=327060
+mem_heap_extra_B=34316
+mem_stacks_B=0
+heap_tree=detailed
+n8: 327060 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 7552 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 7552 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 4028 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=16
+#-----------
+time=23723955483
+mem_heap_B=327268
+mem_heap_extra_B=34364
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=23732925158
+mem_heap_B=327972
+mem_heap_extra_B=34452
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=47127654489
+mem_heap_B=328100
+mem_heap_extra_B=34460
+mem_stacks_B=0
+heap_tree=detailed
+n8: 328100 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 8320 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 8320 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 4300 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=19
+#-----------
+time=117346372513
+mem_heap_B=328196
+mem_heap_extra_B=34476
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=117355714568
+mem_heap_B=328900
+mem_heap_extra_B=34620
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=117362825220
+mem_heap_B=329796
+mem_heap_extra_B=34724
+mem_stacks_B=0
+heap_tree=detailed
+n8: 329796 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 9472 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 9472 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 4844 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=22
+#-----------
+time=117372524343
+mem_heap_B=330668
+mem_heap_extra_B=34836
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=117381597528
+mem_heap_B=331524
+mem_heap_extra_B=35020
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=117387520133
+mem_heap_B=332004
+mem_heap_extra_B=35100
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=117392319553
+mem_heap_B=332572
+mem_heap_extra_B=35164
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=117398151945
+mem_heap_B=333308
+mem_heap_extra_B=35252
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=117404515138
+mem_heap_B=333692
+mem_heap_extra_B=35332
+mem_stacks_B=0
+heap_tree=detailed
+n8: 333692 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 12416 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 12416 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 5796 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=28
+#-----------
+time=117408080696
+mem_heap_B=333836
+mem_heap_extra_B=35348
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=117415098506
+mem_heap_B=334364
+mem_heap_extra_B=35388
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=117423136261
+mem_heap_B=335036
+mem_heap_extra_B=35444
+mem_stacks_B=0
+heap_tree=detailed
+n8: 335036 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 13696 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 13696 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 5860 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=31
+#-----------
+time=117432989554
+mem_heap_B=334740
+mem_heap_extra_B=35236
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=117439442340
+mem_heap_B=335100
+mem_heap_extra_B=35260
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=117445529098
+mem_heap_B=334764
+mem_heap_extra_B=35140
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=117454452506
+mem_heap_B=335100
+mem_heap_extra_B=35236
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=117461668721
+mem_heap_B=335212
+mem_heap_extra_B=35292
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=117468990116
+mem_heap_B=335228
+mem_heap_extra_B=35300
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=117474072983
+mem_heap_B=335140
+mem_heap_extra_B=35244
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=117481084861
+mem_heap_B=335124
+mem_heap_extra_B=35220
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=117489039543
+mem_heap_B=335604
+mem_heap_extra_B=35180
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=117498832074
+mem_heap_B=336084
+mem_heap_extra_B=35180
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=117506013708
+mem_heap_B=336644
+mem_heap_extra_B=35236
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=117510475864
+mem_heap_B=336756
+mem_heap_extra_B=35252
+mem_stacks_B=0
+heap_tree=detailed
+n8: 336756 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 16896 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 16896 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 4380 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=43
+#-----------
+time=117517836818
+mem_heap_B=337108
+mem_heap_extra_B=35244
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=117524396043
+mem_heap_B=337268
+mem_heap_extra_B=35356
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=117533612397
+mem_heap_B=337172
+mem_heap_extra_B=35276
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=117541499511
+mem_heap_B=337236
+mem_heap_extra_B=35324
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=117545497055
+mem_heap_B=337172
+mem_heap_extra_B=35292
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=117551515400
+mem_heap_B=337732
+mem_heap_extra_B=35276
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=117559934838
+mem_heap_B=338580
+mem_heap_extra_B=35356
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=117560331850
+mem_heap_B=338692
+mem_heap_extra_B=35356
+mem_stacks_B=0
+heap_tree=detailed
+n8: 338692 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 18816 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 18816 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 4396 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=51
+#-----------
+time=117560729012
+mem_heap_B=338836
+mem_heap_extra_B=35380
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=117561260503
+mem_heap_B=338980
+mem_heap_extra_B=35396
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=117561921578
+mem_heap_B=338980
+mem_heap_extra_B=35396
+mem_stacks_B=0
+heap_tree=peak
+n8: 338980 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 19072 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 19072 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 4428 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=54
+#-----------
+time=117562844990
+mem_heap_B=339076
+mem_heap_extra_B=35396
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=117563506371
+mem_heap_B=339188
+mem_heap_extra_B=35396
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=117563903200
+mem_heap_B=339284
+mem_heap_extra_B=35380
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=117564563013
+mem_heap_B=339396
+mem_heap_extra_B=35380
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=117564959348
+mem_heap_B=339652
+mem_heap_extra_B=35396
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=117565488059
+mem_heap_B=339780
+mem_heap_extra_B=35404
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=117566704496
+mem_heap_B=339908
+mem_heap_extra_B=35412
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=117567365892
+mem_heap_B=340036
+mem_heap_extra_B=35420
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=117569084014
+mem_heap_B=340292
+mem_heap_extra_B=35436
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=117569480293
+mem_heap_B=340548
+mem_heap_extra_B=35452
+mem_stacks_B=0
+heap_tree=detailed
+n8: 340548 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 131136 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 65536 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 32792 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n1: 20736 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+  n0: 20736 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 12288 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 8192 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+ n0: 4332 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=64
+#-----------
+time=117570008855
+mem_heap_B=340676
+mem_heap_extra_B=35460
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=117571593240
+mem_heap_B=340804
+mem_heap_extra_B=35468
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=117572254785
+mem_heap_B=340932
+mem_heap_extra_B=35476
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=67
+#-----------
+time=117573310697
+mem_heap_B=341188
+mem_heap_extra_B=35492
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=117573707032
+mem_heap_B=341444
+mem_heap_extra_B=35508
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=117574104654
+mem_heap_B=341572
+mem_heap_extra_B=35516
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=70
+#-----------
+time=117574500873
+mem_heap_B=341556
+mem_heap_extra_B=35508
+mem_stacks_B=0
+heap_tree=empty

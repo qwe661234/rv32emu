@@ -1,0 +1,1275 @@
+desc: --massif-out-file=./valgrind/string_sort.tiered.out
+cmd: ./build/rv32emu ../rv8-bench/test_bench/string_sort.elf
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=19132929
+mem_heap_B=72704
+mem_heap_extra_B=8
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=26856343
+mem_heap_B=747833
+mem_heap_extra_B=96487
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=525832590025
+mem_heap_B=747961
+mem_heap_extra_B=96519
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=525842122324
+mem_heap_B=749641
+mem_heap_extra_B=96799
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=525857324691
+mem_heap_B=752481
+mem_heap_extra_B=96975
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=525865984596
+mem_heap_B=753417
+mem_heap_extra_B=97095
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=525876313317
+mem_heap_B=754001
+mem_heap_extra_B=97191
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=525888911244
+mem_heap_B=755281
+mem_heap_extra_B=97335
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=525897832596
+mem_heap_B=756265
+mem_heap_extra_B=97439
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=525939741319
+mem_heap_B=756409
+mem_heap_extra_B=97455
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=526506212145
+mem_heap_B=756537
+mem_heap_extra_B=97463
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=526511655456
+mem_heap_B=757353
+mem_heap_extra_B=97535
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=526591250790
+mem_heap_B=757377
+mem_heap_extra_B=97551
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=526626466223
+mem_heap_B=757401
+mem_heap_extra_B=97567
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=526935002464
+mem_heap_B=757529
+mem_heap_extra_B=97575
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=526936987693
+mem_heap_B=757833
+mem_heap_extra_B=97615
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=527202241514
+mem_heap_B=757857
+mem_heap_extra_B=97631
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=527203722089
+mem_heap_B=757881
+mem_heap_extra_B=97647
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=527265146895
+mem_heap_B=757905
+mem_heap_extra_B=97663
+mem_stacks_B=0
+heap_tree=detailed
+n13: 757905 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n0: 52149 in 192 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+#-----------
+snapshot=20
+#-----------
+time=527266594053
+mem_heap_B=757977
+mem_heap_extra_B=97711
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=527491100404
+mem_heap_B=758001
+mem_heap_extra_B=97727
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=527566333543
+mem_heap_B=758025
+mem_heap_extra_B=97743
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=533978520633
+mem_heap_B=758049
+mem_heap_extra_B=97759
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=534033321459
+mem_heap_B=758073
+mem_heap_extra_B=97775
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=534319304515
+mem_heap_B=758121
+mem_heap_extra_B=97807
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=534325015984
+mem_heap_B=758169
+mem_heap_extra_B=97839
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=534378227534
+mem_heap_B=758193
+mem_heap_extra_B=97855
+mem_stacks_B=0
+heap_tree=detailed
+n13: 758193 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n0: 52437 in 192 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+#-----------
+snapshot=28
+#-----------
+time=534390898947
+mem_heap_B=758217
+mem_heap_extra_B=97871
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=534739483914
+mem_heap_B=758241
+mem_heap_extra_B=97887
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=542264869368
+mem_heap_B=758265
+mem_heap_extra_B=97903
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=553224985203
+mem_heap_B=758289
+mem_heap_extra_B=97919
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=567702444604
+mem_heap_B=758305
+mem_heap_extra_B=97927
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=567707876358
+mem_heap_B=758657
+mem_heap_extra_B=97983
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=608781118015
+mem_heap_B=759073
+mem_heap_extra_B=98023
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=687603382062
+mem_heap_B=759097
+mem_heap_extra_B=98039
+mem_stacks_B=0
+heap_tree=detailed
+n14: 759097 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n0: 44381 in 191 places, all below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+ n1: 8960 0x11BD06: UnknownInlinedFun (emulate.c:656)
+  n1: 8960 0x11BD06: UnknownInlinedFun (emulate.c:987)
+   n1: 8960 0x11BD06: rv_step (emulate.c:1109)
+    n1: 8960 0x10F7D7: UnknownInlinedFun (riscv.c:364)
+     n0: 8960 0x10F7D7: main (main.c:234)
+#-----------
+snapshot=36
+#-----------
+time=731147764056
+mem_heap_B=759113
+mem_heap_extra_B=98047
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=731163989342
+mem_heap_B=760649
+mem_heap_extra_B=98279
+mem_stacks_B=0
+heap_tree=detailed
+n14: 760649 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n0: 44781 in 191 places, all below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+ n1: 10112 0x11BD06: UnknownInlinedFun (emulate.c:656)
+  n1: 10112 0x11BD06: UnknownInlinedFun (emulate.c:987)
+   n1: 10112 0x11BD06: rv_step (emulate.c:1109)
+    n1: 10112 0x10F7D7: UnknownInlinedFun (riscv.c:364)
+     n0: 10112 0x10F7D7: main (main.c:234)
+#-----------
+snapshot=38
+#-----------
+time=731173505437
+mem_heap_B=761601
+mem_heap_extra_B=98415
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=731183453254
+mem_heap_B=762633
+mem_heap_extra_B=98639
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=731200268176
+mem_heap_B=764289
+mem_heap_extra_B=98855
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=731210860122
+mem_heap_B=764897
+mem_heap_extra_B=98935
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=731224436364
+mem_heap_B=766113
+mem_heap_extra_B=99039
+mem_stacks_B=0
+heap_tree=peak
+n14: 766113 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n0: 45893 in 191 places, all below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 14464 0x11BD06: UnknownInlinedFun (emulate.c:656)
+  n1: 14464 0x11BD06: UnknownInlinedFun (emulate.c:987)
+   n1: 14464 0x11BD06: rv_step (emulate.c:1109)
+    n1: 14464 0x10F7D7: UnknownInlinedFun (riscv.c:364)
+     n0: 14464 0x10F7D7: main (main.c:234)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+#-----------
+snapshot=43
+#-----------
+time=731236830032
+mem_heap_B=766073
+mem_heap_extra_B=98871
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=731248858857
+mem_heap_B=766377
+mem_heap_extra_B=98847
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=731258851397
+mem_heap_B=766465
+mem_heap_extra_B=98895
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=731270071069
+mem_heap_B=766593
+mem_heap_extra_B=98959
+mem_stacks_B=0
+heap_tree=detailed
+n14: 766593 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n0: 44837 in 191 places, all below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 16000 0x11BD06: UnknownInlinedFun (emulate.c:656)
+  n1: 16000 0x11BD06: UnknownInlinedFun (emulate.c:987)
+   n1: 16000 0x11BD06: rv_step (emulate.c:1109)
+    n1: 16000 0x10F7D7: UnknownInlinedFun (riscv.c:364)
+     n0: 16000 0x10F7D7: main (main.c:234)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+#-----------
+snapshot=47
+#-----------
+time=731286321523
+mem_heap_B=766441
+mem_heap_extra_B=98871
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=731296288754
+mem_heap_B=767193
+mem_heap_extra_B=98855
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=731310687538
+mem_heap_B=768105
+mem_heap_extra_B=98903
+mem_stacks_B=0
+heap_tree=detailed
+n14: 768105 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n0: 44557 in 191 places, all below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 17792 0x11BD06: UnknownInlinedFun (emulate.c:656)
+  n1: 17792 0x11BD06: UnknownInlinedFun (emulate.c:987)
+   n1: 17792 0x11BD06: rv_step (emulate.c:1109)
+    n1: 17792 0x10F7D7: UnknownInlinedFun (riscv.c:364)
+     n0: 17792 0x10F7D7: main (main.c:234)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+#-----------
+snapshot=50
+#-----------
+time=731313886903
+mem_heap_B=768137
+mem_heap_extra_B=98919
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=731316168819
+mem_heap_B=768361
+mem_heap_extra_B=98919
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=731317632304
+mem_heap_B=768393
+mem_heap_extra_B=98935
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=731319516839
+mem_heap_B=768361
+mem_heap_extra_B=98919
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=731321127590
+mem_heap_B=768409
+mem_heap_extra_B=98943
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=731322731338
+mem_heap_B=768457
+mem_heap_extra_B=98967
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=731324602744
+mem_heap_B=768393
+mem_heap_extra_B=98935
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=731327279674
+mem_heap_B=768409
+mem_heap_extra_B=98943
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=731329153985
+mem_heap_B=768393
+mem_heap_extra_B=98935
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=731331276862
+mem_heap_B=768361
+mem_heap_extra_B=98919
+mem_stacks_B=0
+heap_tree=detailed
+n14: 768361 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n0: 44557 in 191 places, all below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 18048 0x11BD06: UnknownInlinedFun (emulate.c:656)
+  n1: 18048 0x11BD06: UnknownInlinedFun (emulate.c:987)
+   n1: 18048 0x11BD06: rv_step (emulate.c:1109)
+    n1: 18048 0x10F7D7: UnknownInlinedFun (riscv.c:364)
+     n0: 18048 0x10F7D7: main (main.c:234)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+#-----------
+snapshot=60
+#-----------
+time=731332873126
+mem_heap_B=768361
+mem_heap_extra_B=98919
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=731334480951
+mem_heap_B=768329
+mem_heap_extra_B=98903
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=731336485824
+mem_heap_B=768361
+mem_heap_extra_B=98919
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=731338756436
+mem_heap_B=768393
+mem_heap_extra_B=98935
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=731340632771
+mem_heap_B=768441
+mem_heap_extra_B=98959
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=731342376501
+mem_heap_B=768425
+mem_heap_extra_B=98951
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=731343974172
+mem_heap_B=768409
+mem_heap_extra_B=98943
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=67
+#-----------
+time=731345438586
+mem_heap_B=768505
+mem_heap_extra_B=98935
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=731347248016
+mem_heap_B=768697
+mem_heap_extra_B=98919
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=731349047801
+mem_heap_B=768953
+mem_heap_extra_B=98935
+mem_stacks_B=0
+heap_tree=detailed
+n14: 768953 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n0: 44509 in 191 places, all below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 18688 0x11BD06: UnknownInlinedFun (emulate.c:656)
+  n1: 18688 0x11BD06: UnknownInlinedFun (emulate.c:987)
+   n1: 18688 0x11BD06: rv_step (emulate.c:1109)
+    n1: 18688 0x10F7D7: UnknownInlinedFun (riscv.c:364)
+     n0: 18688 0x10F7D7: main (main.c:234)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+#-----------
+snapshot=70
+#-----------
+time=731354496745
+mem_heap_B=769321
+mem_heap_extra_B=98951
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=71
+#-----------
+time=731356137806
+mem_heap_B=769577
+mem_heap_extra_B=98967
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=72
+#-----------
+time=731360287454
+mem_heap_B=769705
+mem_heap_extra_B=98975
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=73
+#-----------
+time=731361864174
+mem_heap_B=769833
+mem_heap_extra_B=98983
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=74
+#-----------
+time=731364981983
+mem_heap_B=769993
+mem_heap_extra_B=99007
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=75
+#-----------
+time=731366438199
+mem_heap_B=770553
+mem_heap_extra_B=99055
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=76
+#-----------
+time=731368424034
+mem_heap_B=770793
+mem_heap_extra_B=99063
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=77
+#-----------
+time=731369877241
+mem_heap_B=771161
+mem_heap_extra_B=99079
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=78
+#-----------
+time=731371594447
+mem_heap_B=771625
+mem_heap_extra_B=99095
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=79
+#-----------
+time=731373576766
+mem_heap_B=771881
+mem_heap_extra_B=99111
+mem_stacks_B=0
+heap_tree=detailed
+n14: 771881 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x133920: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x133920: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10F77C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x133BC0: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x133BC0: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 65536 0x133C21: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x133C21: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10F77C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n0: 44493 in 191 places, all below massif's threshold (1.00%)
+ n1: 32792 0x133BEF: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x133BEF: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10F77C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 21632 0x11BD06: UnknownInlinedFun (emulate.c:656)
+  n1: 21632 0x11BD06: UnknownInlinedFun (emulate.c:987)
+   n1: 21632 0x11BD06: rv_step (emulate.c:1109)
+    n1: 21632 0x10F7D7: UnknownInlinedFun (riscv.c:364)
+     n0: 21632 0x10F7D7: main (main.c:234)
+ n1: 12288 0x133BD6: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x133BD6: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10F77C: main (main.c:227)
+#-----------
+snapshot=80
+#-----------
+time=731376220261
+mem_heap_B=772137
+mem_heap_extra_B=99127
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=81
+#-----------
+time=731378729776
+mem_heap_B=772649
+mem_heap_extra_B=99159
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=82
+#-----------
+time=731380447481
+mem_heap_B=773033
+mem_heap_extra_B=99183
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=83
+#-----------
+time=731381894665
+mem_heap_B=381279
+mem_heap_extra_B=49937
+mem_stacks_B=0
+heap_tree=empty

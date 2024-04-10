@@ -1,0 +1,336 @@
+--------------------------------------------------------------------------------
+Command:            ./build/rv32emu ../rv8-bench/test_bench/idea.elf
+Massif arguments:   --massif-out-file=./valgrind/idea.t1.out
+ms_print arguments: ./valgrind/idea.t1.out
+--------------------------------------------------------------------------------
+
+
+    KB
+368.2^                                                                       :
+     |::::::::::::::@:::::::::::::@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+     |@             @             @                                          #
+   0 +----------------------------------------------------------------------->Gi
+     0                                                                   109.5
+
+Number of snapshots: 71
+ Detailed snapshots: [3, 4, 15, 18, 21, 27, 30, 42, 50, 53 (peak), 63]
+
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+  0              0                0                0             0            0
+  1      8,344,181          352,128          318,700        33,428            0
+  2     14,560,772          353,064          319,532        33,532            0
+  3     20,398,216          354,160          320,532        33,628            0
+90.50% (320,532B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->37.03% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->18.50% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->18.50% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->09.26% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->03.47% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.31% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.43% (5,052B) in 15 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+  4     29,651,158          356,080          322,372        33,708            0
+90.53% (322,372B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->36.83% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->18.40% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->18.40% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->09.21% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->03.45% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.30% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.08% (3,840B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->01.08% (3,840B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->00.86% (3,052B) in 1+ places, all below ms_print's threshold (01.00%)
+
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+  5     37,198,098          357,112          323,292        33,820            0
+  6     42,655,973          357,496          323,604        33,892            0
+  7     50,976,678          358,928          324,900        34,028            0
+  8     58,187,953          359,624          325,516        34,108            0
+  9     66,207,599          359,648          325,532        34,116            0
+ 10     70,565,268          360,392          326,180        34,212            0
+ 11    315,797,663          360,528          326,308        34,220            0
+ 12    316,063,859          360,760          326,500        34,260            0
+ 13    550,939,249          360,896          326,628        34,268            0
+ 14    552,924,399          361,240          326,932        34,308            0
+ 15 23,718,081,480          361,376          327,060        34,316            0
+90.50% (327,060B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->36.29% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->18.14% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->18.14% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->09.07% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->03.40% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.27% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.09% (7,552B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->02.09% (7,552B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->01.11% (4,028B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 16 23,723,955,483          361,632          327,268        34,364            0
+ 17 23,732,925,158          362,424          327,972        34,452            0
+ 18 47,127,654,489          362,560          328,100        34,460            0
+90.50% (328,100B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->36.17% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->18.08% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->18.08% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->09.04% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->03.39% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.29% (8,320B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->02.29% (8,320B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->02.26% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.19% (4,300B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 19 117,346,372,513          362,672          328,196        34,476            0
+ 20 117,355,714,568          363,520          328,900        34,620            0
+ 21 117,362,825,220          364,520          329,796        34,724            0
+90.47% (329,796B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->35.97% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.98% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.98% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->09.00% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->03.37% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.60% (9,472B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->02.60% (9,472B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->02.25% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.33% (4,844B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 22 117,372,524,343          365,504          330,668        34,836            0
+ 23 117,381,597,528          366,544          331,524        35,020            0
+ 24 117,387,520,133          367,104          332,004        35,100            0
+ 25 117,392,319,553          367,736          332,572        35,164            0
+ 26 117,398,151,945          368,560          333,308        35,252            0
+ 27 117,404,515,138          369,024          333,692        35,332            0
+90.43% (333,692B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->35.54% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.76% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.76% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->08.89% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->03.36% (12,416B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->03.36% (12,416B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->03.33% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.22% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.57% (5,796B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 28 117,408,080,696          369,184          333,836        35,348            0
+ 29 117,415,098,506          369,752          334,364        35,388            0
+ 30 117,423,136,261          370,480          335,036        35,444            0
+90.43% (335,036B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->35.40% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.69% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.69% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->08.85% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->03.70% (13,696B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->03.70% (13,696B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->03.32% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.21% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.58% (5,860B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 31 117,432,989,554          369,976          334,740        35,236            0
+ 32 117,439,442,340          370,360          335,100        35,260            0
+ 33 117,445,529,098          369,904          334,764        35,140            0
+ 34 117,454,452,506          370,336          335,100        35,236            0
+ 35 117,461,668,721          370,504          335,212        35,292            0
+ 36 117,468,990,116          370,528          335,228        35,300            0
+ 37 117,474,072,983          370,384          335,140        35,244            0
+ 38 117,481,084,861          370,344          335,124        35,220            0
+ 39 117,489,039,543          370,784          335,604        35,180            0
+ 40 117,498,832,074          371,264          336,084        35,180            0
+ 41 117,506,013,708          371,880          336,644        35,236            0
+ 42 117,510,475,864          372,008          336,756        35,252            0
+90.52% (336,756B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->35.25% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.62% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.62% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->08.81% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->04.54% (16,896B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->04.54% (16,896B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->03.30% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.20% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.18% (4,380B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 43 117,517,836,818          372,352          337,108        35,244            0
+ 44 117,524,396,043          372,624          337,268        35,356            0
+ 45 117,533,612,397          372,448          337,172        35,276            0
+ 46 117,541,499,511          372,560          337,236        35,324            0
+ 47 117,545,497,055          372,464          337,172        35,292            0
+ 48 117,551,515,400          373,008          337,732        35,276            0
+ 49 117,559,934,838          373,936          338,580        35,356            0
+ 50 117,560,331,850          374,048          338,692        35,356            0
+90.55% (338,692B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->35.06% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.52% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.52% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->08.77% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->05.03% (18,816B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->05.03% (18,816B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->03.29% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.19% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.18% (4,396B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 51 117,560,729,012          374,216          338,836        35,380            0
+ 52 117,561,260,503          374,376          338,980        35,396            0
+ 53 117,561,921,578          374,376          338,980        35,396            0
+90.55% (338,980B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->35.03% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.51% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.51% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->08.76% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->05.09% (19,072B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->05.09% (19,072B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->03.28% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.19% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.18% (4,428B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 54 117,562,844,990          374,472          339,076        35,396            0
+ 55 117,563,506,371          374,584          339,188        35,396            0
+ 56 117,563,903,200          374,664          339,284        35,380            0
+ 57 117,564,563,013          374,776          339,396        35,380            0
+ 58 117,564,959,348          375,048          339,652        35,396            0
+ 59 117,565,488,059          375,184          339,780        35,404            0
+ 60 117,566,704,496          375,320          339,908        35,412            0
+ 61 117,567,365,892          375,456          340,036        35,420            0
+ 62 117,569,084,014          375,728          340,292        35,436            0
+ 63 117,569,480,293          376,000          340,548        35,452            0
+90.57% (340,548B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->34.88% (131,136B) 0x10D798: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.43% (65,536B) 0x10DA12: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->17.43% (65,536B) 0x10DA79: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->08.72% (32,792B) 0x10DA42: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->05.51% (20,736B) 0x11994E: rv_step (in /home/qwe661234/rv32emu/build/rv32emu)
+| ->05.51% (20,736B) 0x10DB5F: main (in /home/qwe661234/rv32emu/build/rv32emu)
+|   
+->03.27% (12,288B) 0x10DA29: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->02.18% (8,192B) 0x10DACC: main (in /home/qwe661234/rv32emu/build/rv32emu)
+| 
+->01.15% (4,332B) in 17 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 64 117,570,008,855          376,136          340,676        35,460            0
+ 65 117,571,593,240          376,272          340,804        35,468            0
+ 66 117,572,254,785          376,408          340,932        35,476            0
+ 67 117,573,310,697          376,680          341,188        35,492            0
+ 68 117,573,707,032          376,952          341,444        35,508            0
+ 69 117,574,104,654          377,088          341,572        35,516            0
+ 70 117,574,500,873          377,064          341,556        35,508            0

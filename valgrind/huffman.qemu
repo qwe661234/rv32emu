@@ -1,0 +1,956 @@
+--------------------------------------------------------------------------------
+Command:            ../QE_new/bin/qemu-riscv32 ../rv8-bench/test_bench/huffman.elf
+Massif arguments:   --massif-out-file=./valgrind/huffman.qemu.out
+ms_print arguments: ./valgrind/huffman.qemu.out
+--------------------------------------------------------------------------------
+
+
+    KB
+873.0^                                                                       :
+     |                                                                       #
+     |@:::::::::::::@::::::::::::::::::::::::::::::::::::::::::::::::::::::::#
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+     |@             @             :                                          #
+   0 +----------------------------------------------------------------------->Gi
+     0                                                                   352.1
+
+Number of snapshots: 57
+ Detailed snapshots: [8, 12, 19, 26, 31, 34, 39, 48 (peak), 54]
+
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+  0              0                0                0             0            0
+  1      2,107,323               24                4            20            0
+  2      4,074,655          803,864          775,634        28,230            0
+  3      6,254,902          807,376          777,658        29,718            0
+  4      7,894,446          808,776          778,914        29,862            0
+  5     10,436,035          812,136          780,834        31,302            0
+  6     13,431,693          816,112          783,834        32,278            0
+  7     15,310,017          818,464          785,514        32,950            0
+  8     18,202,592          821,872          787,801        34,071            0
+95.85% (787,801B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->63.83% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->63.83% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->63.82% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->63.82% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->63.79% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->63.79% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->16.35% (134,368B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.98% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.98% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.98% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.98% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.98% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.98% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.98% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.98% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.98% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.98% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->02.60% (21,336B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.33% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.19% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.14% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.14% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.22% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.19% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.19% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.14% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+| | ->01.14% (9,384B) in 5 places, all below massif's threshold (1.00%)
+| |   
+| ->01.09% (8,920B) 0x15060D: main (main.c:936)
+|   
+->11.97% (98,411B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->03.99% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.99% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.99% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.99% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.99% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.99% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.99% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.99% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.99% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.99% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.99% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.99% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.99% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.99% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.99% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->02.63% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->01.99% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.99% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.99% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.99% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.99% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.99% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.99% (16,384B) 0x1: ???
+| |             ->01.99% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.99% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.87% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+| | ->01.85% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+| | | ->01.85% (15,168B) 0x15037F: main (main.c:796)
+| | |   
+| | ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.50% (12,320B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+|   ->01.50% (12,320B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+|     ->01.50% (12,320B) 0x2A0816: tcg_tb_insert (region.c:229)
+|       ->01.50% (12,320B) 0x212EFF: tb_gen_code (translate-all.c:544)
+|         ->01.50% (12,320B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+|           ->01.50% (12,320B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+|             ->01.50% (12,320B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+|               ->01.50% (12,320B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+|                 ->01.50% (12,320B) 0x150703: main (main.c:1014)
+|                   
+->01.87% (15,392B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.87% (15,392B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.83% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+  9     19,585,884          823,384          788,881        34,503            0
+ 10     21,698,486          825,624          790,481        35,143            0
+ 11     23,520,824          825,680          790,521        35,159            0
+ 12     25,424,808          827,808          792,041        35,767            0
+95.68% (792,041B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->63.37% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->63.37% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->63.37% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->63.37% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->63.33% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->63.33% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->16.23% (134,368B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.92% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.92% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.92% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.92% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.92% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.92% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.92% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.92% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.92% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.92% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->02.58% (21,336B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.32% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.18% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.14% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.14% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.21% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.18% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.18% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.13% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+| | ->01.13% (9,384B) in 5 places, all below massif's threshold (1.00%)
+| |   
+| ->01.08% (8,920B) 0x15060D: main (main.c:936)
+|   
+->12.40% (102,651B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->03.96% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.96% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.96% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.96% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.96% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.96% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.96% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.96% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.96% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.96% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.96% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.96% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.96% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.96% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.96% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->02.61% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.00% (16,560B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+| | ->02.00% (16,560B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+| |   ->02.00% (16,560B) 0x2A0816: tcg_tb_insert (region.c:229)
+| |     ->02.00% (16,560B) 0x212EFF: tb_gen_code (translate-all.c:544)
+| |       ->02.00% (16,560B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |         ->02.00% (16,560B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |           ->02.00% (16,560B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |             ->02.00% (16,560B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |               ->02.00% (16,560B) 0x150703: main (main.c:1014)
+| |                 
+| ->01.98% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.98% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.98% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.98% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.98% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.98% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.98% (16,384B) 0x1: ???
+| |             ->01.98% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.98% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.85% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+|   ->01.83% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+|   | ->01.83% (15,168B) 0x15037F: main (main.c:796)
+|   |   
+|   ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->01.86% (15,392B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.86% (15,392B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.81% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 13     28,430,326          828,032          792,201        35,831            0
+ 14     30,738,472          830,552          794,033        36,519            0
+ 15     33,764,400          833,240          795,921        37,319            0
+ 16     36,003,206          833,296          795,993        37,303            0
+ 17     37,447,754          833,688          796,241        37,447            0
+ 18    784,411,724          833,744          796,313        37,431            0
+ 19    784,669,054          833,912          796,881        37,031            0
+95.56% (796,881B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->62.91% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->62.91% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->62.90% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->62.90% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->62.87% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->62.87% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->16.11% (134,368B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.86% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.86% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.86% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.86% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.86% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.86% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.86% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.86% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.86% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.86% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->02.56% (21,336B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.30% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.17% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.13% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.13% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.20% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.17% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.17% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.13% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+| | ->01.13% (9,384B) in 5 places, all below massif's threshold (1.00%)
+| |   
+| ->01.07% (8,920B) 0x15060D: main (main.c:936)
+|   
+->12.83% (107,011B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->03.93% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.93% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.93% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.93% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.93% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.93% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.93% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.93% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.93% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.93% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.93% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.93% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.93% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.93% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.93% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->02.59% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.51% (20,920B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+| | ->02.51% (20,920B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+| |   ->02.51% (20,920B) 0x2A0816: tcg_tb_insert (region.c:229)
+| |     ->02.51% (20,920B) 0x212EFF: tb_gen_code (translate-all.c:544)
+| |       ->02.51% (20,920B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |         ->02.51% (20,920B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |           ->02.51% (20,920B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |             ->02.51% (20,920B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |               ->02.51% (20,920B) 0x150703: main (main.c:1014)
+| |                 
+| ->01.96% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.96% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.96% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.96% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.96% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.96% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.96% (16,384B) 0x1: ???
+| |             ->01.96% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.96% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.84% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+|   ->01.82% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+|   | ->01.82% (15,168B) 0x15037F: main (main.c:796)
+|   |   
+|   ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->01.90% (15,872B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.90% (15,872B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.80% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 20  1,539,301,521          834,136          796,561        37,575            0
+ 21  1,540,056,939          835,144          797,281        37,863            0
+ 22  2,294,596,836          835,256          797,361        37,895            0
+ 23  3,049,166,754          835,424          797,481        37,943            0
+ 24  3,049,428,206          835,760          797,881        37,879            0
+ 25 76,232,003,669          835,784          797,885        37,899            0
+ 26 76,233,107,059          837,240          798,925        38,315            0
+95.42% (798,925B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->62.66% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->62.66% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->62.65% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->62.65% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->62.62% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->62.62% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->16.05% (134,372B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.83% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.83% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.83% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.83% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.83% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.83% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.83% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.83% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.83% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.83% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->02.55% (21,340B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.29% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.17% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.12% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.12% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.19% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.17% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.17% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.12% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+| | ->01.12% (9,384B) in 5 places, all below massif's threshold (1.00%)
+| |   
+| ->01.07% (8,920B) 0x15060D: main (main.c:936)
+|   
+->13.06% (109,371B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->03.92% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.92% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.92% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.92% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.92% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.92% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.92% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.92% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.92% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.92% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.92% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.92% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.92% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.92% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.92% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->02.78% (23,280B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+| | ->02.78% (23,280B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+| |   ->02.78% (23,280B) 0x2A0816: tcg_tb_insert (region.c:229)
+| |     ->02.78% (23,280B) 0x212EFF: tb_gen_code (translate-all.c:544)
+| |       ->02.78% (23,280B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |         ->02.78% (23,280B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |           ->02.78% (23,280B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |             ->02.78% (23,280B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |               ->02.78% (23,280B) 0x150703: main (main.c:1014)
+| |                 
+| ->02.58% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->01.96% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.96% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.96% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.96% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.96% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.96% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.96% (16,384B) 0x1: ???
+| |             ->01.96% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.96% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.83% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+|   ->01.81% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+|   | ->01.81% (15,168B) 0x15037F: main (main.c:796)
+|   |   
+|   ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->01.86% (15,552B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.86% (15,552B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.79% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 27 76,236,149,492          840,968          801,441        39,527            0
+ 28 76,238,549,674          841,080          801,521        39,559            0
+ 29 151,684,522,691          841,080          801,553        39,527            0
+ 30 378,029,494,261          841,160          802,045        39,115            0
+ 31 378,031,115,512          843,040          802,921        40,119            0
+95.24% (802,921B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->62.23% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->62.23% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->62.22% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->62.22% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->62.19% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->62.19% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->15.94% (134,368B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.78% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.78% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.78% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.78% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.78% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.78% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.78% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.78% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.78% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.78% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->02.53% (21,336B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.27% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.16% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.12% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.12% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.19% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.16% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.16% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.11% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+| | ->01.11% (9,384B) in 5 places, all below massif's threshold (1.00%)
+| |   
+| ->01.06% (8,920B) 0x15060D: main (main.c:936)
+|   
+->13.47% (113,531B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->03.89% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.89% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.89% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.89% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.89% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.89% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.89% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.89% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.89% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.89% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.89% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.89% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.89% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.89% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.89% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->03.25% (27,440B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+| | ->03.25% (27,440B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+| |   ->03.25% (27,440B) 0x2A0816: tcg_tb_insert (region.c:229)
+| |     ->03.25% (27,440B) 0x212EFF: tb_gen_code (translate-all.c:544)
+| |       ->03.25% (27,440B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |         ->03.25% (27,440B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |           ->03.25% (27,440B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |             ->03.25% (27,440B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |               ->03.25% (27,440B) 0x150703: main (main.c:1014)
+| |                 
+| ->02.56% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->01.94% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.94% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.94% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.94% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.94% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.94% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.94% (16,384B) 0x1: ???
+| |             ->01.94% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.94% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.82% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+|   ->01.80% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+|   | ->01.80% (15,168B) 0x15037F: main (main.c:796)
+|   |   
+|   ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->01.83% (15,392B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.83% (15,392B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.78% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 32 378,033,557,936          846,400          805,321        41,079            0
+ 33 378,036,638,680          850,768          808,601        42,167            0
+ 34 378,038,751,504          852,728          810,961        41,767            0
+95.10% (810,961B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->61.52% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->61.52% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->61.51% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->61.51% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->61.48% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->61.48% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->15.76% (134,368B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.69% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.69% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.69% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.69% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.69% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.69% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.69% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.69% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.69% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.69% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->02.50% (21,336B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.25% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.15% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.10% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.10% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.17% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.14% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.14% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.10% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+| | ->01.10% (9,384B) in 5 places, all below massif's threshold (1.00%)
+| |   
+| ->01.05% (8,920B) 0x15060D: main (main.c:936)
+|   
+->14.13% (120,451B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->04.03% (34,360B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+| | ->04.03% (34,360B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+| |   ->04.03% (34,360B) 0x2A0816: tcg_tb_insert (region.c:229)
+| |     ->04.03% (34,360B) 0x212EFF: tb_gen_code (translate-all.c:544)
+| |       ->04.03% (34,360B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |         ->04.03% (34,360B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |           ->04.03% (34,360B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |             ->04.03% (34,360B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |               ->04.03% (34,360B) 0x150703: main (main.c:1014)
+| |                 
+| ->03.84% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.84% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.84% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.84% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.84% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.84% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.84% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.84% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.84% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.84% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.84% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.84% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.84% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.84% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.84% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->02.53% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->01.92% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.92% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.92% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.92% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.92% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.92% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.92% (16,384B) 0x1: ???
+| |             ->01.92% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.92% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.80% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+|   ->01.78% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+|   | ->01.78% (15,168B) 0x15037F: main (main.c:796)
+|   |   
+|   ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->01.94% (16,512B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.94% (16,512B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.76% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 35 378,041,819,279          856,536          812,561        43,975            0
+ 36 378,043,512,932          858,776          814,161        44,615            0
+ 37 378,045,279,822          861,016          815,921        45,095            0
+ 38 378,047,004,245          863,480          817,521        45,959            0
+ 39 378,049,561,755          866,392          819,601        46,791            0
+94.60% (819,601B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->60.55% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->60.55% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->60.54% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->60.54% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->60.51% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->60.51% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->15.51% (134,368B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.57% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.57% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.57% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.57% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.57% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.57% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.57% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.57% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.57% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.57% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->02.46% (21,336B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.21% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.13% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.08% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.08% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.15% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.13% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.13% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.08% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+| | ->01.08% (9,384B) in 5 places, all below massif's threshold (1.00%)
+| |   
+| ->01.03% (8,920B) 0x15060D: main (main.c:936)
+|   
+->15.03% (130,211B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->05.09% (44,120B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+| | ->05.09% (44,120B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+| |   ->05.09% (44,120B) 0x2A0816: tcg_tb_insert (region.c:229)
+| |     ->05.09% (44,120B) 0x212EFF: tb_gen_code (translate-all.c:544)
+| |       ->05.09% (44,120B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |         ->05.09% (44,120B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |           ->05.09% (44,120B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |             ->05.09% (44,120B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |               ->05.09% (44,120B) 0x150703: main (main.c:1014)
+| |                 
+| ->03.78% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.78% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.78% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.78% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.78% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.78% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.78% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.78% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.78% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.78% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.78% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.78% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.78% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.78% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.78% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->02.49% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->01.89% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.89% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.89% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.89% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.89% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.89% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.89% (16,384B) 0x1: ???
+| |             ->01.89% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.89% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.77% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+|   ->01.75% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+|   | ->01.75% (15,168B) 0x15037F: main (main.c:796)
+|   |   
+|   ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->01.78% (15,392B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.78% (15,392B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.73% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 40 378,051,217,341          868,464          821,081        47,383            0
+ 41 378,052,957,977          870,480          822,681        47,799            0
+ 42 378,055,545,651          873,560          824,721        48,839            0
+ 43 378,057,241,740          875,464          826,241        49,223            0
+ 44 378,060,023,521          879,384          828,881        50,503            0
+ 45 378,061,247,247          881,176          830,161        51,015            0
+ 46 378,063,164,037          884,032          832,201        51,831            0
+ 47 378,065,639,609          887,280          834,521        52,759            0
+ 48 378,067,837,585          889,880          836,525        53,355            0
+94.00% (836,525B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->58.95% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->58.95% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->58.95% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->58.95% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->58.92% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->58.92% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->16.52% (146,971B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->06.84% (60,880B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+| | ->06.84% (60,880B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+| |   ->06.84% (60,880B) 0x2A0816: tcg_tb_insert (region.c:229)
+| |     ->06.84% (60,880B) 0x212EFF: tb_gen_code (translate-all.c:544)
+| |       ->06.84% (60,880B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |         ->06.84% (60,880B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |           ->06.84% (60,880B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |             ->06.84% (60,880B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |               ->06.84% (60,880B) 0x150703: main (main.c:1014)
+| |                 
+| ->03.68% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.68% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.68% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.68% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.68% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.68% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.68% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.68% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.68% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.68% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.68% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.68% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.68% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.68% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.68% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->02.42% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->01.84% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.84% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.84% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.84% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.84% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.84% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.84% (16,384B) 0x1: ???
+| |             ->01.84% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.84% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.72% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+|   ->01.70% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+|   | ->01.70% (15,168B) 0x15037F: main (main.c:796)
+|   |   
+|   ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->15.10% (134,372B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.37% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.37% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.37% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.37% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.37% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.37% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.37% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.37% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.37% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.37% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->02.40% (21,340B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->02.15% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.10% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.06% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.06% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.12% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.10% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.10% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.05% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+| | ->01.05% (9,384B) in 5 places, all below massif's threshold (1.00%)
+| |   
+| ->01.00% (8,920B) 0x15060D: main (main.c:936)
+|   
+->01.75% (15,552B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.75% (15,552B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.69% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 49 378,069,235,639          891,672          837,805        53,867            0
+ 50 378,069,493,434          891,928          837,841        54,087            0
+ 51 378,069,758,073          892,320          838,121        54,199            0
+ 52 378,070,033,686          892,712          838,561        54,151            0
+ 53 378,070,306,282          893,104          838,681        54,423            0
+ 54 378,070,583,265          893,552          839,001        54,551            0
+93.90% (839,001B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+->58.71% (524,608B) 0x278D34: qemu_try_memalign (memalign.c:53)
+| ->58.71% (524,608B) 0x278E64: qemu_memalign (memalign.c:73)
+|   ->58.70% (524,544B) 0x27551A: qht_map_create (qht.c:457)
+|   | ->58.70% (524,544B) 0x275D99: qht_init (qht.c:475)
+|   |   ->58.67% (524,288B) 0x20BF39: tcg_init_machine (tcg-all.c:116)
+|   |   | ->58.67% (524,288B) 0x150373: main (main.c:794)
+|   |   |   
+|   |   ->00.03% (256B) in 1+ places, all below ms_print's threshold (01.00%)
+|   |   
+|   ->00.01% (64B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->16.74% (149,611B) 0x4FFD738: g_malloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.11% (63,520B) 0x2CA2F9: q_tree_node_new (qtree.c:122)
+| | ->07.11% (63,520B) 0x2CA2F9: q_tree_insert_internal.isra.0 (qtree.c:604)
+| |   ->07.11% (63,520B) 0x2A0816: tcg_tb_insert (region.c:229)
+| |     ->07.11% (63,520B) 0x212EFF: tb_gen_code (translate-all.c:544)
+| |       ->07.11% (63,520B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |         ->07.11% (63,520B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |           ->07.11% (63,520B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |             ->07.11% (63,520B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |               ->07.11% (63,520B) 0x150703: main (main.c:1014)
+| |                 
+| ->03.67% (32,784B) 0x2A5492: tcg_malloc_internal (tcg.c:847)
+| | ->03.67% (32,784B) 0x2A5657: tcg_malloc (tcg.h:780)
+| |   ->03.67% (32,784B) 0x2A5657: tcg_op_alloc (tcg.c:3198)
+| |     ->03.67% (32,784B) 0x2AD6CC: tcg_emit_op (tcg.c:3214)
+| |       ->03.67% (32,784B) 0x2B0BEA: tcg_gen_op3 (tcg-op.c:55)
+| |         ->03.67% (32,784B) 0x213857: gen_tb_start (translator.c:52)
+| |           ->03.67% (32,784B) 0x213857: translator_loop (translator.c:150)
+| |             ->03.67% (32,784B) 0x1DDAC1: gen_intermediate_code (translate.c:1293)
+| |               ->03.67% (32,784B) 0x212872: setjmp_gen_code.constprop.0 (translate-all.c:279)
+| |                 ->03.67% (32,784B) 0x212CAA: tb_gen_code (translate-all.c:357)
+| |                   ->03.67% (32,784B) 0x20CB4D: cpu_exec_loop.constprop.0 (cpu-exec.c:1006)
+| |                     ->03.67% (32,784B) 0x20CD98: cpu_exec_setjmp.isra.0 (cpu-exec.c:1058)
+| |                       ->03.67% (32,784B) 0x20D29B: cpu_exec (cpu-exec.c:1084)
+| |                         ->03.67% (32,784B) 0x15B2C7: cpu_loop (cpu_loop.c:37)
+| |                           ->03.67% (32,784B) 0x150703: main (main.c:1014)
+| |                             
+| ->02.41% (21,579B) in 20 places, all below massif's threshold (1.00%)
+| | 
+| ->01.83% (16,384B) 0x4FFDB73: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| | ->01.83% (16,384B) 0x4FBDBA8: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| |   ->01.83% (16,384B) 0x400647D: call_init.part.0 (dl-init.c:70)
+| |     ->01.83% (16,384B) 0x4006567: call_init (dl-init.c:33)
+| |       ->01.83% (16,384B) 0x4006567: _dl_init (dl-init.c:117)
+| |         ->01.83% (16,384B) 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+| |           ->01.83% (16,384B) 0x1: ???
+| |             ->01.83% (16,384B) 0x1FFF0000D2: ???
+| |               ->01.83% (16,384B) 0x1FFF0000ED: ???
+| |                 
+| ->01.72% (15,344B) 0x24C8FE: object_new_with_type (object.c:747)
+|   ->01.70% (15,168B) 0x151615: cpu_create (cpu-common.c:60)
+|   | ->01.70% (15,168B) 0x15037F: main (main.c:796)
+|   |   
+|   ->00.02% (176B) in 1+ places, all below ms_print's threshold (01.00%)
+|   
+->15.04% (134,368B) 0x4FFDC50: g_malloc0 (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->07.34% (65,552B) 0x20D361: tcg_exec_realizefn (cpu-exec.c:1102)
+| | ->07.34% (65,552B) 0x1E644C: cpu_exec_realizefn (cpu-target.c:138)
+| |   ->07.34% (65,552B) 0x15C86D: riscv_cpu_realize (cpu.c:1059)
+| |     ->07.34% (65,552B) 0x24653A: device_set_realized (qdev.c:510)
+| |       ->07.34% (65,552B) 0x24A1EB: property_set_bool (object.c:2305)
+| |         ->07.34% (65,552B) 0x24D3BA: object_property_set (object.c:1435)
+| |           ->07.34% (65,552B) 0x2508D2: object_property_set_qobject (qom-qobject.c:28)
+| |             ->07.34% (65,552B) 0x24D9E7: object_property_set_bool (object.c:1504)
+| |               ->07.34% (65,552B) 0x151647: cpu_create (cpu-common.c:61)
+| |                 ->07.34% (65,552B) 0x15037F: main (main.c:796)
+| |                   
+| ->03.39% (30,256B) in 21 places, all below massif's threshold (1.00%)
+| | 
+| ->02.15% (19,176B) 0x24A9F6: type_new (object.c:106)
+| | ->01.09% (9,776B) in 4 places, all below massif's threshold (1.00%)
+| | | 
+| | ->01.05% (9,400B) 0x24B202: type_initialize_interface (object.c:274)
+| |   ->01.05% (9,400B) in 2 places, all below massif's threshold (1.00%)
+| |     
+| ->01.12% (10,000B) 0x24D03E: object_property_try_add (object.c:1258)
+| | ->01.09% (9,760B) 0x24D0D8: object_property_add (object.c:1279)
+| | | ->01.09% (9,760B) in 3 places, all below massif's threshold (1.00%)
+| | |   
+| | ->00.03% (240B) in 1+ places, all below ms_print's threshold (01.00%)
+| | 
+| ->01.05% (9,384B) 0x24AD98: type_initialize.part.0 (object.c:325)
+|   ->01.05% (9,384B) in 5 places, all below massif's threshold (1.00%)
+|     
+->01.72% (15,392B) 0x4FFDD7F: g_realloc (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7200.4)
+| ->01.72% (15,392B) in 8 places, all below massif's threshold (1.00%)
+|   
+->01.68% (15,022B) in 16 places, all below massif's threshold (1.00%)
+  
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+ 55 378,070,847,895          893,888          839,401        54,487            0
+ 56 378,071,218,907          893,928          839,281        54,647            0

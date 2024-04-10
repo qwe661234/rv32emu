@@ -1,0 +1,9 @@
+# declare -a arr=( "numeric_sort" "qsort" "miniz" "primes" "sha" "dhrystone" "FP_emulation" "bitfield" "stream" "string_sort" "assignment" "idea" "huffman")
+declare -a arr=("stream" "string_sort" "assignment" "idea" "huffman")
+## now loop through the above array
+for i in "${arr[@]}"
+do
+   valgrind --tool=massif --massif-out-file=./valgrind/$i.qemu.out ../QE_new/bin/qemu-riscv32 "../rv8-bench/test_bench/$i.elf"
+   ms_print ./valgrind/$i.qemu.out > ./valgrind/$i.qemu
+   # or do whatever with individual element of the array
+done

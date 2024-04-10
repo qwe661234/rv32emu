@@ -1,0 +1,2589 @@
+desc: --massif-out-file=./valgrind/assignment.t2.out
+cmd: ./build/rv32emu ../rv8-bench/test_bench/assignment.elf
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=22327265
+mem_heap_B=750953
+mem_heap_extra_B=96943
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=300243944292
+mem_heap_B=752233
+mem_heap_extra_B=96967
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=301731937238
+mem_heap_B=757657
+mem_heap_extra_B=98303
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=302903438574
+mem_heap_B=757969
+mem_heap_extra_B=98511
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=304836367183
+mem_heap_B=758161
+mem_heap_extra_B=98639
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=305946850941
+mem_heap_B=758185
+mem_heap_extra_B=98655
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=308170272697
+mem_heap_B=758313
+mem_heap_extra_B=98663
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=308943744791
+mem_heap_B=758841
+mem_heap_extra_B=98807
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=311378900999
+mem_heap_B=758865
+mem_heap_extra_B=98823
+mem_stacks_B=0
+heap_tree=detailed
+n13: 758865 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x123B70: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x123B70: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10E76C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x123D6E: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x123D6E: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10E76C: main (main.c:227)
+ n1: 65536 0x123DC9: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x123DC9: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10E76C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n0: 53109 in 192 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n1: 32792 0x123D9D: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x123D9D: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10E76C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 12288 0x123D84: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x123D84: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10E76C: main (main.c:227)
+#-----------
+snapshot=10
+#-----------
+time=313084800470
+mem_heap_B=758889
+mem_heap_extra_B=98839
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=316108955239
+mem_heap_B=758905
+mem_heap_extra_B=98847
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=317642220143
+mem_heap_B=759097
+mem_heap_extra_B=98895
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=341341189666
+mem_heap_B=759121
+mem_heap_extra_B=98911
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=343164654389
+mem_heap_B=759145
+mem_heap_extra_B=98927
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=355508271855
+mem_heap_B=759169
+mem_heap_extra_B=98943
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=355872535576
+mem_heap_B=759241
+mem_heap_extra_B=98991
+mem_stacks_B=0
+heap_tree=detailed
+n13: 759241 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 131136 0x123B70: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x123B70: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10E76C: main (main.c:227)
+ n2: 81292 0x55DEDEE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 81122 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 81104 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 81104 in 1996 places, all below massif's threshold (1.00%)
+   n0: 18 in 1 place, below massif's threshold (1.00%)
+  n0: 170 in 1 place, below massif's threshold (1.00%)
+ n1: 72800 0xB1A3791: __new_exitfn (cxa_atexit.c:114)
+  n1: 72800 0xB1A390A: __internal_atexit (cxa_atexit.c:44)
+   n1: 72800 0xB1A390A: __cxa_atexit (cxa_atexit.c:70)
+    n0: 72800 in 70 places, all below massif's threshold (1.00%)
+ n1: 72704 0xB791939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n1: 72704 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+      n1: 72704 0x1: ???
+       n1: 72704 0x1FFF0000E6: ???
+        n0: 72704 0x1FFF0000F6: ???
+ n1: 65536 0x123D6E: UnknownInlinedFun (jit.c:1729)
+  n1: 65536 0x123D6E: rv_create.constprop.0 (riscv.c:302)
+   n0: 65536 0x10E76C: main (main.c:227)
+ n1: 65536 0x123DC9: UnknownInlinedFun (cache.c:130)
+  n1: 65536 0x123DC9: rv_create.constprop.0 (riscv.c:303)
+   n0: 65536 0x10E76C: main (main.c:227)
+ n1: 57600 0x78192D3: std::_Rb_tree_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique_<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_const_iterator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<unsigned int, std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<unsigned int>, std::allocator<std::pair<unsigned int const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 57600 in 800 places, all below massif's threshold (1.00%)
+ n0: 53485 in 192 places, all below massif's threshold (1.00%)
+ n1: 50712 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 50712 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 49164 0x55DEE2E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 49164 0x55DF01B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 49164 0x55D0C2A: llvm::cl::Option::addArgument() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 49164 0x553A67B: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 49164 0x400647D: call_init.part.0 (dl-init.c:70)
+        n1: 49164 0x4006567: call_init (dl-init.c:33)
+         n1: 49164 0x4006567: _dl_init (dl-init.c:117)
+          n1: 49164 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+           n1: 49164 0x1: ???
+            n1: 49164 0x1FFF0000E6: ???
+             n0: 49164 0x1FFF0000F6: ???
+      n0: 0 in 7 places, all below massif's threshold (1.00%)
+   n0: 1548 in 1 place, below massif's threshold (1.00%)
+ n1: 32792 0x123D9D: UnknownInlinedFun (cache.c:123)
+  n1: 32792 0x123D9D: rv_create.constprop.0 (riscv.c:303)
+   n0: 32792 0x10E76C: main (main.c:227)
+ n1: 31680 0x7818EFA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 31680 0x781919A: std::_Rb_tree_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_M_insert_<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> const&, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned int> > >::_Alloc_node&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 31680 in 40 places, all below massif's threshold (1.00%)
+ n1: 12288 0x123D84: UnknownInlinedFun (jit.c:1730)
+  n1: 12288 0x123D84: rv_create.constprop.0 (riscv.c:302)
+   n0: 12288 0x10E76C: main (main.c:227)
+#-----------
+snapshot=17
+#-----------
+time=366805599277
+mem_heap_B=759265
+mem_heap_extra_B=99007
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=367758454089
+mem_heap_B=759313
+mem_heap_extra_B=99039
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=385102637573
+mem_heap_B=759337
+mem_heap_extra_B=99055
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=409841167686
+mem_heap_B=759361
+mem_heap_extra_B=99071
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=410007783295
+mem_heap_B=759409
+mem_heap_extra_B=99103
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=464528587372
+mem_heap_B=759505
+mem_heap_extra_B=99167
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=464604959027
+mem_heap_B=759577
+mem_heap_extra_B=99215
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=618165578842
+mem_heap_B=759601
+mem_heap_extra_B=99231
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=618182356891
+mem_heap_B=759769
+mem_heap_extra_B=99343
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=628119407335
+mem_heap_B=759793
+mem_heap_extra_B=99359
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=628163155029
+mem_heap_B=759841
+mem_heap_extra_B=99391
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=631522581772
+mem_heap_B=759865
+mem_heap_extra_B=99407
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=631542786340
+mem_heap_B=760129
+mem_heap_extra_B=99583
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=1103017609563
+mem_heap_B=760257
+mem_heap_extra_B=99591
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=1103017683215
+mem_heap_B=760865
+mem_heap_extra_B=99671
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=1199713776733
+mem_heap_B=761513
+mem_heap_extra_B=99767
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=1908638216212
+mem_heap_B=761665
+mem_heap_extra_B=99791
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=2444338293124
+mem_heap_B=762465
+mem_heap_extra_B=99799
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=2444347161520
+mem_heap_B=1205138
+mem_heap_extra_B=111886
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=3018325014419
+mem_heap_B=1207511
+mem_heap_extra_B=112361
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=3019655529435
+mem_heap_B=12221666
+mem_heap_extra_B=422430
+mem_stacks_B=0
+heap_tree=detailed
+n11: 12221666 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 4351872 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2175936 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2175936 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 2175936 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 2175936 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 2175936 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 2175936 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 2175936 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 2175936 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 2175936 0x12129C: t2 (t2jit.c:205)
+           n1: 2175936 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 2175936 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 2175936 0xB283A03: clone (clone.S:100)
+  n1: 2175936 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2175936 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 2175936 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 2175936 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 2175936 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 2175936 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 2175936 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 2175936 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 2175936 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 2175936 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 2175936 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 2175936 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 2175936 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 2175936 0x121279: t2 (t2jit.c:193)
+                n1: 2175936 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 2175936 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 2175936 0xB283A03: clone (clone.S:100)
+ n1: 2357760 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 2357760 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1178880 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1178880 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1178880 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1178880 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1178880 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 1178880 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 1178880 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 1178880 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 1178880 0x12129C: t2 (t2jit.c:205)
+            n1: 1178880 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 1178880 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 1178880 0xB283A03: clone (clone.S:100)
+   n1: 1178880 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1178880 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1178880 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1178880 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1178880 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 1178880 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 1178880 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 1178880 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 1178880 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 1178880 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 1178880 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 1178880 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 1178880 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 1178880 0x121279: t2 (t2jit.c:193)
+                 n1: 1178880 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 1178880 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 1178880 0xB283A03: clone (clone.S:100)
+ n0: 2136798 in 1643 places, all below massif's threshold (1.00%)
+ n3: 983040 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 688128 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 688128 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 688128 in 29 places, all below massif's threshold (1.00%)
+  n0: 147456 in 2 places, all below massif's threshold (1.00%)
+  n1: 147456 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 147456 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 147456 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 147456 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 147456 in 2 places, all below massif's threshold (1.00%)
+ n4: 833080 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 362392 in 51 places, all below massif's threshold (1.00%)
+  n1: 191808 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 191808 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 191808 in 2 places, all below massif's threshold (1.00%)
+  n1: 143712 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 143712 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 143712 in 2 places, all below massif's threshold (1.00%)
+  n1: 135168 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 135168 in 38 places, all below massif's threshold (1.00%)
+ n2: 393216 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 196608 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 196608 in 2 places, all below massif's threshold (1.00%)
+  n1: 196608 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 196608 in 3 places, all below massif's threshold (1.00%)
+ n2: 385024 0x55F9A8F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 245760 in 50 places, all below massif's threshold (1.00%)
+  n1: 139264 0x5A44709: llvm::MachineInstr::MachineInstr(llvm::MachineFunction&, llvm::MCInstrDesc const&, llvm::DebugLoc, bool) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 139264 0x5A37B70: llvm::MachineFunction::CreateMachineInstr(llvm::MCInstrDesc const&, llvm::DebugLoc, bool) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 139264 in 8 places, all below massif's threshold (1.00%)
+ n1: 287296 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 287296 in 22 places, all below massif's threshold (1.00%)
+ n1: 231372 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 231372 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 172176 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 162936 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 162936 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 162936 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 162936 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 162936 in 7 places, all below massif's threshold (1.00%)
+    n0: 9240 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 131136 0x123B70: UnknownInlinedFun (jit.c:1713)
+  n1: 131136 0x123B70: rv_create.constprop.0 (riscv.c:302)
+   n0: 131136 0x10E76C: main (main.c:227)
+ n1: 131072 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 131072 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 131072 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 131072 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 131072 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 131072 0x5707A6F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n2: 131072 0x5748FC9: LLVMBuildLoad2 (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 131072 0x11C587: t2_clw (t2_rv32_template.c:1439)
+         n1: 131072 0x11E025: trace_ebb (t2jit.c:97)
+          n1: 131072 0x11E25E: trace_ebb (t2jit.c:121)
+           n1: 131072 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 131072 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 131072 0x11E2DF: trace_ebb (t2jit.c:140)
+              n1: 131072 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 131072 0x11E25E: trace_ebb (t2jit.c:121)
+                n1: 131072 0x11E25E: trace_ebb (t2jit.c:121)
+                 n1: 131072 0x1211E7: t2 (t2jit.c:176)
+                  n1: 131072 0x1213E8: t2c_routine (riscv.c:209)
+                   n1: 131072 0xB1F2AC2: start_thread (pthread_create.c:442)
+                    n0: 131072 0xB283A03: clone (clone.S:100)
+        n0: 0 in 3 places, all below massif's threshold (1.00%)
+      n0: 0 in 2 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=38
+#-----------
+time=3021134016072
+mem_heap_B=20592837
+mem_heap_extra_B=707227
+mem_stacks_B=0
+heap_tree=detailed
+n12: 20592837 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 7615776 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 3807888 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 3807888 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 3807888 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 3807888 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 3807888 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 3807888 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 3807888 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 3807888 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 3807888 0x12129C: t2 (t2jit.c:205)
+           n1: 3807888 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 3807888 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 3807888 0xB283A03: clone (clone.S:100)
+  n1: 3807888 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 3807888 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 3807888 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 3807888 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 3807888 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 3807888 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 3807888 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 3807888 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 3807888 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 3807888 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 3807888 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 3807888 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 3807888 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 3807888 0x121279: t2 (t2jit.c:193)
+                n1: 3807888 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 3807888 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 3807888 0xB283A03: clone (clone.S:100)
+ n1: 4126080 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 4126080 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2063040 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 2063040 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 2063040 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 2063040 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 2063040 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 2063040 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 2063040 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 2063040 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 2063040 0x12129C: t2 (t2jit.c:205)
+            n1: 2063040 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 2063040 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 2063040 0xB283A03: clone (clone.S:100)
+   n1: 2063040 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 2063040 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 2063040 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 2063040 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 2063040 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 2063040 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 2063040 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 2063040 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 2063040 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 2063040 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 2063040 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 2063040 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 2063040 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 2063040 0x121279: t2 (t2jit.c:193)
+                 n1: 2063040 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 2063040 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 2063040 0xB283A03: clone (clone.S:100)
+ n0: 2785130 in 1653 places, all below massif's threshold (1.00%)
+ n3: 1720320 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1204224 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1204224 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 1204224 in 29 places, all below massif's threshold (1.00%)
+  n0: 258048 in 2 places, all below massif's threshold (1.00%)
+  n1: 258048 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 258048 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 258048 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 258048 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 258048 in 2 places, all below massif's threshold (1.00%)
+ n4: 1715688 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 721384 in 51 places, all below massif's threshold (1.00%)
+  n1: 416448 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 416448 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 416448 in 2 places, all below massif's threshold (1.00%)
+  n1: 311616 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 311616 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 311616 in 2 places, all below massif's threshold (1.00%)
+  n1: 266240 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 266240 in 38 places, all below massif's threshold (1.00%)
+ n2: 688128 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 344064 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 344064 in 2 places, all below massif's threshold (1.00%)
+  n1: 344064 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 344064 in 3 places, all below massif's threshold (1.00%)
+ n1: 415800 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 415800 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 356604 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 347364 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 347364 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 347364 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 347364 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 347364 in 7 places, all below massif's threshold (1.00%)
+    n0: 9240 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 409952 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 409952 in 23 places, all below massif's threshold (1.00%)
+ n1: 356352 0x55F9A8F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 356352 in 56 places, all below massif's threshold (1.00%)
+ n1: 262144 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 262144 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 262144 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 262144 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 262144 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 262144 0x5749482: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n2: 262144 0x5749518: LLVMBuildInBoundsGEP2 (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 262144 0x11EDEB: t2_srli (t2_rv32_template.c:726)
+         n1: 262144 0x11FDB9: t2_fuse7 (t2_rv32_template.c:2122)
+          n1: 262144 0x11E025: trace_ebb (t2jit.c:97)
+           n1: 262144 0x11E25E: trace_ebb (t2jit.c:121)
+            n1: 262144 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 262144 0x11E2DF: trace_ebb (t2jit.c:140)
+              n1: 262144 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 262144 0x1211E7: t2 (t2jit.c:176)
+                n1: 262144 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 262144 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 262144 0xB283A03: clone (clone.S:100)
+        n0: 0 in 3 places, all below massif's threshold (1.00%)
+      n0: 0 in 2 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 250240 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 250240 in 18 places, all below massif's threshold (1.00%)
+ n2: 247227 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 217501 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 217298 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 217298 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 217298 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 217298 in 20 places, all below massif's threshold (1.00%)
+   n0: 203 in 1 place, below massif's threshold (1.00%)
+  n0: 29726 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=39
+#-----------
+time=3023056207709
+mem_heap_B=33744622
+mem_heap_extra_B=1113834
+mem_stacks_B=0
+heap_tree=detailed
+n11: 33744622 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 13418272 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 6709136 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 6709136 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 6709136 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 6709136 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 6709136 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 6709136 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 6709136 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 6709136 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 6709136 0x12129C: t2 (t2jit.c:205)
+           n1: 6709136 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 6709136 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 6709136 0xB283A03: clone (clone.S:100)
+  n1: 6709136 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 6709136 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 6709136 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 6709136 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 6709136 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 6709136 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 6709136 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 6709136 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 6709136 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 6709136 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 6709136 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 6709136 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 6709136 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 6709136 0x121279: t2 (t2jit.c:193)
+                n1: 6709136 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 6709136 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 6709136 0xB283A03: clone (clone.S:100)
+ n1: 7269760 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 7269760 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 3634880 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 3634880 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 3634880 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 3634880 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 3634880 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 3634880 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 3634880 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 3634880 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 3634880 0x12129C: t2 (t2jit.c:205)
+            n1: 3634880 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 3634880 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 3634880 0xB283A03: clone (clone.S:100)
+   n1: 3634880 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 3634880 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 3634880 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 3634880 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 3634880 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 3634880 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 3634880 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 3634880 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 3634880 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 3634880 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 3634880 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 3634880 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 3634880 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 3634880 0x121279: t2 (t2jit.c:193)
+                 n1: 3634880 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 3634880 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 3634880 0xB283A03: clone (clone.S:100)
+ n0: 3352950 in 1660 places, all below massif's threshold (1.00%)
+ n3: 3031040 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2121728 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2121728 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 2121728 in 29 places, all below massif's threshold (1.00%)
+  n0: 454656 in 2 places, all below massif's threshold (1.00%)
+  n1: 454656 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 454656 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 454656 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 454656 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 454656 in 2 places, all below massif's threshold (1.00%)
+ n4: 2844920 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1223976 in 54 places, all below massif's threshold (1.00%)
+  n1: 673536 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 673536 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 673536 in 2 places, all below massif's threshold (1.00%)
+  n1: 504144 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 504144 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 504144 in 2 places, all below massif's threshold (1.00%)
+  n1: 443264 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 443264 in 38 places, all below massif's threshold (1.00%)
+ n2: 1212416 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 606208 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 606208 in 2 places, all below massif's threshold (1.00%)
+  n1: 606208 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 606208 in 3 places, all below massif's threshold (1.00%)
+ n1: 657144 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 657144 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 597948 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 587160 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 587160 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 587160 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 587160 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 587160 in 7 places, all below massif's threshold (1.00%)
+    n0: 10788 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 580744 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 580744 in 23 places, all below massif's threshold (1.00%)
+ n1: 524288 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 524288 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 524288 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 524288 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 524288 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 524288 0x5749482: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n2: 524288 0x5749518: LLVMBuildInBoundsGEP2 (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 524288 0x11BD0B: t2_cbnez (t2_rv32_template.c:1755)
+         n1: 524288 0x11E025: trace_ebb (t2jit.c:97)
+          n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+           n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+                n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+                 n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+                  n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                   n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                    n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                     n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+                      n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                       n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                        n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                         n1: 524288 0x1211E7: t2 (t2jit.c:176)
+                          n1: 524288 0x1213E8: t2c_routine (riscv.c:209)
+                           n1: 524288 0xB1F2AC2: start_thread (pthread_create.c:442)
+                            n0: 524288 0xB283A03: clone (clone.S:100)
+        n0: 0 in 4 places, all below massif's threshold (1.00%)
+      n0: 0 in 3 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 434112 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 434112 in 18 places, all below massif's threshold (1.00%)
+ n2: 418976 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 367418 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 367215 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 367215 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 367215 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 367215 in 20 places, all below massif's threshold (1.00%)
+   n0: 203 in 1 place, below massif's threshold (1.00%)
+  n0: 51558 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=40
+#-----------
+time=3025122774578
+mem_heap_B=44046867
+mem_heap_extra_B=1483821
+mem_stacks_B=0
+heap_tree=detailed
+n11: 44046867 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 17044832 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 8522416 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 8522416 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 8522416 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 8522416 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 8522416 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 8522416 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 8522416 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 8522416 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 8522416 0x12129C: t2 (t2jit.c:205)
+           n1: 8522416 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 8522416 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 8522416 0xB283A03: clone (clone.S:100)
+  n1: 8522416 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 8522416 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 8522416 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 8522416 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 8522416 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 8522416 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 8522416 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 8522416 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 8522416 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 8522416 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 8522416 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 8522416 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 8522416 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 8522416 0x121279: t2 (t2jit.c:193)
+                n1: 8522416 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 8522416 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 8522416 0xB283A03: clone (clone.S:100)
+ n1: 9234560 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 9234560 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 4617280 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 4617280 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 4617280 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 4617280 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 4617280 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 4617280 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 4617280 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 4617280 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 4617280 0x12129C: t2 (t2jit.c:205)
+            n1: 4617280 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 4617280 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 4617280 0xB283A03: clone (clone.S:100)
+   n1: 4617280 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 4617280 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 4617280 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 4617280 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 4617280 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 4617280 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 4617280 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 4617280 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 4617280 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 4617280 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 4617280 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 4617280 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 4617280 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 4617280 0x121279: t2 (t2jit.c:193)
+                 n1: 4617280 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 4617280 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 4617280 0xB283A03: clone (clone.S:100)
+ n0: 4821088 in 1680 places, all below massif's threshold (1.00%)
+ n5: 4108344 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1213544 in 53 places, all below massif's threshold (1.00%)
+  n1: 1015872 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1015872 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 507936 0x58EB32A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 507936 in 2 places, all below massif's threshold (1.00%)
+    n1: 507936 0x58EB3DC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 507936 in 2 places, all below massif's threshold (1.00%)
+  n1: 760464 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 760464 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 472464 0x58E6EAE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 472464 0x58DB8B2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 472464 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 472464 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 472464 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 472464 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 472464 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 472464 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 472464 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 472464 0x12129C: t2 (t2jit.c:205)
+              n1: 472464 0x1213E8: t2c_routine (riscv.c:209)
+               n1: 472464 0xB1F2AC2: start_thread (pthread_create.c:442)
+                n0: 472464 0xB283A03: clone (clone.S:100)
+    n0: 288000 in 1 place, below massif's threshold (1.00%)
+  n1: 626944 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 626944 in 38 places, all below massif's threshold (1.00%)
+  n1: 491520 0x57DD048: llvm::BinaryOperator::Create(llvm::Instruction::BinaryOps, llvm::Value*, llvm::Value*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 491520 in 18 places, all below massif's threshold (1.00%)
+ n3: 3850240 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2695168 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2695168 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 2695168 in 29 places, all below massif's threshold (1.00%)
+  n0: 577536 in 2 places, all below massif's threshold (1.00%)
+  n1: 577536 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 577536 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 577536 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 577536 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 577536 in 2 places, all below massif's threshold (1.00%)
+ n2: 1540096 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 770048 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 770048 in 2 places, all below massif's threshold (1.00%)
+  n1: 770048 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 770048 in 3 places, all below massif's threshold (1.00%)
+ n1: 903024 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 903024 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 843828 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 833040 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 833040 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 833040 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 833040 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 833040 in 8 places, all below massif's threshold (1.00%)
+    n0: 10788 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 815024 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 815024 in 23 places, all below massif's threshold (1.00%)
+ n1: 607920 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 607920 in 18 places, all below massif's threshold (1.00%)
+ n2: 597451 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 529111 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 528653 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 528653 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 528653 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 528653 in 21 places, all below massif's threshold (1.00%)
+   n0: 458 in 1 place, below massif's threshold (1.00%)
+  n0: 68340 in 1 place, below massif's threshold (1.00%)
+ n1: 524288 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 524288 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 524288 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 524288 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 524288 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 524288 0x5749482: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n2: 524288 0x5749518: LLVMBuildInBoundsGEP2 (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 524288 0x11BD0B: t2_cbnez (t2_rv32_template.c:1755)
+         n1: 524288 0x11E025: trace_ebb (t2jit.c:97)
+          n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+           n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+                n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+                 n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+                  n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                   n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                    n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                     n1: 524288 0x11E2DF: trace_ebb (t2jit.c:140)
+                      n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                       n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                        n1: 524288 0x11E25E: trace_ebb (t2jit.c:121)
+                         n1: 524288 0x1211E7: t2 (t2jit.c:176)
+                          n1: 524288 0x1213E8: t2c_routine (riscv.c:209)
+                           n1: 524288 0xB1F2AC2: start_thread (pthread_create.c:442)
+                            n0: 524288 0xB283A03: clone (clone.S:100)
+        n0: 0 in 4 places, all below massif's threshold (1.00%)
+      n0: 0 in 3 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=41
+#-----------
+time=3026358307569
+mem_heap_B=52122530
+mem_heap_extra_B=1743038
+mem_stacks_B=0
+heap_tree=detailed
+n11: 52122530 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 20308736 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 10154368 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 10154368 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 10154368 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 10154368 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 10154368 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 10154368 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 10154368 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 10154368 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 10154368 0x12129C: t2 (t2jit.c:205)
+           n1: 10154368 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 10154368 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 10154368 0xB283A03: clone (clone.S:100)
+  n1: 10154368 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 10154368 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 10154368 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 10154368 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 10154368 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 10154368 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 10154368 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 10154368 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 10154368 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 10154368 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 10154368 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 10154368 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 10154368 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 10154368 0x121279: t2 (t2jit.c:193)
+                n1: 10154368 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 10154368 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 10154368 0xB283A03: clone (clone.S:100)
+ n1: 11002880 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 11002880 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 5501440 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 5501440 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 5501440 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 5501440 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 5501440 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 5501440 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 5501440 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 5501440 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 5501440 0x12129C: t2 (t2jit.c:205)
+            n1: 5501440 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 5501440 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 5501440 0xB283A03: clone (clone.S:100)
+   n1: 5501440 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 5501440 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 5501440 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 5501440 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 5501440 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 5501440 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 5501440 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 5501440 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 5501440 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 5501440 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 5501440 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 5501440 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 5501440 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 5501440 0x121279: t2 (t2jit.c:193)
+                 n1: 5501440 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 5501440 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 5501440 0xB283A03: clone (clone.S:100)
+ n0: 5012503 in 1684 places, all below massif's threshold (1.00%)
+ n5: 4860096 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1445264 in 53 places, all below massif's threshold (1.00%)
+  n1: 1203072 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1203072 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 601536 0x58EB32A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 601536 in 2 places, all below massif's threshold (1.00%)
+    n1: 601536 0x58EB3DC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 601536 in 2 places, all below massif's threshold (1.00%)
+  n1: 900144 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 900144 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 558000 0x58E6EAE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 558000 0x58DB8B2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 558000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 558000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 558000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 558000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 558000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 558000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 558000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 558000 0x12129C: t2 (t2jit.c:205)
+              n1: 558000 0x1213E8: t2c_routine (riscv.c:209)
+               n1: 558000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                n0: 558000 0xB283A03: clone (clone.S:100)
+    n0: 342144 in 1 place, below massif's threshold (1.00%)
+  n1: 736000 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 736000 in 38 places, all below massif's threshold (1.00%)
+  n1: 575616 0x57DD048: llvm::BinaryOperator::Create(llvm::Instruction::BinaryOps, llvm::Value*, llvm::Value*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 575616 in 18 places, all below massif's threshold (1.00%)
+ n3: 4587520 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 3211264 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 3211264 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 3211264 in 29 places, all below massif's threshold (1.00%)
+  n0: 688128 in 2 places, all below massif's threshold (1.00%)
+  n1: 688128 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 688128 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 688128 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 688128 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 688128 in 2 places, all below massif's threshold (1.00%)
+ n2: 1835008 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 917504 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 917504 in 2 places, all below massif's threshold (1.00%)
+  n1: 917504 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 917504 in 3 places, all below massif's threshold (1.00%)
+ n1: 1069020 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1069020 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1009824 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 999036 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 999036 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 999036 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 999036 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 999036 in 8 places, all below massif's threshold (1.00%)
+    n0: 10788 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 1048576 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1048576 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1048576 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1048576 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 1048576 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1048576 0x5746F85: LLVMBuildAdd (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1048576 0x11A7A7: t2_cadd (t2_rv32_template.c:1914)
+        n1: 1048576 0x11E025: trace_ebb (t2jit.c:97)
+         n1: 1048576 0x11E2DF: trace_ebb (t2jit.c:140)
+          n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+           n1: 1048576 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 1048576 0x1211E7: t2 (t2jit.c:176)
+                n1: 1048576 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 1048576 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 1048576 0xB283A03: clone (clone.S:100)
+      n0: 0 in 4 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 955408 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 955408 in 23 places, all below massif's threshold (1.00%)
+ n1: 732224 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 732224 in 18 places, all below massif's threshold (1.00%)
+ n2: 710559 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 627931 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 626915 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 626915 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 626915 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 626915 in 21 places, all below massif's threshold (1.00%)
+   n0: 1016 in 1 place, below massif's threshold (1.00%)
+  n0: 82628 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=42
+#-----------
+time=3027826894947
+mem_heap_B=61354824
+mem_heap_extra_B=2039296
+mem_stacks_B=0
+heap_tree=detailed
+n11: 61354824 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 24297952 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 12148976 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 12148976 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12148976 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12148976 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12148976 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12148976 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12148976 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12148976 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12148976 0x12129C: t2 (t2jit.c:205)
+           n1: 12148976 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 12148976 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 12148976 0xB283A03: clone (clone.S:100)
+  n1: 12148976 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 12148976 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12148976 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12148976 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12148976 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12148976 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12148976 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12148976 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12148976 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12148976 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 12148976 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 12148976 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 12148976 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 12148976 0x121279: t2 (t2jit.c:193)
+                n1: 12148976 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 12148976 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 12148976 0xB283A03: clone (clone.S:100)
+ n1: 13164160 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 13164160 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 6582080 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 6582080 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 6582080 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 6582080 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 6582080 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 6582080 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 6582080 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 6582080 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 6582080 0x12129C: t2 (t2jit.c:205)
+            n1: 6582080 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 6582080 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 6582080 0xB283A03: clone (clone.S:100)
+   n1: 6582080 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 6582080 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 6582080 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 6582080 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 6582080 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 6582080 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 6582080 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 6582080 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 6582080 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 6582080 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 6582080 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 6582080 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 6582080 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 6582080 0x121279: t2 (t2jit.c:193)
+                 n1: 6582080 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 6582080 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 6582080 0xB283A03: clone (clone.S:100)
+ n5: 5753496 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1725128 in 54 places, all below massif's threshold (1.00%)
+  n1: 1421376 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1421376 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 710688 0x58EB32A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 710688 in 2 places, all below massif's threshold (1.00%)
+    n1: 710688 0x58EB3DC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 710688 in 2 places, all below massif's threshold (1.00%)
+  n1: 1063440 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1063440 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 654768 0x58E6EAE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 654768 0x58DB8B2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 654768 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 654768 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 654768 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 654768 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 654768 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 654768 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 654768 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 654768 0x12129C: t2 (t2jit.c:205)
+              n1: 654768 0x1213E8: t2c_routine (riscv.c:209)
+               n1: 654768 0xB1F2AC2: start_thread (pthread_create.c:442)
+                n0: 654768 0xB283A03: clone (clone.S:100)
+    n0: 408672 in 1 place, below massif's threshold (1.00%)
+  n1: 865536 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 865536 in 38 places, all below massif's threshold (1.00%)
+  n1: 678016 0x57DD048: llvm::BinaryOperator::Create(llvm::Instruction::BinaryOps, llvm::Value*, llvm::Value*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 678016 in 18 places, all below massif's threshold (1.00%)
+ n3: 5488640 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 3842048 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 3842048 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 3842048 in 29 places, all below massif's threshold (1.00%)
+  n0: 823296 in 2 places, all below massif's threshold (1.00%)
+  n1: 823296 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 823296 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 823296 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 823296 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 823296 in 2 places, all below massif's threshold (1.00%)
+ n0: 5368993 in 1686 places, all below massif's threshold (1.00%)
+ n2: 2195456 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1097728 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1097728 in 2 places, all below massif's threshold (1.00%)
+  n1: 1097728 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1097728 in 3 places, all below massif's threshold (1.00%)
+ n1: 1253472 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1253472 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1194276 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1183488 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1183488 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1183488 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1183488 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 1183488 in 8 places, all below massif's threshold (1.00%)
+    n0: 10788 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 1065504 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1065504 in 23 places, all below massif's threshold (1.00%)
+ n1: 1048576 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1048576 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1048576 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1048576 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 1048576 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1048576 0x5746F85: LLVMBuildAdd (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1048576 0x11A7A7: t2_cadd (t2_rv32_template.c:1914)
+        n1: 1048576 0x11E025: trace_ebb (t2jit.c:97)
+         n1: 1048576 0x11E2DF: trace_ebb (t2jit.c:140)
+          n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+           n1: 1048576 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 1048576 0x1211E7: t2 (t2jit.c:176)
+                n1: 1048576 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 1048576 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 1048576 0xB283A03: clone (clone.S:100)
+      n0: 0 in 4 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 874480 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 874480 in 18 places, all below massif's threshold (1.00%)
+ n2: 844095 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 744639 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 742908 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 742908 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 742908 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 742908 in 21 places, all below massif's threshold (1.00%)
+   n0: 1731 in 1 place, below massif's threshold (1.00%)
+  n0: 99456 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=43
+#-----------
+time=3029260514690
+mem_heap_B=71387846
+mem_heap_extra_B=2343458
+mem_stacks_B=0
+heap_tree=detailed
+n11: 71387846 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 28287168 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 14143584 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 14143584 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 14143584 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 14143584 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 14143584 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 14143584 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 14143584 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 14143584 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 14143584 0x12129C: t2 (t2jit.c:205)
+           n1: 14143584 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 14143584 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 14143584 0xB283A03: clone (clone.S:100)
+  n1: 14143584 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 14143584 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 14143584 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 14143584 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 14143584 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 14143584 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 14143584 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 14143584 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 14143584 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 14143584 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 14143584 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 14143584 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 14143584 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 14143584 0x121279: t2 (t2jit.c:193)
+                n1: 14143584 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 14143584 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 14143584 0xB283A03: clone (clone.S:100)
+ n1: 15325440 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 15325440 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 7662720 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 7662720 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 7662720 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 7662720 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 7662720 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 7662720 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 7662720 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 7662720 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 7662720 0x12129C: t2 (t2jit.c:205)
+            n1: 7662720 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 7662720 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 7662720 0xB283A03: clone (clone.S:100)
+   n1: 7662720 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 7662720 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 7662720 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 7662720 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 7662720 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 7662720 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 7662720 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 7662720 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 7662720 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 7662720 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 7662720 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 7662720 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 7662720 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 7662720 0x121279: t2 (t2jit.c:193)
+                 n1: 7662720 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 7662720 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 7662720 0xB283A03: clone (clone.S:100)
+ n5: 6592176 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1983216 in 54 places, all below massif's threshold (1.00%)
+  n1: 1623552 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1623552 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 811776 0x58EB32A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 811776 in 2 places, all below massif's threshold (1.00%)
+    n1: 811776 0x58EB3DC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 811776 in 2 places, all below massif's threshold (1.00%)
+  n1: 1214784 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1214784 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 748080 0x58E6EAE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 748080 0x58DB8B2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 748080 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 748080 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 748080 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 748080 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 748080 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 748080 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 748080 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 748080 0x12129C: t2 (t2jit.c:205)
+              n1: 748080 0x1213E8: t2c_routine (riscv.c:209)
+               n1: 748080 0xB1F2AC2: start_thread (pthread_create.c:442)
+                n0: 748080 0xB283A03: clone (clone.S:100)
+    n0: 466704 in 1 place, below massif's threshold (1.00%)
+  n1: 992512 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 992512 in 38 places, all below massif's threshold (1.00%)
+  n1: 778112 0x57DD048: llvm::BinaryOperator::Create(llvm::Instruction::BinaryOps, llvm::Value*, llvm::Value*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 778112 in 18 places, all below massif's threshold (1.00%)
+ n0: 6467539 in 1688 places, all below massif's threshold (1.00%)
+ n3: 6389760 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 4472832 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 4472832 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 4472832 in 29 places, all below massif's threshold (1.00%)
+  n0: 958464 in 2 places, all below massif's threshold (1.00%)
+  n1: 958464 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 958464 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 958464 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 958464 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 958464 in 2 places, all below massif's threshold (1.00%)
+ n2: 2555904 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1277952 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1277952 in 2 places, all below massif's threshold (1.00%)
+  n1: 1277952 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1277952 in 3 places, all below massif's threshold (1.00%)
+ n1: 1425636 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1425636 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1366440 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1355652 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1355652 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1355652 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1355652 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 1355652 in 8 places, all below massif's threshold (1.00%)
+    n0: 10788 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 1323744 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1323744 in 23 places, all below massif's threshold (1.00%)
+ n1: 1048576 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1048576 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1048576 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1048576 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 1048576 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1048576 0x5746F85: LLVMBuildAdd (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1048576 0x11A7A7: t2_cadd (t2_rv32_template.c:1914)
+        n1: 1048576 0x11E025: trace_ebb (t2jit.c:97)
+         n1: 1048576 0x11E2DF: trace_ebb (t2jit.c:140)
+          n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+           n1: 1048576 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 1048576 0x1211E7: t2 (t2jit.c:176)
+                n1: 1048576 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 1048576 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 1048576 0xB283A03: clone (clone.S:100)
+      n0: 0 in 4 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 1002456 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1002456 in 18 places, all below massif's threshold (1.00%)
+ n2: 969447 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 854944 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 852534 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 852534 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 852534 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 852534 in 21 places, all below massif's threshold (1.00%)
+   n0: 2410 in 1 place, below massif's threshold (1.00%)
+  n0: 114503 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=44
+#-----------
+time=3030666122429
+mem_heap_B=78883221
+mem_heap_extra_B=2613347
+mem_stacks_B=0
+heap_tree=detailed
+n11: 78883221 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 31551072 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 15775536 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 15775536 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 15775536 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 15775536 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 15775536 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 15775536 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 15775536 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 15775536 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 15775536 0x12129C: t2 (t2jit.c:205)
+           n1: 15775536 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 15775536 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 15775536 0xB283A03: clone (clone.S:100)
+  n1: 15775536 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 15775536 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 15775536 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 15775536 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 15775536 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 15775536 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 15775536 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 15775536 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 15775536 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 15775536 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 15775536 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 15775536 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 15775536 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 15775536 0x121279: t2 (t2jit.c:193)
+                n1: 15775536 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 15775536 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 15775536 0xB283A03: clone (clone.S:100)
+ n1: 17093760 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 17093760 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 8546880 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 8546880 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 8546880 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 8546880 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 8546880 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 8546880 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 8546880 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 8546880 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 8546880 0x12129C: t2 (t2jit.c:205)
+            n1: 8546880 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 8546880 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 8546880 0xB283A03: clone (clone.S:100)
+   n1: 8546880 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 8546880 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 8546880 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 8546880 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 8546880 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 8546880 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 8546880 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 8546880 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 8546880 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 8546880 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 8546880 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 8546880 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 8546880 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 8546880 0x121279: t2 (t2jit.c:193)
+                 n1: 8546880 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 8546880 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 8546880 0xB283A03: clone (clone.S:100)
+ n5: 7454096 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 2245600 in 54 places, all below massif's threshold (1.00%)
+  n1: 1836864 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1836864 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 918432 0x58EB32A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 918432 in 2 places, all below massif's threshold (1.00%)
+    n1: 918432 0x58EB3DC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n0: 918432 in 2 places, all below massif's threshold (1.00%)
+  n1: 1374192 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1374192 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 846000 0x58E6EAE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 846000 0x58DB8B2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 846000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 846000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 846000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 846000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 846000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 846000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 846000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 846000 0x12129C: t2 (t2jit.c:205)
+              n1: 846000 0x1213E8: t2c_routine (riscv.c:209)
+               n1: 846000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                n0: 846000 0xB283A03: clone (clone.S:100)
+    n0: 528192 in 1 place, below massif's threshold (1.00%)
+  n1: 1120128 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1120128 in 38 places, all below massif's threshold (1.00%)
+  n1: 877312 0x57DD048: llvm::BinaryOperator::Create(llvm::Instruction::BinaryOps, llvm::Value*, llvm::Value*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 877312 in 18 places, all below massif's threshold (1.00%)
+ n3: 7127040 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 4988928 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 4988928 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 4988928 in 29 places, all below massif's threshold (1.00%)
+  n0: 1069056 in 2 places, all below massif's threshold (1.00%)
+  n1: 1069056 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1069056 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1069056 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1069056 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1069056 in 2 places, all below massif's threshold (1.00%)
+ n0: 6537847 in 1692 places, all below massif's threshold (1.00%)
+ n2: 2850816 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1425408 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1425408 in 2 places, all below massif's threshold (1.00%)
+  n1: 1425408 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1425408 in 3 places, all below massif's threshold (1.00%)
+ n1: 1610064 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1610064 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1550868 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1540080 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1540080 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1540080 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1540080 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 1540080 in 8 places, all below massif's threshold (1.00%)
+    n0: 10788 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 1373384 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1373384 in 23 places, all below massif's threshold (1.00%)
+ n1: 1138456 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1138456 in 18 places, all below massif's threshold (1.00%)
+ n2: 1098110 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 967776 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 964909 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 964909 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 964909 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 964909 in 21 places, all below massif's threshold (1.00%)
+   n0: 2867 in 1 place, below massif's threshold (1.00%)
+  n0: 130334 in 1 place, below massif's threshold (1.00%)
+ n1: 1048576 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1048576 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1048576 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1048576 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 1048576 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1048576 0x5746F85: LLVMBuildAdd (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1048576 0x11A7A7: t2_cadd (t2_rv32_template.c:1914)
+        n1: 1048576 0x11E025: trace_ebb (t2jit.c:97)
+         n1: 1048576 0x11E2DF: trace_ebb (t2jit.c:140)
+          n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+           n1: 1048576 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 1048576 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 1048576 0x1211E7: t2 (t2jit.c:176)
+                n1: 1048576 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 1048576 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 1048576 0xB283A03: clone (clone.S:100)
+      n0: 0 in 4 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=45
+#-----------
+time=3032584384923
+mem_heap_B=101901648
+mem_heap_extra_B=3166736
+mem_stacks_B=0
+heap_tree=detailed
+n10: 101901648 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 42068096 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 21034048 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 21034048 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 21034048 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 21034048 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 21034048 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 21034048 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 21034048 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 21034048 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 21034048 0x12129C: t2 (t2jit.c:205)
+           n1: 21034048 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 21034048 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 21034048 0xB283A03: clone (clone.S:100)
+  n1: 21034048 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 21034048 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 21034048 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 21034048 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 21034048 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 21034048 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 21034048 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 21034048 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 21034048 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 21034048 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 21034048 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 21034048 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 21034048 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 21034048 0x121279: t2 (t2jit.c:193)
+                n1: 21034048 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 21034048 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 21034048 0xB283A03: clone (clone.S:100)
+ n1: 22791680 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 22791680 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 11395840 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 11395840 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 11395840 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 11395840 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 11395840 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 11395840 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 11395840 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 11395840 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 11395840 0x12129C: t2 (t2jit.c:205)
+            n1: 11395840 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 11395840 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 11395840 0xB283A03: clone (clone.S:100)
+   n1: 11395840 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 11395840 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 11395840 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 11395840 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 11395840 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 11395840 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 11395840 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 11395840 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 11395840 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 11395840 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 11395840 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 11395840 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 11395840 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 11395840 0x121279: t2 (t2jit.c:193)
+                 n1: 11395840 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 11395840 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 11395840 0xB283A03: clone (clone.S:100)
+ n3: 9502720 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 6651904 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 6651904 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 6651904 in 29 places, all below massif's threshold (1.00%)
+  n0: 1425408 in 2 places, all below massif's threshold (1.00%)
+  n1: 1425408 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1425408 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1425408 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1425408 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1425408 in 2 places, all below massif's threshold (1.00%)
+ n0: 8961778 in 1694 places, all below massif's threshold (1.00%)
+ n4: 8553408 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 3644960 in 56 places, all below massif's threshold (1.00%)
+  n1: 2060352 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2060352 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 2060352 in 2 places, all below massif's threshold (1.00%)
+  n1: 1541088 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1541088 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 1541088 in 2 places, all below massif's threshold (1.00%)
+  n1: 1307008 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1307008 in 40 places, all below massif's threshold (1.00%)
+ n2: 3801088 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 1900544 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1900544 in 2 places, all below massif's threshold (1.00%)
+  n1: 1900544 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1900544 in 3 places, all below massif's threshold (1.00%)
+ n1: 1844652 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1844652 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1785456 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1767336 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1767336 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1767336 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1767336 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 1767336 in 8 places, all below massif's threshold (1.00%)
+    n0: 18120 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 1827176 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1827176 in 23 places, all below massif's threshold (1.00%)
+ n1: 1293088 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1293088 in 18 places, all below massif's threshold (1.00%)
+ n2: 1257962 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1104412 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1100675 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1100675 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1100675 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1100675 in 21 places, all below massif's threshold (1.00%)
+   n0: 3737 in 1 place, below massif's threshold (1.00%)
+  n0: 153550 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=46
+#-----------
+time=3033386522049
+mem_heap_B=110689111
+mem_heap_extra_B=3374585
+mem_stacks_B=0
+heap_tree=peak
+n11: 110689111 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 45332000 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 22666000 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 22666000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 22666000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 22666000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 22666000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 22666000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 22666000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 22666000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 22666000 0x12129C: t2 (t2jit.c:205)
+           n1: 22666000 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 22666000 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 22666000 0xB283A03: clone (clone.S:100)
+  n1: 22666000 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 22666000 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 22666000 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 22666000 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 22666000 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 22666000 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 22666000 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 22666000 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 22666000 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 22666000 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 22666000 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 22666000 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 22666000 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 22666000 0x121279: t2 (t2jit.c:193)
+                n1: 22666000 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 22666000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 22666000 0xB283A03: clone (clone.S:100)
+ n1: 24560000 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 24560000 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 12280000 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12280000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12280000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12280000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12280000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12280000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12280000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12280000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12280000 0x12129C: t2 (t2jit.c:205)
+            n1: 12280000 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 12280000 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 12280000 0xB283A03: clone (clone.S:100)
+   n1: 12280000 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12280000 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12280000 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12280000 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12280000 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12280000 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12280000 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12280000 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12280000 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 12280000 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 12280000 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 12280000 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 12280000 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 12280000 0x121279: t2 (t2jit.c:193)
+                 n1: 12280000 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 12280000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 12280000 0xB283A03: clone (clone.S:100)
+ n3: 10240000 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 7168000 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 7168000 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 7168000 in 29 places, all below massif's threshold (1.00%)
+  n0: 1536000 in 2 places, all below massif's threshold (1.00%)
+  n1: 1536000 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1536000 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1536000 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1536000 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1536000 in 2 places, all below massif's threshold (1.00%)
+ n4: 9040864 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 3866256 in 56 places, all below massif's threshold (1.00%)
+  n1: 2169984 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2169984 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 2169984 in 2 places, all below massif's threshold (1.00%)
+  n1: 1622736 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1622736 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 1622736 in 2 places, all below massif's threshold (1.00%)
+  n1: 1381888 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1381888 in 40 places, all below massif's threshold (1.00%)
+ n0: 8678917 in 1693 places, all below massif's threshold (1.00%)
+ n2: 4096000 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2048000 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 2048000 in 2 places, all below massif's threshold (1.00%)
+  n1: 2048000 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 2048000 in 3 places, all below massif's threshold (1.00%)
+ n1: 2097152 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2097152 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 2097152 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 2097152 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 2097152 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 2097152 0x5749482: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n2: 2097152 0x5749518: LLVMBuildInBoundsGEP2 (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 2097152 0x119E06: t2_caddi (t2_rv32_template.c:1491)
+         n1: 2097152 0x11E025: trace_ebb (t2jit.c:97)
+          n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+           n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+                n1: 2097152 0x1211E7: t2 (t2jit.c:176)
+                 n1: 2097152 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 2097152 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 2097152 0xB283A03: clone (clone.S:100)
+        n0: 0 in 5 places, all below massif's threshold (1.00%)
+      n0: 0 in 4 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 1985160 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1985160 in 23 places, all below massif's threshold (1.00%)
+ n1: 1953816 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1953816 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1894620 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1876500 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1876500 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1876500 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1876500 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 1876500 in 8 places, all below massif's threshold (1.00%)
+    n0: 18120 in 1 place, below massif's threshold (1.00%)
+   n0: 59196 in 7 places, all below massif's threshold (1.00%)
+ n1: 1373736 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1373736 in 18 places, all below massif's threshold (1.00%)
+ n2: 1331466 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1167368 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1163252 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1163252 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1163252 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1163252 in 21 places, all below massif's threshold (1.00%)
+   n0: 4116 in 1 place, below massif's threshold (1.00%)
+  n0: 164098 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=47
+#-----------
+time=3033390175993
+mem_heap_B=110086917
+mem_heap_extra_B=3360747
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=3311686849432
+mem_heap_B=109948896
+mem_heap_extra_B=3358896
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=3311688988837
+mem_heap_B=109955848
+mem_heap_extra_B=3359920
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=3311689081418
+mem_heap_B=109956440
+mem_heap_extra_B=3359936
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=3311689156719
+mem_heap_B=109956616
+mem_heap_extra_B=3359832
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=3311689233615
+mem_heap_B=109956600
+mem_heap_extra_B=3359824
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=3311689329122
+mem_heap_B=109957224
+mem_heap_extra_B=3359896
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=3385071744347
+mem_heap_B=109957240
+mem_heap_extra_B=3359904
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=3385071833284
+mem_heap_B=109957208
+mem_heap_extra_B=3359888
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=3385071918858
+mem_heap_B=109957368
+mem_heap_extra_B=3359912
+mem_stacks_B=0
+heap_tree=detailed
+n11: 109957368 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 45332000 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 22666000 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 22666000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 22666000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 22666000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 22666000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 22666000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 22666000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 22666000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 22666000 0x12129C: t2 (t2jit.c:205)
+           n1: 22666000 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 22666000 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 22666000 0xB283A03: clone (clone.S:100)
+  n1: 22666000 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 22666000 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 22666000 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 22666000 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 22666000 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 22666000 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 22666000 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 22666000 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 22666000 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 22666000 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 22666000 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 22666000 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 22666000 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 22666000 0x121279: t2 (t2jit.c:193)
+                n1: 22666000 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 22666000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 22666000 0xB283A03: clone (clone.S:100)
+ n1: 24560000 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 24560000 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 12280000 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12280000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12280000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12280000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12280000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12280000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12280000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12280000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12280000 0x12129C: t2 (t2jit.c:205)
+            n1: 12280000 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 12280000 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 12280000 0xB283A03: clone (clone.S:100)
+   n1: 12280000 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12280000 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12280000 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12280000 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12280000 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12280000 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12280000 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12280000 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12280000 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 12280000 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 12280000 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 12280000 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 12280000 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 12280000 0x121279: t2 (t2jit.c:193)
+                 n1: 12280000 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 12280000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 12280000 0xB283A03: clone (clone.S:100)
+ n3: 10240000 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 7168000 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 7168000 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 7168000 in 29 places, all below massif's threshold (1.00%)
+  n0: 1536000 in 2 places, all below massif's threshold (1.00%)
+  n1: 1536000 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1536000 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1536000 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1536000 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1536000 in 2 places, all below massif's threshold (1.00%)
+ n4: 9040864 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 3866256 in 56 places, all below massif's threshold (1.00%)
+  n1: 2169984 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2169984 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 2169984 in 2 places, all below massif's threshold (1.00%)
+  n1: 1622736 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1622736 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 1622736 in 2 places, all below massif's threshold (1.00%)
+  n1: 1381888 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1381888 in 40 places, all below massif's threshold (1.00%)
+ n0: 7977662 in 1693 places, all below massif's threshold (1.00%)
+ n2: 4096000 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2048000 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 2048000 in 2 places, all below massif's threshold (1.00%)
+  n1: 2048000 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 2048000 in 3 places, all below massif's threshold (1.00%)
+ n1: 2097152 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2097152 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 2097152 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 2097152 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 2097152 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 2097152 0x5749482: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n2: 2097152 0x5749518: LLVMBuildInBoundsGEP2 (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 2097152 0x119E06: t2_caddi (t2_rv32_template.c:1491)
+         n1: 2097152 0x11E025: trace_ebb (t2jit.c:97)
+          n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+           n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+                n1: 2097152 0x1211E7: t2 (t2jit.c:176)
+                 n1: 2097152 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 2097152 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 2097152 0xB283A03: clone (clone.S:100)
+        n0: 0 in 5 places, all below massif's threshold (1.00%)
+      n0: 0 in 4 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 1957768 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1957768 in 23 places, all below massif's threshold (1.00%)
+ n1: 1950720 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1950720 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1894620 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1876500 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1876500 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1876500 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1876500 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 1876500 in 8 places, all below massif's threshold (1.00%)
+    n0: 18120 in 1 place, below massif's threshold (1.00%)
+   n0: 56100 in 7 places, all below massif's threshold (1.00%)
+ n1: 1373736 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1373736 in 18 places, all below massif's threshold (1.00%)
+ n2: 1331466 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1167368 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1163252 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1163252 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1163252 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1163252 in 21 places, all below massif's threshold (1.00%)
+   n0: 4116 in 1 place, below massif's threshold (1.00%)
+  n0: 164098 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=57
+#-----------
+time=3385071999932
+mem_heap_B=109957512
+mem_heap_extra_B=3359888
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=3385072102573
+mem_heap_B=109958008
+mem_heap_extra_B=3359952
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=3385072180004
+mem_heap_B=109958280
+mem_heap_extra_B=3359992
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=3385072269539
+mem_heap_B=109958536
+mem_heap_extra_B=3360024
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=3385072345344
+mem_heap_B=109958520
+mem_heap_extra_B=3360000
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=3385072421936
+mem_heap_B=109958648
+mem_heap_extra_B=3360008
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=3385072532437
+mem_heap_B=109958824
+mem_heap_extra_B=3360072
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=3385072627601
+mem_heap_B=109958840
+mem_heap_extra_B=3360096
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=3385072706964
+mem_heap_B=109958792
+mem_heap_extra_B=3360024
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=3385072784318
+mem_heap_B=109958776
+mem_heap_extra_B=3360016
+mem_stacks_B=0
+heap_tree=detailed
+n11: 109958776 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 45332000 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 22666000 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 22666000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 22666000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 22666000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 22666000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 22666000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 22666000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 22666000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 22666000 0x12129C: t2 (t2jit.c:205)
+           n1: 22666000 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 22666000 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 22666000 0xB283A03: clone (clone.S:100)
+  n1: 22666000 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 22666000 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 22666000 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 22666000 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 22666000 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 22666000 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 22666000 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 22666000 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 22666000 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 22666000 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 22666000 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 22666000 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 22666000 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 22666000 0x121279: t2 (t2jit.c:193)
+                n1: 22666000 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 22666000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 22666000 0xB283A03: clone (clone.S:100)
+ n1: 24560000 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 24560000 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 12280000 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12280000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12280000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12280000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12280000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12280000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12280000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12280000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12280000 0x12129C: t2 (t2jit.c:205)
+            n1: 12280000 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 12280000 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 12280000 0xB283A03: clone (clone.S:100)
+   n1: 12280000 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12280000 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12280000 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12280000 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12280000 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12280000 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12280000 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12280000 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12280000 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 12280000 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 12280000 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 12280000 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 12280000 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 12280000 0x121279: t2 (t2jit.c:193)
+                 n1: 12280000 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 12280000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 12280000 0xB283A03: clone (clone.S:100)
+ n3: 10240000 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 7168000 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 7168000 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 7168000 in 29 places, all below massif's threshold (1.00%)
+  n0: 1536000 in 2 places, all below massif's threshold (1.00%)
+  n1: 1536000 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1536000 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1536000 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1536000 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1536000 in 2 places, all below massif's threshold (1.00%)
+ n4: 9040864 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 3866256 in 56 places, all below massif's threshold (1.00%)
+  n1: 2169984 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2169984 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 2169984 in 2 places, all below massif's threshold (1.00%)
+  n1: 1622736 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1622736 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 1622736 in 2 places, all below massif's threshold (1.00%)
+  n1: 1381888 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1381888 in 40 places, all below massif's threshold (1.00%)
+ n0: 7979070 in 1693 places, all below massif's threshold (1.00%)
+ n2: 4096000 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2048000 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 2048000 in 2 places, all below massif's threshold (1.00%)
+  n1: 2048000 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 2048000 in 3 places, all below massif's threshold (1.00%)
+ n1: 2097152 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2097152 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 2097152 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 2097152 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 2097152 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 2097152 0x5749482: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n2: 2097152 0x5749518: LLVMBuildInBoundsGEP2 (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 2097152 0x119E06: t2_caddi (t2_rv32_template.c:1491)
+         n1: 2097152 0x11E025: trace_ebb (t2jit.c:97)
+          n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+           n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+                n1: 2097152 0x1211E7: t2 (t2jit.c:176)
+                 n1: 2097152 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 2097152 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 2097152 0xB283A03: clone (clone.S:100)
+        n0: 0 in 5 places, all below massif's threshold (1.00%)
+      n0: 0 in 4 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 1957768 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1957768 in 23 places, all below massif's threshold (1.00%)
+ n1: 1950720 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1950720 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1894620 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1876500 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1876500 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1876500 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1876500 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 1876500 in 8 places, all below massif's threshold (1.00%)
+    n0: 18120 in 1 place, below massif's threshold (1.00%)
+   n0: 56100 in 7 places, all below massif's threshold (1.00%)
+ n1: 1373736 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1373736 in 18 places, all below massif's threshold (1.00%)
+ n2: 1331466 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1167368 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1163252 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1163252 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1163252 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1163252 in 21 places, all below massif's threshold (1.00%)
+   n0: 4116 in 1 place, below massif's threshold (1.00%)
+  n0: 164098 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=67
+#-----------
+time=3385072871663
+mem_heap_B=109958792
+mem_heap_extra_B=3360040
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=3385072959843
+mem_heap_B=109958856
+mem_heap_extra_B=3360120
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=3385073036502
+mem_heap_B=109959000
+mem_heap_extra_B=3360016
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=70
+#-----------
+time=3385073138505
+mem_heap_B=109959240
+mem_heap_extra_B=3360024
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=71
+#-----------
+time=3449878212087
+mem_heap_B=109959752
+mem_heap_extra_B=3360056
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=72
+#-----------
+time=3449878294021
+mem_heap_B=109959800
+mem_heap_extra_B=3360080
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=73
+#-----------
+time=3449878391914
+mem_heap_B=109960136
+mem_heap_extra_B=3360080
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=74
+#-----------
+time=3449878514547
+mem_heap_B=109960264
+mem_heap_extra_B=3360088
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=75
+#-----------
+time=3449878597925
+mem_heap_B=109960312
+mem_heap_extra_B=3360112
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=76
+#-----------
+time=3449878696327
+mem_heap_B=109960648
+mem_heap_extra_B=3360112
+mem_stacks_B=0
+heap_tree=detailed
+n11: 109960648 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 45332000 0x801CADD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 22666000 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 22666000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 22666000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 22666000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 22666000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 22666000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 22666000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 22666000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 22666000 0x12129C: t2 (t2jit.c:205)
+           n1: 22666000 0x1213E8: t2c_routine (riscv.c:209)
+            n1: 22666000 0xB1F2AC2: start_thread (pthread_create.c:442)
+             n0: 22666000 0xB283A03: clone (clone.S:100)
+  n1: 22666000 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 22666000 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 22666000 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 22666000 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 22666000 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 22666000 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 22666000 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 22666000 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 22666000 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 22666000 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 22666000 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 22666000 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 22666000 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 22666000 0x121279: t2 (t2jit.c:193)
+                n1: 22666000 0x1213E8: t2c_routine (riscv.c:209)
+                 n1: 22666000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                  n0: 22666000 0xB283A03: clone (clone.S:100)
+ n1: 24560000 0x801B704: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 24560000 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 12280000 0x58B96CC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12280000 0x57F3D7F: llvm::FPPassManager::runOnFunction(llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12280000 0x57FB372: llvm::FPPassManager::runOnModule(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12280000 0x57F4925: llvm::legacy::PassManagerImpl::run(llvm::Module&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12280000 0x7045B58: llvm::MCJIT::emitObject(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12280000 0x7045CDA: llvm::MCJIT::generateCodeForModule(llvm::Module*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12280000 0x70467CD: llvm::MCJIT::finalizeObject() (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12280000 0x6FEEF4F: LLVMGetPointerToGlobal (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12280000 0x12129C: t2 (t2jit.c:205)
+            n1: 12280000 0x1213E8: t2c_routine (riscv.c:209)
+             n1: 12280000 0xB1F2AC2: start_thread (pthread_create.c:442)
+              n0: 12280000 0xB283A03: clone (clone.S:100)
+   n1: 12280000 0x801CC9A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 12280000 0x712C88C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 12280000 0x6B96F1D: llvm::TargetIRAnalysis::run(llvm::Function const&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 12280000 0x615342A: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 12280000 0x582ABE3: llvm::AnalysisManager<llvm::Function>::getResultImpl(llvm::AnalysisKey*, llvm::Function&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 12280000 0x6647D26: llvm::SimplifyCFGPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+         n1: 12280000 0x77EADFC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+          n1: 12280000 0x58283FD: llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+           n1: 12280000 0x741518C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+            n1: 12280000 0x582C3C0: llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+             n1: 12280000 0x7414FBC: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+              n1: 12280000 0x5826FFD: llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+               n1: 12280000 0x81FAAB4: LLVMRunPasses (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+                n1: 12280000 0x121279: t2 (t2jit.c:193)
+                 n1: 12280000 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 12280000 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 12280000 0xB283A03: clone (clone.S:100)
+ n3: 10240000 0x76C4CEF: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 7168000 0x76C4BEA: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 7168000 0x76C2492: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 7168000 in 29 places, all below massif's threshold (1.00%)
+  n0: 1536000 in 2 places, all below massif's threshold (1.00%)
+  n1: 1536000 0x7FE3195: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1536000 0x7FE2594: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1536000 0x801B715: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1536000 0x801CB2C: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1536000 in 2 places, all below massif's threshold (1.00%)
+ n4: 9040864 0x5848172: llvm::User::operator new(unsigned long, unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 3866256 in 56 places, all below massif's threshold (1.00%)
+  n1: 2169984 0x57DE30D: llvm::CastInst::CreatePointerCast(llvm::Value*, llvm::Type*, llvm::Twine const&, llvm::Instruction*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 2169984 0x56FC63E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 2169984 in 2 places, all below massif's threshold (1.00%)
+  n1: 1622736 0x58F7ABD: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1622736 0x58EB3A7: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n0: 1622736 in 2 places, all below massif's threshold (1.00%)
+  n1: 1381888 0x56F9C21: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 1381888 in 40 places, all below massif's threshold (1.00%)
+ n0: 7980942 in 1693 places, all below massif's threshold (1.00%)
+ n2: 4096000 0x7310E3F: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2048000 0x73103B8: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 2048000 in 2 places, all below massif's threshold (1.00%)
+  n1: 2048000 0x806C928: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n0: 2048000 in 3 places, all below massif's threshold (1.00%)
+ n1: 2097152 0x584DAF2: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n1: 2097152 0x584D9F1: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 2097152 0x5848D52: llvm::Value::setValueName(llvm::StringMapEntry<llvm::Value*>*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 2097152 0x58498C8: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n2: 2097152 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 2097152 0x5749482: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n2: 2097152 0x5749518: LLVMBuildInBoundsGEP2 (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n1: 2097152 0x119E06: t2_caddi (t2_rv32_template.c:1491)
+         n1: 2097152 0x11E025: trace_ebb (t2jit.c:97)
+          n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+           n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+            n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+             n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+              n1: 2097152 0x11E25E: trace_ebb (t2jit.c:121)
+               n1: 2097152 0x11E2DF: trace_ebb (t2jit.c:140)
+                n1: 2097152 0x1211E7: t2 (t2jit.c:176)
+                 n1: 2097152 0x1213E8: t2c_routine (riscv.c:209)
+                  n1: 2097152 0xB1F2AC2: start_thread (pthread_create.c:442)
+                   n0: 2097152 0xB283A03: clone (clone.S:100)
+        n0: 0 in 5 places, all below massif's threshold (1.00%)
+      n0: 0 in 4 places, all below massif's threshold (1.00%)
+    n0: 0 in 1 place, below massif's threshold (1.00%)
+ n1: 1957768 0x56482EB: llvm::SmallVectorBase<unsigned int>::mallocForGrow(unsigned long, unsigned long, unsigned long&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1957768 in 23 places, all below massif's threshold (1.00%)
+ n1: 1950720 0x5653B8E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1950720 0x56542E2: llvm::StringMapImpl::RehashTable(unsigned int) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n2: 1894620 0x584E7DE: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1876500 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1876500 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n1: 1876500 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+       n1: 1876500 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+        n0: 1876500 in 8 places, all below massif's threshold (1.00%)
+    n0: 18120 in 1 place, below massif's threshold (1.00%)
+   n0: 56100 in 7 places, all below massif's threshold (1.00%)
+ n1: 1373736 0x5745577: LLVMCreateBuilder (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n0: 1373736 in 18 places, all below massif's threshold (1.00%)
+ n2: 1331466 0x584E79E: ??? (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+  n2: 1167368 0x584E3B6: llvm::ValueSymbolTable::makeUniqueName(llvm::Value*, llvm::SmallString<256u>&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+   n1: 1163252 0x584E669: llvm::ValueSymbolTable::createValueName(llvm::StringRef, llvm::Value*) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+    n1: 1163252 0x58498BD: llvm::Value::setNameImpl(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+     n1: 1163252 0x5849918: llvm::Value::setName(llvm::Twine const&) (in /usr/lib/x86_64-linux-gnu/libLLVM-14.so.1)
+      n0: 1163252 in 21 places, all below massif's threshold (1.00%)
+   n0: 4116 in 1 place, below massif's threshold (1.00%)
+  n0: 164098 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=77
+#-----------
+time=3449878825925
+mem_heap_B=109960808
+mem_heap_extra_B=3360136
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=78
+#-----------
+time=3449878899578
+mem_heap_B=109962696
+mem_heap_extra_B=3360240
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=79
+#-----------
+time=3449878973248
+mem_heap_B=109750456
+mem_heap_extra_B=3357920
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=80
+#-----------
+time=3449879046912
+mem_heap_B=109713624
+mem_heap_extra_B=3339504
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=81
+#-----------
+time=3449879146035
+mem_heap_B=109646504
+mem_heap_extra_B=3327168
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=82
+#-----------
+time=3449879219711
+mem_heap_B=109571342
+mem_heap_extra_B=3311122
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=83
+#-----------
+time=3449879343616
+mem_heap_B=109514140
+mem_heap_extra_B=3298388
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=84
+#-----------
+time=3449879516943
+mem_heap_B=109511805
+mem_heap_extra_B=3298291
+mem_stacks_B=0
+heap_tree=empty
