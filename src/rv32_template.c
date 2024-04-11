@@ -279,8 +279,8 @@ RVOP(
         alu32imm, 32, 0x81, 0, TMP, imm;
         alu32imm, 32, 0x81, 4, TMP, ~1U;
         break;
-        predict;
         st, S32, TMP, PC;
+        predict;
         exit;
     }))
 
@@ -2323,8 +2323,8 @@ RVOP(
         rald, VR0, rs1;
         mov, VR0, TMP;
         break;
-        predict;
         st, S32, TMP, PC;
+        predict;
         exit;
     }))
 
@@ -2377,8 +2377,8 @@ RVOP(
         rald, VR1, rs1;
         mov, VR1, TMP;
         break;
-        predict;
         st, S32, TMP, PC;
+        predict;
         exit;
     }))
 

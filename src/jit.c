@@ -1448,26 +1448,23 @@ static void ra_load2_sext(struct jit_state *state,
     }
 }
 
+static void patch(riscv_t *rv, uint64_t PC)
+{
+    struct jit_state *state = rv->jit_state;
+    for (int i = 0; i < state->n_blocks; i++) {
+        if (PC == state->offset_map[i].pc) {
+            uint64_t target =
+                (uintptr_t) state->buf + state->offset_map[i].offset;
+            asm inline("jmp *%0\n\t" : "=r"(target) : "r"(target) :);
+        }
+    }
+}
+
 void parse_branch_history_table(struct jit_state *state, rv_insn_t *ir)
 {
-    int max_idx = 0;
-    branch_history_table_t *bt = ir->branch_table;
-    for (int i = 0; i < HISTORY_SIZE; i++) {
-        if (!bt->times[i])
-            break;
-        if (bt->times[max_idx] < bt->times[i])
-            max_idx = i;
-    }
-    if (bt->PC[max_idx] && bt->times[max_idx] >= IN_JUMP_THRESHOLD) {
-        save_reg(state, register_map[0].reg_idx);
-        unmap_vm_reg(register_map[0].reg_idx);
-        emit_load_imm(state, register_map[0].reg_idx, bt->PC[max_idx]);
-        emit_cmp32(state, temp_reg, register_map[0].reg_idx);
-        uint32_t jump_loc = state->offset;
-        emit_jcc_offset(state, 0x85);
-        emit_jmp(state, bt->PC[max_idx]);
-        emit_jump_target_offset(state, JUMP_LOC, state->offset);
-    }
+    /* temp_reg == rv->PC */
+    emit_mov(state, temp_reg, parameter_reg[1]);
+    emit_call(state, (uintptr_t) patch);
 }
 
 #define GEN(inst, code)                                                       \
@@ -1650,6 +1647,9 @@ static void translate_chained_block(struct jit_state *state,
         return;
 
     set_add(&state->set, block->pc_start);
+    if (block->pc_start == 0x10cd8) {
+        printf("%#x\n", state->offset);
+    }
     offset_map_insert(state, block->pc_start);
     translate(state, rv, block);
     rv_insn_t *ir = block->ir_tail;
@@ -1665,23 +1665,23 @@ static void translate_chained_block(struct jit_state *state,
         if (block1->translatable)
             translate_chained_block(state, rv, block1);
     }
-    branch_history_table_t *bt = ir->branch_table;
-    if (bt) {
-        int max_idx = 0;
-        for (int i = 0; i < HISTORY_SIZE; i++) {
-            if (!bt->times[i])
-                break;
-            if (bt->times[max_idx] < bt->times[i])
-                max_idx = i;
-        }
-        if (bt->PC[max_idx] && bt->times[max_idx] >= IN_JUMP_THRESHOLD &&
-            !set_has(&state->set, bt->PC[max_idx])) {
-            block_t *block1 =
-                cache_get(rv->block_cache, bt->PC[max_idx], false);
-            if (block1 && block1->translatable)
-                translate_chained_block(state, rv, block1);
-        }
-    }
+    // branch_history_table_t *bt = ir->branch_table;
+    // if (bt) {
+    //     int max_idx = 0;
+    //     for (int i = 0; i < HISTORY_SIZE; i++) {
+    //         if (!bt->times[i])
+    //             break;
+    //         if (bt->times[max_idx] < bt->times[i])
+    //             max_idx = i;
+    //     }
+    //     if (bt->PC[max_idx] && bt->times[max_idx] >= IN_JUMP_THRESHOLD &&
+    //         !set_has(&state->set, bt->PC[max_idx])) {
+    //         block_t *block1 =
+    //             cache_get(rv->block_cache, bt->PC[max_idx], false);
+    //         if (block1 && block1->translatable)
+    //             translate_chained_block(state, rv, block1);
+    //     }
+    // }
 }
 
 uint32_t jit_translate(riscv_t *rv, block_t *block)
