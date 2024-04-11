@@ -16,10 +16,15 @@ struct jump {
     uint32_t target_offset;
 };
 
-struct offset_map {
+typedef struct {
+    struct hlist_head *ht_list_head;
+} offset_map_t;
+
+typedef struct {
     uint32_t pc;
     uint32_t offset;
-};
+    struct hlist_node ht_list;
+} map_entry_t;
 
 struct jit_state {
     set_t set;
@@ -30,7 +35,7 @@ struct jit_state {
     uint32_t entry_loc;
     uint32_t exit_loc;
     uint32_t retpoline_loc;
-    struct offset_map *offset_map;
+    offset_map_t *offset_map;
     int n_blocks;
     struct jump *jumps;
     int n_jumps;

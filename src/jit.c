@@ -259,12 +259,42 @@ static inline void set_dirty(int reg_idx, bool is_dirty)
     }
 }
 
-static inline void offset_map_insert(struct jit_state *state, int32_t target_pc)
+HASH_FUNC_IMPL(map_hash,
+               BLOCK_MAP_CAPACITY_BITS,
+               (1 << BLOCK_MAP_CAPACITY_BITS))
+
+map_entry_t *offset_map_get(const struct jit_state *state, uint32_t target_pc)
 {
-    struct offset_map *map_entry = &state->offset_map[state->n_blocks++];
-    assert(state->n_blocks < MAX_BLOCKS);
-    map_entry->pc = target_pc;
-    map_entry->offset = state->offset;
+    if (hlist_empty(&state->offset_map->ht_list_head[map_hash(target_pc)]))
+        return NULL;
+
+    map_entry_t *entry = NULL;
+#ifdef __HAVE_TYPEOF
+    hlist_for_each_entry (
+        entry, &state->offset_map->ht_list_head[map_hash(target_pc)], ht_list)
+#else
+    hlist_for_each_entry (entry,
+                          &state->offset_map->ht_list_head[map_hash(target_pc)],
+                          ht_list, map_entry_t)
+#endif
+    {
+        if (entry->pc == target_pc)
+            break;
+    }
+    if (!entry || entry->pc != target_pc)
+        return NULL;
+
+    return entry;
+}
+
+static inline void offset_map_insert(const struct jit_state *state,
+                                     uint32_t target_pc)
+{
+    map_entry_t *new_entry = malloc(sizeof(map_entry_t));
+    new_entry->pc = target_pc;
+    new_entry->offset = state->offset;
+    hlist_add_head(&new_entry->ht_list,
+                   &state->offset_map->ht_list_head[map_hash(target_pc)]);
 }
 
 #if !defined(__APPLE__)
@@ -1451,12 +1481,10 @@ static void ra_load2_sext(struct jit_state *state,
 static void patch(riscv_t *rv, uint64_t PC)
 {
     struct jit_state *state = rv->jit_state;
-    for (int i = 0; i < state->n_blocks; i++) {
-        if (PC == state->offset_map[i].pc) {
-            uint64_t target =
-                (uintptr_t) state->buf + state->offset_map[i].offset;
-            asm inline("jmp *%0\n\t" : "=r"(target) : "r"(target) :);
-        }
+    map_entry_t *target = offset_map_get(state, PC);
+    if (target) {
+        uint64_t jump_loc = (uintptr_t) state->buf + target->offset;
+        asm inline("jmp *%0\n\t" : "=r"(jump_loc) : "r"(jump_loc) :);
     }
 }
 
@@ -1619,12 +1647,9 @@ static void resolve_jumps(struct jit_state *state)
 #endif
         else {
             target_loc = jump.offset_loc + sizeof(uint32_t);
-            for (int i = 0; i < state->n_blocks; i++) {
-                if (jump.target_pc == state->offset_map[i].pc) {
-                    target_loc = state->offset_map[i].offset;
-                    break;
-                }
-            }
+            map_entry_t *target = offset_map_get(state, jump.target_pc);
+            if (target)
+                target_loc = target->offset;
         }
 #if defined(__x86_64__)
         /* Assumes jump offset is at end of instruction */
@@ -1647,9 +1672,7 @@ static void translate_chained_block(struct jit_state *state,
         return;
 
     set_add(&state->set, block->pc_start);
-    if (block->pc_start == 0x10cd8) {
-        printf("%#x\n", state->offset);
-    }
+
     offset_map_insert(state, block->pc_start);
     translate(state, rv, block);
     rv_insn_t *ir = block->ir_tail;
@@ -1665,33 +1688,15 @@ static void translate_chained_block(struct jit_state *state,
         if (block1->translatable)
             translate_chained_block(state, rv, block1);
     }
-    // branch_history_table_t *bt = ir->branch_table;
-    // if (bt) {
-    //     int max_idx = 0;
-    //     for (int i = 0; i < HISTORY_SIZE; i++) {
-    //         if (!bt->times[i])
-    //             break;
-    //         if (bt->times[max_idx] < bt->times[i])
-    //             max_idx = i;
-    //     }
-    //     if (bt->PC[max_idx] && bt->times[max_idx] >= IN_JUMP_THRESHOLD &&
-    //         !set_has(&state->set, bt->PC[max_idx])) {
-    //         block_t *block1 =
-    //             cache_get(rv->block_cache, bt->PC[max_idx], false);
-    //         if (block1 && block1->translatable)
-    //             translate_chained_block(state, rv, block1);
-    //     }
-    // }
 }
 
 uint32_t jit_translate(riscv_t *rv, block_t *block)
 {
     struct jit_state *state = rv->jit_state;
     if (set_has(&state->set, block->pc_start)) {
-        for (int i = 0; i < state->n_blocks; i++) {
-            if (block->pc_start == state->offset_map[i].pc) {
-                return state->offset_map[i].offset;
-            }
+        map_entry_t *target = offset_map_get(state, block->pc_start);
+        if (target) {
+            return target->offset;
         }
         __UNREACHABLE;
     }
@@ -1726,7 +1731,13 @@ struct jit_state *jit_state_init(size_t size)
     set_reset(&state->set);
     reset_reg();
     prepare_translate(state);
-    state->offset_map = calloc(MAX_BLOCKS, sizeof(struct offset_map));
+    state->offset_map = malloc(sizeof(offset_map_t));
+    state->offset_map->ht_list_head =
+        malloc((1 << BLOCK_MAP_CAPACITY_BITS) * sizeof(struct hlist_head));
+
+    for (size_t i = 0; i < (1 << BLOCK_MAP_CAPACITY_BITS); i++)
+        INIT_HLIST_HEAD(&state->offset_map->ht_list_head[i]);
+
     state->jumps = calloc(MAX_JUMPS, sizeof(struct jump));
     return state;
 }
