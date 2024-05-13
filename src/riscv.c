@@ -28,8 +28,11 @@
 #include "riscv_private.h"
 #include "utils.h"
 #if RV32_HAS(JIT)
+#include <pthread.h>
+
 #include "cache.h"
 #include "jit.h"
+#include "t2c.h"
 #define CODE_CACHE_SIZE (4 * 1024 * 1024)
 #endif
 
@@ -184,6 +187,27 @@ IO_HANDLER_IMPL(byte, write_b, W)
 #undef R
 #undef W
 
+#if RV32_HAS(JIT)
+static pthread_t t2c_thread;
+void *t2c_routine(void *arg)
+{
+    riscv_t *rv = (riscv_t *) arg;
+    while (!rv->exit) {
+        if (!list_empty(&rv->wait_queue)) {
+            queue_entry_t *entry =
+                list_last_entry(&rv->wait_queue, queue_entry_t, list);
+            pthread_mutex_lock(&rv->wait_queue_lock);
+            list_del_init(&entry->list);
+            pthread_mutex_unlock(&rv->wait_queue_lock);
+            assert(entry->block);
+            t2_compile(entry->block, (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base);
+            free(entry);
+        }
+    }
+    return NULL;
+}
+#endif
+
 riscv_t *rv_create(riscv_user_t rv_attr)
 {
     assert(rv_attr);
@@ -269,6 +293,10 @@ riscv_t *rv_create(riscv_user_t rv_attr)
     rv->jit_state = jit_state_init(CODE_CACHE_SIZE);
     rv->block_cache = cache_create(BLOCK_MAP_CAPACITY_BITS);
     assert(rv->block_cache);
+    rv->exit = false;
+    pthread_mutex_init(&rv->wait_queue_lock, NULL);
+    INIT_LIST_HEAD(&rv->wait_queue);
+    pthread_create(&t2c_thread, NULL, t2c_routine, rv);
 #endif
 
     return rv;
@@ -353,6 +381,7 @@ void rv_delete(riscv_t *rv)
     memory_delete(attr->mem);
     block_map_destroy(rv);
 #else
+    rv->exit = true;
     mpool_destroy(rv->chain_entry_mp);
     jit_state_exit(rv->jit_state);
     cache_free(rv->block_cache);

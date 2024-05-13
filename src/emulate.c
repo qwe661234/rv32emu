@@ -308,6 +308,7 @@ static block_t *block_alloc(riscv_t *rv)
     block->translatable = true;
     block->hot = false;
     block->hot2 = false;
+    block->compiled = false;
     block->has_loops = false;
     block->n_invoke = 0;
     INIT_LIST_HEAD(&block->list);
@@ -1150,12 +1151,13 @@ void rv_step(void *arg)
             prev = NULL;
             continue;
         } /* check if invoking times of t1 generated code exceed threshold */
-        if (block->n_invoke >= THRESHOLD) {
-            t2_compile(block,
-                       (uint64_t) ((memory_t *) PRIV(rv)->mem)->mem_base);
-            ((funcPtr_t) block->func)(rv);
-            prev = NULL;
-            continue;
+        else if (!block->compiled && block->n_invoke >= THRESHOLD) {
+            block->compiled = true;
+            queue_entry_t *entry = malloc(sizeof(queue_entry_t));
+            entry->block = block;
+            pthread_mutex_lock(&rv->wait_queue_lock);
+            list_add(&entry->list, &rv->wait_queue);
+            pthread_mutex_unlock(&rv->wait_queue_lock);
         }
 #endif
         /* execute by tier-1 JIT compiler */
