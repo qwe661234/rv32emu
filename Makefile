@@ -125,7 +125,16 @@ endif
 ENABLE_JIT ?= 0
 $(call set-feature, JIT)
 ifeq ($(call has, JIT), 1)
-OBJS_EXT += jit.o
+OBJS_EXT += jit.o 
+ifneq ("$(findstring -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS, "$(shell llvm-config-17 --cflags)")", "")
+ENABLE_T2C := 1
+OBJS_EXT += t2c.o
+CFLAGS += -g `llvm-config-17 --cflags`
+LDFLAGS += `llvm-config-17 --libs core executionengine mcjit interpreter analysis native --system-libs`
+else
+ENABLE_T2C := 0
+$(warning No llvm-config-17 installed. Check llvm-config-17 installation in advance)
+endif
 ifneq ($(processor),$(filter $(processor),x86_64 aarch64 arm64))
 $(error JIT mode only supports for x64 and arm64 target currently.)
 endif
@@ -134,6 +143,10 @@ src/rv32_jit.c:
 	$(Q)tools/gen-jit-template.py $(CFLAGS) > $@
 
 $(OUT)/jit.o: src/jit.c src/rv32_jit.c
+	$(VECHO) "  CC\t$@\n"
+	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF $@.d $<
+
+$(OUT)/t2c.o: src/t2c.c src/t2c_template.c
 	$(VECHO) "  CC\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF $@.d $<
 endif
